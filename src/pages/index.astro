@@ -1,12 +1,40 @@
 ---
-import Welcome from "../components/Welcome.astro";
-import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
 ---
 
 <Layout>
-  <Welcome />
+  <main>
+    <h1 class="mb-10 text-3xl font-bold tracking-tight">charlidev</h1>
+    <ul class="space-y-6">
+      {
+        posts.map((post) => (
+          <li>
+            <a
+              href={`/${post.id}`}
+              class="group flex items-baseline justify-between gap-4"
+            >
+              <span class="font-medium group-hover:underline">
+                {post.data.title}
+              </span>
+              <time
+                datetime={post.data.pubDate.toISOString()}
+                class="shrink-0 text-sm text-gray-400"
+              >
+                {post.data.pubDate.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </time>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
 </Layout>
-1
