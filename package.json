@@ -1,0 +1,50 @@
+{
+  "name": "blogs-charlidev",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,ts,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.astro": [
+      "prettier --write"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "@astrojs/svelte": "^8.0.5",
+    "astro": "^6.1.6",
+    "svelte": "^5.55.4",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "eslint": "^10.2.0",
+    "eslint-plugin-astro": "^1.7.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.2",
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript-eslint": "^8.58.2"
+  }
+}
