@@ -42,6 +42,27 @@ importers:
         specifier: ^8.58.2
         version: 8.58.2(eslint@10.2.0(jiti@2.6.1))(typescript@5.9.3)
 
+  apps/admin:
+    dependencies:
+      '@astrojs/svelte':
+        specifier: ^8.0.5
+        version: 8.0.5(astro@6.1.6(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(lightningcss@1.32.0)(svelte@5.55.4(@typescript-eslint/types@8.58.2))(typescript@5.9.3)(yaml@2.8.3)
+      '@tailwindcss/vite':
+        specifier: ^4.2.2
+        version: 4.2.2(vite@7.3.2(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))
+      astro:
+        specifier: ^6.1.6
+        version: 6.1.6(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(typescript@5.9.3)(yaml@2.8.3)
+      svelte:
+        specifier: ^5.55.4
+        version: 5.55.4(@typescript-eslint/types@8.58.2)
+      tailwindcss:
+        specifier: ^4.2.2
+        version: 4.2.2
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   apps/client:
     dependencies:
       '@astrojs/mdx':
