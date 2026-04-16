@@ -99,6 +99,12 @@ importers:
 
   packages/types: {}
 
+  packages/ui:
+    dependencies:
+      svelte:
+        specifier: ^5.0.0
+        version: 5.55.4(@typescript-eslint/types@8.58.2)
+
 packages:
 
   '@astrojs/compiler@2.13.1':

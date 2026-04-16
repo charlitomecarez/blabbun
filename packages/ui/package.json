@@ -1,0 +1,12 @@
+{
+  "name": "@openblobs/ui",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "exports": {
+    "./src/*": "./src/*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  }
+}
