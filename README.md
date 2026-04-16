@@ -1,6 +1,6 @@
-# charlidev blog
+# openblobs
 
-A personal blog where I write about whatever's on my mind — rants, opinions, and my arguably trash taste in things.
+A personal blog where I write about whatever's on my mind — rants, opinions, and my arguably somethings to blab about.
 
 Built with [Astro](https://astro.build) and [Svelte](https://svelte.dev).
 

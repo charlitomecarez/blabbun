@@ -1,7 +1,8 @@
 ---
 import { getCollection, render } from "astro:content";
+
+import BackButton from "@/components/buttons/BackButton.svelte";
 import Layout from "@/layouts/Layout.astro";
-import BackButton from "@/components/BackButton.svelte";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts", ({ data }) => !data.draft);
