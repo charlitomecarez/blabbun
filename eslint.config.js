@@ -23,11 +23,11 @@ export default [
   },
   {
     ignores: [
-      "dist/",
-      "node_modules/",
-      ".astro/",
-      "playwright-report/",
-      "test-results/",
+      "**/dist/**",
+      "**/node_modules/**",
+      "**/.astro/**",
+      "**/playwright-report/**",
+      "**/test-results/**",
     ],
   },
 ];
