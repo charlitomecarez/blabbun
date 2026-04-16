@@ -6,6 +6,10 @@
   "exports": {
     "./src/*": "./src/*"
   },
+  "dependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "tailwindcss": "^4.2.2"
+  },
   "peerDependencies": {
     "svelte": "^5.0.0"
   }
