@@ -1,0 +1,103 @@
+name: Deploy Client
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "apps/client/**"
+      - "packages/**"
+      - "pnpm-lock.yaml"
+      - "package.json"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --filter @openblobs/client lint
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @openblobs/client exec playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: pnpm --filter @openblobs/client test --project=chromium
+        env:
+          CI: true
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_CLIENT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setting@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
+
+      - name: Pull Vercel environment
+        working-directory: apps/client
+        run: |
+          vercel pull --yes \
+            --environment=${{ github.event_name == 'push' && 'production' || 'preview' }} \
+            --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build
+        working-directory: apps/client
+        run: |
+          vercel build \
+            ${{ github.event_name == 'push' && '--prod' || '' }} \
+            --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy
+        working-directory: apps/client
+        run: |
+          vercel deploy --prebuilt \
+            ${{ github.event_name == 'push' && '--prod' || '' }} \
+            --token=${{ secrets.VERCEL_TOKEN }}
