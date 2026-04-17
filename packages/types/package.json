@@ -3,6 +3,12 @@
   "private": true,
   "type": "module",
   "version": "0.0.1",
+  "scripts": {
+    "cd:root": "cd ../.. && $SHELL",
+    "cd:client": "cd ../../apps/client && $SHELL",
+    "cd:admin": "cd ../../apps/admin && $SHELL",
+    "cd:ui": "cd ../ui && $SHELL"
+  },
   "exports": {
     ".": "./src/index.ts"
   }

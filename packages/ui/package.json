@@ -4,13 +4,22 @@
   "type": "module",
   "version": "0.0.1",
   "exports": {
-    "./src/*": "./src/*"
+    "./components/buttons": "./components/buttons/index.ts",
+    "./components/inputs": "./components/inputs/index.ts",
+    "./styles/*": "./styles/*"
   },
   "peerDependencies": {
     "@tailwindcss/typography": "^0.5.19",
     "svelte": "^5.0.0"
   },
+  "scripts": {
+    "cd:root": "cd ../.. && $SHELL",
+    "cd:client": "cd ../../apps/client && $SHELL",
+    "cd:admin": "cd ../../apps/admin && $SHELL",
+    "cd:types": "cd ../types && $SHELL"
+  },
   "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "tailwindcss": "^4.2.2"
   }
 }

@@ -12,7 +12,12 @@
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "format": "prettier --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "cd:root": "$SHELL",
+    "cd:client": "cd apps/client && $SHELL",
+    "cd:admin": "cd apps/admin && $SHELL",
+    "cd:ui": "cd packages/ui && $SHELL",
+    "cd:types": "cd packages/types && $SHELL"
   },
   "lint-staged": {
     "*.{js,ts,mjs}": [

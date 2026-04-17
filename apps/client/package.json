@@ -11,7 +11,11 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "playwright test",
-    "test:ui": "playwright test --ui"
+    "test:ui": "playwright test --ui",
+    "cd:root": "cd ../.. && $SHELL",
+    "cd:admin": "cd ../admin && $SHELL",
+    "cd:ui": "cd ../../packages/ui && $SHELL",
+    "cd:types": "cd ../../packages/types && $SHELL"
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.3",
@@ -27,6 +31,7 @@
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^25.6.0",
     "knip": "^6.4.1"
   }
 }
