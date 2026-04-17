@@ -6,6 +6,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+    "dev": "pnpm --parallel -r dev",
     "dev:client": "pnpm --filter @openblobs/client dev",
     "dev:admin": "pnpm --filter @openblobs/admin dev",
     "build": "pnpm -r build",
