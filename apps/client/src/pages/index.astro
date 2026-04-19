@@ -12,45 +12,7 @@ const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
 const featuredPost = posts[0] ?? null;
 const feedPosts = posts.slice(1);
 
-// Placeholders — used only when real posts are < 3; no image so feed adapts
-const placeholderFeed = [
-  {
-    author: "Arch Weaver",
-    date: "Apr 15, 2026",
-    title: "Living Systems and the Architecture of Change",
-    excerpt:
-      "How organisms adapt their internal scaffolding to environmental pressure — and what that means for software design patterns in distributed systems.",
-    tag: "TECHNICAL",
-    readTime: "8 min read",
-    imageUrl: undefined,
-    href: "#",
-  },
-  {
-    author: "Kai Fontana",
-    date: "Apr 10, 2026",
-    title: "The Geometry of Decentralized State",
-    excerpt:
-      "A spatial exploration of ledger mechanics through the lens of Euclidean geometry and modern cryptography.",
-    tag: "BLUEPRINTS",
-    readTime: "12 min read",
-    imageUrl: undefined,
-    href: "#",
-  },
-  {
-    author: "Mira Osei",
-    date: "Apr 5, 2026",
-    title: "Why We Still Print on Digital Paper",
-    excerpt:
-      'Questioning the obsession with "app-like" experiences when the world craves the intentionality of a physical journal.',
-    tag: "EDITORIAL",
-    readTime: "5 min read",
-    imageUrl: undefined,
-    href: "#",
-  },
-];
-
-// Real posts — only pass imageUrl if the frontmatter has one
-const realFeedItems = feedPosts.map((post) => ({
+const displayFeed = feedPosts.slice(0, 3).map((post) => ({
   author: "The Lunan",
   date: post.data.pubDate.toLocaleDateString("en-US", {
     month: "short",
@@ -64,8 +26,6 @@ const realFeedItems = feedPosts.map((post) => ({
   imageUrl: post.data.image,
   href: `/${post.id}`,
 }));
-
-const displayFeed = [...realFeedItems, ...placeholderFeed].slice(0, 3);
 
 // Featured post — image is optional
 const featuredHasImage = !!featuredPost?.data.image;
