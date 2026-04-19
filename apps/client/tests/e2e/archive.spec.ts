@@ -9,28 +9,39 @@ test("archive page renders heading and post count", async ({ page }) => {
 
 test("archive lists all posts by default", async ({ page }) => {
   await page.goto("/archive");
+  const titles = page.locator("article h3");
   await expect(
-    page.getByText("The Tabs vs. Spaces Thing Is Not About Tabs or Spaces")
+    titles.filter({
+      hasText: "The Tabs vs. Spaces Thing Is Not About Tabs or Spaces",
+    })
   ).toBeVisible();
-  await expect(page.getByText("On Not Finishing Things")).toBeVisible();
-  await expect(page.getByText("Why I Stopped Using Dark Mode")).toBeVisible();
-  await expect(page.getByText("Hello World")).toBeVisible();
+  await expect(
+    titles.filter({ hasText: "On Not Finishing Things" })
+  ).toBeVisible();
+  await expect(
+    titles.filter({ hasText: "Why I Stopped Using Dark Mode" })
+  ).toBeVisible();
+  await expect(titles.filter({ hasText: "Hello World" })).toBeVisible();
 });
 
 test("tag filter hides posts from other tags", async ({ page }) => {
   await page.goto("/archive");
   // Click the "personal" tag pill — only "On Not Finishing Things" has this tag
   await page.getByRole("button", { name: /personal/i }).click();
-  await expect(page.getByText("On Not Finishing Things")).toBeVisible();
-  await expect(page.getByText("Hello World")).not.toBeVisible();
+  const titles = page.locator("article h3");
+  await expect(
+    titles.filter({ hasText: "On Not Finishing Things" })
+  ).toBeVisible();
+  await expect(titles.filter({ hasText: "Hello World" })).not.toBeVisible();
 });
 
 test("all pill restores full list", async ({ page }) => {
   await page.goto("/archive");
   await page.getByRole("button", { name: /personal/i }).click();
-  await expect(page.getByText("Hello World")).not.toBeVisible();
+  const titles = page.locator("article h3");
+  await expect(titles.filter({ hasText: "Hello World" })).not.toBeVisible();
   await page.getByRole("button", { name: /all/i }).click();
-  await expect(page.getByText("Hello World")).toBeVisible();
+  await expect(titles.filter({ hasText: "Hello World" })).toBeVisible();
 });
 
 test("sort oldest-first reverses the list", async ({ page }) => {
