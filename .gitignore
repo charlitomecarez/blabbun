@@ -33,3 +33,6 @@ playwright/.cache/
 apps/*/dist/
 apps/*/.astro/
 apps/*/node_modules/
+
+# super powers claude plugin folder
+.superpowers

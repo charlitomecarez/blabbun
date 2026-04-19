@@ -12,7 +12,7 @@
   }
 
   const {
-    author = "openblobs",
+    author = "The Lunan",
     date = "",
     title,
     excerpt = "",
