@@ -14,11 +14,12 @@
   interface Props {
     posts: PostItem[];
     tags: string[];
+    lockedTag?: string; // uppercase tag — hides filter pills and pre-filters list
   }
 
-  const { posts, tags }: Props = $props();
+  const { posts, tags, lockedTag }: Props = $props();
 
-  let activeTag = $state("all");
+  let activeTag = $state(lockedTag ?? "all");
   let sortOrder = $state<"newest" | "oldest">("newest");
 
   const filtered = $derived(
@@ -43,32 +44,37 @@
 
 <div>
   <!-- Filter bar -->
-  <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
-    <!-- Tag pills -->
-    <div class="flex flex-wrap gap-2">
-      <button
-        onclick={() => (activeTag = "all")}
-        aria-pressed={activeTag === "all"}
-        class="font-manrope rounded-full px-3 py-1 text-[11px] font-bold tracking-[0.06em] uppercase transition-colors
-               {activeTag === 'all'
-          ? 'bg-[#386547] text-[#ccf05f]'
-          : 'bg-[#ebf3ed] text-[#386547] hover:bg-[#d8ede0]'}"
-      >
-        All
-      </button>
-      {#each tags as tag}
+  <div
+    class="mb-6 flex flex-wrap items-center gap-4
+           {lockedTag ? 'justify-end' : 'justify-between'}"
+  >
+    {#if !lockedTag}
+      <!-- Tag pills -->
+      <div class="flex flex-wrap gap-2">
         <button
-          onclick={() => (activeTag = tag)}
-          aria-pressed={activeTag === tag}
+          onclick={() => (activeTag = "all")}
+          aria-pressed={activeTag === "all"}
           class="font-manrope rounded-full px-3 py-1 text-[11px] font-bold tracking-[0.06em] uppercase transition-colors
-                 {activeTag === tag
+                 {activeTag === 'all'
             ? 'bg-[#386547] text-[#ccf05f]'
             : 'bg-[#ebf3ed] text-[#386547] hover:bg-[#d8ede0]'}"
         >
-          {tag}
+          All
         </button>
-      {/each}
-    </div>
+        {#each tags as tag}
+          <button
+            onclick={() => (activeTag = tag)}
+            aria-pressed={activeTag === tag}
+            class="font-manrope rounded-full px-3 py-1 text-[11px] font-bold tracking-[0.06em] uppercase transition-colors
+                   {activeTag === tag
+              ? 'bg-[#386547] text-[#ccf05f]'
+              : 'bg-[#ebf3ed] text-[#386547] hover:bg-[#d8ede0]'}"
+          >
+            {tag}
+          </button>
+        {/each}
+      </div>
+    {/if}
 
     <!-- Sort dropdown — aria-label required by e2e test contract -->
     <select
