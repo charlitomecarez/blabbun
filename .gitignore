@@ -28,3 +28,8 @@ pnpm-debug.log*
 /playwright-report/
 /blob-report/
 playwright/.cache/
+
+# monorepo workspace
+apps/*/dist/
+apps/*/.astro/
+apps/*/node_modules/
