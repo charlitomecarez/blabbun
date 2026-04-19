@@ -45,7 +45,10 @@ const postItems = tagPosts.map((post) => ({
   href: `/${post.id}`,
 }));
 
-const label = tag.charAt(0) + tag.slice(1).toLowerCase();
+const label = tag
+  .split(" ")
+  .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+  .join(" ");
 ---
 
 <Layout>

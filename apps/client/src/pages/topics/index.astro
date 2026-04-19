@@ -21,7 +21,10 @@ const topics = [...tagMap.entries()]
     tag,
     count,
     slug: tag.toLowerCase(),
-    label: tag.charAt(0) + tag.slice(1).toLowerCase(),
+    label: tag
+      .split(" ")
+      .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+      .join(" "),
   }));
 ---
 
