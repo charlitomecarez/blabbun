@@ -2,6 +2,7 @@
 import { FeedItem } from "@openblobs/ui/components/cards";
 import { getCollection } from "astro:content";
 
+import NewsletterBar from "@/components/home/NewsletterBar.svelte";
 import Layout from "@/layouts/Layout.astro";
 
 const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
@@ -111,6 +112,9 @@ const featuredAuthor = "openblobs";
         of software — from inside the blob.
       </p>
     </section>
+
+    <!-- ─── Newsletter Bar ──────────────────────────────────────── -->
+    <NewsletterBar client:load />
 
     <!-- ─── Hero Featured Card ────────────────────────────────── -->
     <section class="mx-auto max-w-[1200px] px-4 pt-8 pb-4 md:px-8 md:pt-12">
