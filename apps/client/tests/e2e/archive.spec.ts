@@ -1,0 +1,44 @@
+// apps/client/tests/e2e/archive.spec.ts
+import { expect, test } from "@playwright/test";
+
+test("archive page renders heading and post count", async ({ page }) => {
+  await page.goto("/archive");
+  await expect(page.getByRole("heading", { name: "Archive" })).toBeVisible();
+  await expect(page.getByText(/\d+ posts/)).toBeVisible();
+});
+
+test("archive lists all posts by default", async ({ page }) => {
+  await page.goto("/archive");
+  await expect(
+    page.getByText("The Tabs vs. Spaces Thing Is Not About Tabs or Spaces")
+  ).toBeVisible();
+  await expect(page.getByText("On Not Finishing Things")).toBeVisible();
+  await expect(page.getByText("Why I Stopped Using Dark Mode")).toBeVisible();
+  await expect(page.getByText("Hello World")).toBeVisible();
+});
+
+test("tag filter hides posts from other tags", async ({ page }) => {
+  await page.goto("/archive");
+  // Click the "personal" tag pill — only "On Not Finishing Things" has this tag
+  await page.getByRole("button", { name: /personal/i }).click();
+  await expect(page.getByText("On Not Finishing Things")).toBeVisible();
+  await expect(page.getByText("Hello World")).not.toBeVisible();
+});
+
+test("all pill restores full list", async ({ page }) => {
+  await page.goto("/archive");
+  await page.getByRole("button", { name: /personal/i }).click();
+  await expect(page.getByText("Hello World")).not.toBeVisible();
+  await page.getByRole("button", { name: /all/i }).click();
+  await expect(page.getByText("Hello World")).toBeVisible();
+});
+
+test("sort oldest-first reverses the list", async ({ page }) => {
+  await page.goto("/archive");
+  const titles = page.locator("h3");
+  // Default: newest first — first title should be the most recent post
+  await expect(titles.first()).toContainText("The Tabs vs. Spaces Thing");
+  // Switch to oldest first
+  await page.getByRole("combobox").selectOption("oldest");
+  await expect(titles.first()).toContainText("Why I Stopped Using Dark Mode");
+});
