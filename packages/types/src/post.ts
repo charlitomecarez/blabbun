@@ -5,4 +5,5 @@ export interface Post {
   updatedDate?: Date;
   tags: string[];
   draft: boolean;
+  image?: string;
 }

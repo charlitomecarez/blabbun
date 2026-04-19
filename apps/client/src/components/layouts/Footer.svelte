@@ -1,12 +1,8 @@
-<!-- 
+<script lang="ts">
+  // Re-exported from @openblobs/ui — client-specific defaults are set there.
+  // Import directly from @openblobs/ui/components/layouts if you need to
+  // pass custom columns, brandName, etc.
+</script>
 
-*** Footer Section ***
-- Add the email input component / newsletter
-- Add the social links with icons
-- Copyright notice
-- Branding Logo
-- Back to top button
-
--->
-
-<div>Just a simple text for now</div>
+<!-- This file intentionally left as a passthrough. -->
+<!-- Layout.astro now imports Footer from @openblobs/ui/components/layouts -->

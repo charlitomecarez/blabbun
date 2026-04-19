@@ -1,5 +1,6 @@
 ---
 import "@openblobs/ui/styles/global.css";
+import { Navbar, Footer } from "@openblobs/ui/components/layouts";
 ---
 
 <!doctype html>
@@ -11,10 +12,18 @@ import "@openblobs/ui/styles/global.css";
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>openblobs</title>
+    <!-- Space Grotesk (headings) + Manrope (body) from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body class="bg-white text-gray-900 antialiased">
-    <div class="mx-auto max-w-2xl px-4 py-16">
-      <slot />
-    </div>
+  <body class="font-manrope bg-[#f1f8f3] text-[#29302d] antialiased">
+    <!-- Fixed navbar — pages use pt-[67px] to compensate -->
+    <Navbar client:load />
+    <slot />
+    <Footer />
   </body>
 </html>

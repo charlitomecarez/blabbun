@@ -1,9 +1,8 @@
-<!-- 
+<script lang="ts">
+  // Re-exported from @openblobs/ui — client-specific defaults are set there.
+  // Import directly from @openblobs/ui/components/layouts if you need to
+  // pass custom props (links, brandName, etc.).
+</script>
 
-*** Navbar Section ***
-- Intro about you
-- Short message / branding
-
--->
-
-<div>Just a simple text for now</div>
+<!-- This file intentionally left as a passthrough. -->
+<!-- Layout.astro now imports Navbar from @openblobs/ui/components/layouts -->

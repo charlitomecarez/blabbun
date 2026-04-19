@@ -1,4 +1,5 @@
 ---
+import { FeedItem } from "@openblobs/ui/components/cards";
 import { getCollection } from "astro:content";
 
 import Layout from "@/layouts/Layout.astro";
@@ -6,36 +7,268 @@ import Layout from "@/layouts/Layout.astro";
 const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+
+const featuredPost = posts[0] ?? null;
+const feedPosts = posts.slice(1);
+
+// Placeholders — used only when real posts are < 3; no image so feed adapts
+const placeholderFeed = [
+  {
+    author: "Arch Weaver",
+    date: "Apr 15, 2026",
+    title: "Living Systems and the Architecture of Change",
+    excerpt:
+      "How organisms adapt their internal scaffolding to environmental pressure — and what that means for software design patterns in distributed systems.",
+    tag: "TECHNICAL",
+    readTime: "8 min read",
+    imageUrl: undefined,
+    href: "#",
+  },
+  {
+    author: "Kai Fontana",
+    date: "Apr 10, 2026",
+    title: "The Geometry of Decentralized State",
+    excerpt:
+      "A spatial exploration of ledger mechanics through the lens of Euclidean geometry and modern cryptography.",
+    tag: "BLUEPRINTS",
+    readTime: "12 min read",
+    imageUrl: undefined,
+    href: "#",
+  },
+  {
+    author: "Mira Osei",
+    date: "Apr 5, 2026",
+    title: "Why We Still Print on Digital Paper",
+    excerpt:
+      'Questioning the obsession with "app-like" experiences when the world craves the intentionality of a physical journal.',
+    tag: "EDITORIAL",
+    readTime: "5 min read",
+    imageUrl: undefined,
+    href: "#",
+  },
+];
+
+// Real posts — only pass imageUrl if the frontmatter has one
+const realFeedItems = feedPosts.map((post) => ({
+  author: "openblobs",
+  date: post.data.pubDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }),
+  title: post.data.title,
+  excerpt: post.data.description,
+  tag: (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
+  readTime: "5 min read",
+  imageUrl: post.data.image,
+  href: `/${post.id}`,
+}));
+
+const displayFeed = [...realFeedItems, ...placeholderFeed].slice(0, 3);
+
+// Featured post — image is optional
+const featuredHasImage = !!featuredPost?.data.image;
+const featuredImageUrl = featuredPost?.data.image ?? null;
+
+const featuredTitle =
+  featuredPost?.data.title ?? "Living Systems and the New Architecture";
+const featuredExcerpt =
+  featuredPost?.data.description ??
+  "Exploring the convergence of generative algorithms and organic structuralism — how the blob aesthetic is redefining modern infrastructure.";
+const featuredHref = featuredPost ? `/${featuredPost.id}` : "#";
+const featuredDate = featuredPost
+  ? featuredPost.data.pubDate.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })
+  : "Apr 15, 2026";
+const featuredAuthor = "openblobs";
 ---
 
 <Layout>
-  <main>
-    <h1 class="mb-10 text-3xl font-bold tracking-tight">openblobs</h1>
-    <ul class="space-y-6">
-      {
-        posts.map((post) => (
-          <li>
-            <a
-              href={`/${post.id}`}
-              class="group flex items-baseline justify-between gap-4"
-            >
-              <span class="font-medium group-hover:underline">
-                {post.data.title}
+  <main class="pt-[64px]">
+    <!-- ─── Compact Hero ───────────────────────────────────────── -->
+    <section
+      class="flex flex-col items-center border-b border-[rgba(197,247,208,0.3)] px-4 pt-14 pb-10 text-center md:px-8 md:pt-20 md:pb-16"
+    >
+      <p
+        class="font-manrope mb-3 text-[11px] font-bold tracking-[4px] text-[rgba(41,48,45,0.5)] uppercase md:text-[13px]"
+      >
+        TECHNICAL BLOG &nbsp;·&nbsp; SINCE 2024
+      </p>
+
+      <h1
+        class="font-space-grotesk text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-[#2d5a3d] sm:text-[46px] md:text-[52px]"
+      >
+        Open Blobs
+      </h1>
+
+      <p
+        class="font-manrope mt-4 max-w-[540px] text-[15px] leading-[1.65] text-[rgba(41,48,45,0.6)] md:text-[17px]"
+      >
+        Raw entries on architecture, design systems, and the organic evolution
+        of software — from inside the blob.
+      </p>
+    </section>
+
+    <!-- ─── Hero Featured Card ────────────────────────────────── -->
+    <section class="mx-auto max-w-[1200px] px-4 pt-8 pb-4 md:px-8 md:pt-12">
+      <div
+        class="group relative overflow-hidden rounded-[12px] bg-[#e1eae5] transition-colors hover:bg-[#d8e5dd]"
+      >
+        {
+          featuredHasImage ? (
+            /* ── With image: text left (7 cols) + image right (5 cols) ── */
+            <div class="flex flex-col md:grid md:grid-cols-12">
+              <div class="flex flex-col justify-center gap-4 p-7 md:col-span-7 md:gap-5 md:p-10">
+                <span class="font-manrope inline-flex w-fit rounded-full bg-[#ccf05f] px-3 py-1 text-[11px] font-bold tracking-[0.08em] text-[#29302d] uppercase">
+                  FEATURED
+                </span>
+
+                <a
+                  href={featuredHref}
+                  class="after:absolute after:inset-0 after:z-0"
+                  aria-label={featuredTitle}
+                />
+
+                <h2 class="font-space-grotesk text-[28px] leading-[1.1] font-bold tracking-[-0.04em] text-[#29302d] transition-colors group-hover:text-[#386547] sm:text-[36px] md:text-[42px]">
+                  {featuredTitle}
+                </h2>
+
+                <p class="font-manrope max-w-[480px] text-[14px] leading-[1.65] text-[rgba(41,48,45,0.65)] md:text-[15px]">
+                  {featuredExcerpt}
+                </p>
+
+                <div class="flex items-center gap-3">
+                  <div class="font-space-grotesk flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#c5f7d0] text-[12px] font-bold text-[#386547]">
+                    OB
+                  </div>
+                  <span class="font-manrope text-[13px] font-medium text-[rgba(41,48,45,0.6)]">
+                    {featuredAuthor}
+                  </span>
+                  <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.35)]">
+                    {featuredDate}
+                  </span>
+                </div>
+
+                <a
+                  href={featuredHref}
+                  class="font-manrope relative z-10 inline-flex w-fit items-center gap-2 rounded-full bg-[#386547] px-5 py-2.5 text-[13px] font-bold text-[#ccffd8] transition-colors hover:bg-[#2d5a3d] md:px-6 md:py-3"
+                >
+                  Read entry
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 7h12M8 2l5 5-5 5"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </a>
+              </div>
+
+              <div class="relative min-h-[200px] overflow-hidden md:col-span-5 md:min-h-0">
+                <div class="absolute inset-y-0 left-0 z-10 hidden w-16 bg-[linear-gradient(to_right,#e1eae5,transparent)] md:block" />
+                <img
+                  src={featuredImageUrl || ""}
+                  alt={featuredTitle}
+                  class="h-full w-full object-cover"
+                  style="min-height:200px;"
+                />
+              </div>
+            </div>
+          ) : (
+            /* ── No image: full-width text with larger excerpt ── */
+            <div class="flex flex-col gap-5 p-7 md:max-w-[720px] md:p-12">
+              <span class="font-manrope inline-flex w-fit rounded-full bg-[#ccf05f] px-3 py-1 text-[11px] font-bold tracking-[0.08em] text-[#29302d] uppercase">
+                FEATURED
               </span>
-              <time
-                datetime={post.data.pubDate.toISOString()}
-                class="shrink-0 text-sm text-gray-400"
-              >
-                {post.data.pubDate.toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+
+              <a
+                href={featuredHref}
+                class="after:absolute after:inset-0 after:z-0"
+                aria-label={featuredTitle}
+              />
+
+              <h2 class="font-space-grotesk text-[30px] leading-[1.08] font-bold tracking-[-0.04em] text-[#29302d] transition-colors group-hover:text-[#386547] sm:text-[40px] md:text-[48px]">
+                {featuredTitle}
+              </h2>
+
+              <p class="font-manrope max-w-[600px] text-[15px] leading-[1.7] text-[rgba(41,48,45,0.65)] md:text-[17px]">
+                {featuredExcerpt}
+              </p>
+
+              <div class="flex flex-wrap items-center gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="font-space-grotesk flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#c5f7d0] text-[12px] font-bold text-[#386547]">
+                    OB
+                  </div>
+                  <span class="font-manrope text-[13px] font-medium text-[rgba(41,48,45,0.6)]">
+                    {featuredAuthor}
+                  </span>
+                  <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.35)]">
+                    {featuredDate}
+                  </span>
+                </div>
+
+                <a
+                  href={featuredHref}
+                  class="font-manrope relative z-10 inline-flex items-center gap-2 rounded-full bg-[#386547] px-5 py-2.5 text-[13px] font-bold text-[#ccffd8] transition-colors hover:bg-[#2d5a3d]"
+                >
+                  Read entry
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 7h12M8 2l5 5-5 5"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </section>
+
+    <!-- ─── Latest Entries Feed ───────────────────────────────── -->
+    <section class="mx-auto max-w-[1200px] px-4 pt-12 pb-12 md:px-8 md:pt-16">
+      <div class="mb-2 border-b-2 border-[#c5f7d0] pb-3">
+        <span
+          class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase"
+        >
+          LATEST ENTRIES
+        </span>
+      </div>
+
+      <div>
+        {displayFeed.map((item) => <FeedItem {...item} />)}
+      </div>
+
+      <div class="mt-10 flex justify-center">
+        <a
+          href="/archive"
+          class="font-manrope rounded-[8px] border-2 border-[rgba(56,101,71,0.12)] bg-white px-6 py-3 text-[14px] font-bold text-[#386547] transition-colors hover:border-[#386547] md:px-8 md:text-[15px]"
+        >
+          Load more entries
+        </a>
+      </div>
+    </section>
   </main>
 </Layout>

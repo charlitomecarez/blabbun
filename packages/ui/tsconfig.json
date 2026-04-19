@@ -7,7 +7,8 @@
     "strict": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "plugins": [{ "name": "typescript-svelte-plugin" }]
   },
   "include": ["components/**/*.ts", "components/**/*.svelte", "styles/**/*"]
 }
