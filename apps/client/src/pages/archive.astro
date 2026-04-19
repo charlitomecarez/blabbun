@@ -25,7 +25,11 @@ const postItems = allPosts.map((post) => ({
   href: `/${post.id}`,
 }));
 
-const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
+const allTags = [
+  ...new Set(
+    allPosts.flatMap((p) => p.data.tags ?? []).map((t) => t.toUpperCase())
+  ),
+].sort();
 ---
 
 <Layout>

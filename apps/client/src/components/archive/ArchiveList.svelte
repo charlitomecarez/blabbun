@@ -23,11 +23,7 @@
 
   const filtered = $derived(
     posts
-      .filter((p) =>
-        activeTag === "all"
-          ? true
-          : p.tag.toLowerCase() === activeTag.toLowerCase()
-      )
+      .filter((p) => (activeTag === "all" ? true : p.tag === activeTag))
       .sort((a, b) => {
         const aTs = Date.parse(a.pubDateRaw);
         const bTs = Date.parse(b.pubDateRaw);
