@@ -1,7 +1,8 @@
 ---
-import { FeedItem } from "@openblobs/ui/components/cards";
+import { FeedItem } from "@thelunan/ui/components/cards";
 import { getCollection } from "astro:content";
 
+import NewsletterBar from "@/components/home/NewsletterBar.svelte";
 import Layout from "@/layouts/Layout.astro";
 
 const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
@@ -50,7 +51,7 @@ const placeholderFeed = [
 
 // Real posts — only pass imageUrl if the frontmatter has one
 const realFeedItems = feedPosts.map((post) => ({
-  author: "openblobs",
+  author: "The Lunan",
   date: post.data.pubDate.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -83,34 +84,50 @@ const featuredDate = featuredPost
       year: "numeric",
     })
   : "Apr 15, 2026";
-const featuredAuthor = "openblobs";
+const featuredAuthor = "The Lunan";
 ---
 
 <Layout>
   <main class="pt-[64px]">
     <!-- ─── Compact Hero ───────────────────────────────────────── -->
     <section
-      class="flex flex-col items-center border-b border-[rgba(197,247,208,0.3)] px-4 pt-14 pb-10 text-center md:px-8 md:pt-20 md:pb-16"
+      class="relative flex flex-col items-center overflow-hidden border-b border-[rgba(197,247,208,0.3)] px-4 pt-14 pb-10 text-center md:px-8 md:pt-20 md:pb-16"
     >
-      <p
-        class="font-manrope mb-3 text-[11px] font-bold tracking-[4px] text-[rgba(41,48,45,0.5)] uppercase md:text-[13px]"
+      <!-- background blob shapes -->
+      <div
+        class="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-[rgba(197,247,208,0.25)] md:h-64 md:w-64"
       >
-        TECHNICAL BLOG &nbsp;·&nbsp; SINCE 2024
-      </p>
+      </div>
+      <div
+        class="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-[rgba(197,247,208,0.15)] md:h-44 md:w-44"
+      >
+      </div>
+
+      <span
+        class="font-manrope mb-5 inline-block rounded-full bg-[#ccf05f] px-3 py-1 text-[10px] font-bold tracking-[3px] text-[#29302d] uppercase"
+      >
+        Personal Blog
+      </span>
 
       <h1
         class="font-space-grotesk text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-[#2d5a3d] sm:text-[46px] md:text-[52px]"
       >
-        Open Blobs
+        The Lunan<span class="text-[#ccf05f]">.</span>
       </h1>
 
+      <div class="my-4 h-[2px] w-10 rounded-full bg-[#386547]"></div>
+
       <p
-        class="font-manrope mt-4 max-w-[540px] text-[15px] leading-[1.65] text-[rgba(41,48,45,0.6)] md:text-[17px]"
+        class="font-manrope max-w-[540px] text-[15px] leading-[1.65] text-[rgba(41,48,45,0.6)] md:text-[17px]"
       >
-        Raw entries on architecture, design systems, and the organic evolution
-        of software — from inside the blob.
+        A quiet corner for unfiltered reflections — half-finished ideas,
+        late-night opinions, and the kind of takes you only really say when
+        you&apos;re not trying to impress anyone.
       </p>
     </section>
+
+    <!-- ─── Newsletter Bar ──────────────────────────────────────── -->
+    <NewsletterBar client:load />
 
     <!-- ─── Hero Featured Card ────────────────────────────────── -->
     <section class="mx-auto max-w-[1200px] px-4 pt-8 pb-4 md:px-8 md:pt-12">
@@ -142,7 +159,7 @@ const featuredAuthor = "openblobs";
 
                 <div class="flex items-center gap-3">
                   <div class="font-space-grotesk flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#c5f7d0] text-[12px] font-bold text-[#386547]">
-                    OB
+                    TL
                   </div>
                   <span class="font-manrope text-[13px] font-medium text-[rgba(41,48,45,0.6)]">
                     {featuredAuthor}
@@ -209,7 +226,7 @@ const featuredAuthor = "openblobs";
               <div class="flex flex-wrap items-center gap-4">
                 <div class="flex items-center gap-3">
                   <div class="font-space-grotesk flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#c5f7d0] text-[12px] font-bold text-[#386547]">
-                    OB
+                    TL
                   </div>
                   <span class="font-manrope text-[13px] font-medium text-[rgba(41,48,45,0.6)]">
                     {featuredAuthor}
