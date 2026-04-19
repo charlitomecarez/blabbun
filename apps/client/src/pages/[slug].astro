@@ -1,5 +1,5 @@
 ---
-import { PostHero } from "@openblobs/ui/components/cards";
+import { PostHero } from "@thelunan/ui/components/cards";
 import { getCollection, render } from "astro:content";
 
 import Layout from "@/layouts/Layout.astro";
@@ -27,8 +27,8 @@ const hasImage = !!post.data.image;
     <PostHero
       title={post.data.title}
       description={post.data.description}
-      {tag}
-      {readTime}
+      tag={tag}
+      readTime={readTime}
       pubDate={post.data.pubDate}
       backHref="/"
     />

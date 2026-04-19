@@ -7,8 +7,8 @@
   },
   "scripts": {
     "dev": "pnpm --parallel -r dev",
-    "dev:client": "pnpm --filter @openblobs/client dev",
-    "dev:admin": "pnpm --filter @openblobs/admin dev",
+    "dev:client": "pnpm --filter @thelunan/client dev",
+    "dev:admin": "pnpm --filter @thelunan/admin dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "format": "prettier --write .",
