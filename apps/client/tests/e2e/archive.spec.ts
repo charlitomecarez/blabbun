@@ -35,10 +35,12 @@ test("all pill restores full list", async ({ page }) => {
 
 test("sort oldest-first reverses the list", async ({ page }) => {
   await page.goto("/archive");
-  const titles = page.locator("h3");
+  const titles = page.locator("article h3");
   // Default: newest first — first title should be the most recent post
   await expect(titles.first()).toContainText("The Tabs vs. Spaces Thing");
   // Switch to oldest first
-  await page.getByRole("combobox").selectOption("oldest");
+  await page.getByRole("combobox", { name: /sort/i }).selectOption("oldest");
+  // Apr 8 is the earliest pubDate across the 4 demo posts
   await expect(titles.first()).toContainText("Why I Stopped Using Dark Mode");
+  // ArchiveList <select> must have aria-label="Sort"
 });
