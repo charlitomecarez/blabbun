@@ -29,7 +29,9 @@ test("topic detail renders heading and filtered posts", async ({ page }) => {
   const titles = page.locator("article h3");
   // Both opinion posts must be visible
   await expect(
-    titles.filter({ hasText: "The Tabs vs. Spaces Thing" })
+    titles.filter({
+      hasText: "The Tabs vs. Spaces Thing Is Not About Tabs or Spaces",
+    })
   ).toBeVisible();
   await expect(
     titles.filter({ hasText: "Why I Stopped Using Dark Mode" })
@@ -56,7 +58,9 @@ test("topic detail sort oldest-first works", async ({ page }) => {
   await page.goto("/topics/opinion");
   const titles = page.locator("article h3");
   // Default newest first: tabs post is Apr 19
-  await expect(titles.first()).toContainText("The Tabs vs. Spaces Thing");
+  await expect(titles.first()).toContainText(
+    "The Tabs vs. Spaces Thing Is Not About Tabs or Spaces"
+  );
   await page.getByRole("combobox", { name: /sort/i }).selectOption("oldest");
   // Oldest: dark mode post is Apr 8
   await expect(titles.first()).toContainText("Why I Stopped Using Dark Mode");
