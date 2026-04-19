@@ -1,4 +1,4 @@
-# openblobs
+# The Lunan
 
 A personal blog where I write about whatever's on my mind — rants, opinions, and my arguably somethings to blab about.
 
