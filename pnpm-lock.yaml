@@ -47,15 +47,15 @@ importers:
       '@astrojs/svelte':
         specifier: ^8.0.5
         version: 8.0.5(@types/node@25.6.0)(astro@6.1.6(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(lightningcss@1.32.0)(svelte@5.55.4(@typescript-eslint/types@8.58.2))(typescript@5.9.3)(yaml@2.8.3)
-      '@openblobs/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@openblobs/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@tailwindcss/vite':
         specifier: ^4.2.2
         version: 4.2.2(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))
+      '@thelunan/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@thelunan/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       astro:
         specifier: ^6.1.6
         version: 6.1.6(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(typescript@5.9.3)(yaml@2.8.3)
@@ -87,15 +87,15 @@ importers:
       '@astrojs/svelte':
         specifier: ^8.0.5
         version: 8.0.5(@types/node@25.6.0)(astro@6.1.6(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(lightningcss@1.32.0)(svelte@5.55.4(@typescript-eslint/types@8.58.2))(typescript@5.9.3)(yaml@2.8.3)
-      '@openblobs/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@openblobs/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@tailwindcss/vite':
         specifier: ^4.2.2
         version: 4.2.2(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))
+      '@thelunan/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@thelunan/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       astro:
         specifier: ^6.1.6
         version: 6.1.6(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(typescript@5.9.3)(yaml@2.8.3)

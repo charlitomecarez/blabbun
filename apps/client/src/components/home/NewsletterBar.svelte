@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EmailInput } from "@openblobs/ui/components/inputs";
+  import { EmailInput } from "@thelunan/ui/components/inputs";
 
   let email = $state("");
   let submitted = $state(false);
@@ -27,14 +27,14 @@
         class="font-space-grotesk text-[26px] leading-[1.15] font-bold
                tracking-[-0.04em] text-[#29302d] sm:text-[30px] md:text-[34px]"
       >
-        Stay inside the blob.
+        Stay in the room.
       </h2>
       <p
         class="font-manrope max-w-[400px] text-[15px] leading-[1.7]
                text-[rgba(41,48,45,0.6)]"
       >
-        Architectural deep-dives, design system notes, and raw entries on
-        software evolution — delivered straight to your inbox.
+        No strict structure, no fixed niche — just whatever's currently
+        occupying space in the head, straight to your inbox.
       </p>
     </div>
 
@@ -69,7 +69,8 @@
             You're in.
           </p>
           <p class="font-manrope text-[14px] text-[rgba(41,48,45,0.55)]">
-            Dispatches will arrive when there's something worth saying.
+            Thoughts will find their way to you when there's something worth
+            saying.
           </p>
         </div>
       {:else}

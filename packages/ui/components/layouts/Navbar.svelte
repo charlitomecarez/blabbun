@@ -14,7 +14,7 @@
   }
 
   const {
-    brandName = "openblobs",
+    brandName = "The Lunan",
     brandHref = "/",
     links = [
       { label: "Archive", href: "/archive" },

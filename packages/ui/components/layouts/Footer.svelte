@@ -11,8 +11,8 @@
   }
 
   const {
-    brandName = "openblobs",
-    copyright = `© ${new Date().getFullYear()} openblobs`,
+    brandName = "The Lunan",
+    copyright = `© ${new Date().getFullYear()} The Lunan`,
     links = [
       { label: "Terms", href: "/terms" },
       { label: "Privacy", href: "/privacy" },

@@ -1,5 +1,5 @@
 {
-  "name": "@openblobs/admin",
+  "name": "@thelunan/admin",
   "private": true,
   "type": "module",
   "version": "0.0.1",
@@ -17,8 +17,8 @@
   },
   "dependencies": {
     "@astrojs/svelte": "^8.0.5",
-    "@openblobs/types": "workspace:*",
-    "@openblobs/ui": "workspace:*",
+    "@thelunan/types": "workspace:*",
+    "@thelunan/ui": "workspace:*",
     "@tailwindcss/vite": "^4.2.2",
     "astro": "^6.1.6",
     "svelte": "^5.55.4",
