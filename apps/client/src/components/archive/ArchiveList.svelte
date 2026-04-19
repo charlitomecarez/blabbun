@@ -24,7 +24,10 @@
 
   const filtered = $derived(
     posts
-      .filter((p) => (activeTag === "all" ? true : p.tag === activeTag))
+      .filter((p) => {
+        const tag = lockedTag ?? activeTag;
+        return tag === "all" ? true : p.tag === tag;
+      })
       .sort((a, b) => {
         const aTs = Date.parse(a.pubDateRaw);
         const bTs = Date.parse(b.pubDateRaw);
@@ -88,11 +91,19 @@
   </div>
 
   {#if filtered.length === 0}
-    <p
-      class="font-manrope py-12 text-center text-[15px] text-[rgba(41,48,45,0.45)]"
-    >
-      No posts tagged "{activeTag}".
-    </p>
+    {#if lockedTag}
+      <p
+        class="font-manrope py-12 text-center text-[15px] text-[rgba(41,48,45,0.45)]"
+      >
+        No posts in this topic yet.
+      </p>
+    {:else}
+      <p
+        class="font-manrope py-12 text-center text-[15px] text-[rgba(41,48,45,0.45)]"
+      >
+        No posts tagged "{activeTag}".
+      </p>
+    {/if}
   {:else}
     <!-- Grouped post list -->
     {#each groups as [month, monthPosts]}
