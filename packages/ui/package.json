@@ -1,0 +1,44 @@
+{
+  "name": "@openblobs/ui",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "exports": {
+    "./components/buttons": {
+      "svelte": "./components/buttons/index.ts",
+      "types": "./components/buttons/index.ts",
+      "default": "./components/buttons/index.ts"
+    },
+    "./components/inputs": {
+      "svelte": "./components/inputs/index.ts",
+      "types": "./components/inputs/index.ts",
+      "default": "./components/inputs/index.ts"
+    },
+    "./components/layouts": {
+      "svelte": "./components/layouts/index.ts",
+      "types": "./components/layouts/index.ts",
+      "default": "./components/layouts/index.ts"
+    },
+    "./components/cards": {
+      "svelte": "./components/cards/index.ts",
+      "types": "./components/cards/index.ts",
+      "default": "./components/cards/index.ts"
+    },
+    "./styles/*": "./styles/*"
+  },
+  "peerDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "svelte": "^5.0.0"
+  },
+  "scripts": {
+    "cd:root": "cd ../.. && $SHELL",
+    "cd:client": "cd ../../apps/client && $SHELL",
+    "cd:admin": "cd ../../apps/admin && $SHELL",
+    "cd:types": "cd ../types && $SHELL"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "svelte-check": "^4.4.6",
+    "tailwindcss": "^4.2.2"
+  }
+}

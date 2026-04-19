@@ -1,0 +1,99 @@
+---
+import { PostHero } from "@openblobs/ui/components/cards";
+import { getCollection, render } from "astro:content";
+
+import Layout from "@/layouts/Layout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const wordCount = post.body?.trim().split(/\s+/).length ?? 0;
+const readTime = `${Math.max(1, Math.round(wordCount / 200))} min read`;
+const tag = (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase();
+const hasImage = !!post.data.image;
+---
+
+<Layout>
+  <div class="pt-[64px]">
+    <!-- ─── Post Hero ─────────────────────────────────────────── -->
+    <PostHero
+      title={post.data.title}
+      description={post.data.description}
+      {tag}
+      {readTime}
+      pubDate={post.data.pubDate}
+      backHref="/"
+    />
+
+    {
+      hasImage && (
+        /* ── Hero image — only rendered when the post supplies one ── */
+        <div class="mx-auto max-w-[1200px] px-4 pt-8 md:px-8 md:pt-10">
+          <div class="overflow-hidden rounded-[12px]">
+            <img
+              src={post.data.image}
+              alt={post.data.title}
+              class="w-full object-cover"
+              style="max-height: 480px;"
+            />
+          </div>
+        </div>
+      )
+    }
+
+    <!-- ─── Article Body ──────────────────────────────────────── -->
+    <article
+      class:list={[
+        "mx-auto max-w-[760px] px-4 pb-20 md:px-8",
+        hasImage ? "pt-12 md:pt-16" : "pt-10 md:pt-14",
+      ]}
+    >
+      <div
+        class="prose prose-lg prose-headings:font-space-grotesk prose-headings:font-bold prose-headings:tracking-[-0.03em] prose-headings:text-[#29302d] prose-h2:text-[28px] prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-[22px] prose-h3:mt-8 prose-h3:mb-3 prose-p:font-manrope prose-p:text-[17px] prose-p:leading-[1.75] prose-p:text-[rgba(41,48,45,0.75)] prose-a:text-[#386547] prose-a:font-semibold prose-a:no-underline hover:prose-a:underline prose-strong:text-[#29302d] prose-code:font-mono prose-code:text-[#29302d] prose-code:bg-[rgba(197,247,208,0.3)] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-[4px] prose-code:text-[0.875em] prose-blockquote:border-l-[3px] prose-blockquote:border-[#c5f7d0] prose-blockquote:bg-[rgba(197,247,208,0.1)] prose-blockquote:rounded-r-[8px] prose-blockquote:px-6 prose-blockquote:py-1 prose-blockquote:text-[rgba(41,48,45,0.65)] prose-blockquote:not-italic prose-hr:border-[rgba(197,247,208,0.5)] prose-hr:my-12 prose-img:rounded-[8px] max-w-none"
+      >
+        <Content />
+      </div>
+
+      <!-- ─── Article Footer ────────────────────────────────── -->
+      <footer class="mt-16 border-t border-[rgba(197,247,208,0.4)] pt-8">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <a
+            href="/"
+            class="font-manrope group inline-flex items-center gap-2 text-[13px] font-semibold text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547]"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              aria-hidden="true"
+              class="transition-transform group-hover:-translate-x-0.5"
+            >
+              <path
+                d="M13 7H1M6 2L1 7l5 5"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+            Back to archive
+          </a>
+
+          <span
+            class="font-manrope rounded-full bg-[#ebf3ed] px-4 py-1.5 text-[11px] font-bold tracking-[0.08em] text-[#386547] uppercase"
+          >
+            {tag}
+          </span>
+        </div>
+      </footer>
+    </article>
+  </div>
+</Layout>
