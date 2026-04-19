@@ -1,0 +1,71 @@
+---
+// apps/client/src/pages/topics/index.astro
+import { getCollection } from "astro:content";
+
+import Layout from "@/layouts/Layout.astro";
+
+const allPosts = await getCollection("posts", ({ data }) => !data.draft);
+
+// Build tag → post count map, uppercase keys, sorted alphabetically
+const tagMap = new Map<string, number>();
+for (const post of allPosts) {
+  for (const raw of post.data.tags ?? []) {
+    const tag = raw.toUpperCase();
+    tagMap.set(tag, (tagMap.get(tag) ?? 0) + 1);
+  }
+}
+
+const topics = [...tagMap.entries()]
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([tag, count]) => ({
+    tag,
+    count,
+    slug: tag.toLowerCase(),
+    label: tag.charAt(0) + tag.slice(1).toLowerCase(),
+  }));
+---
+
+<Layout>
+  <main class="mx-auto max-w-[1200px] px-4 pt-[64px] pb-20 md:px-8">
+    <div class="mb-10 pt-12 md:pt-16">
+      <h1
+        class="font-space-grotesk text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-[#2d5a3d] sm:text-[46px]"
+      >
+        Topics<span class="text-[#ccf05f]">.</span>
+      </h1>
+      <p class="font-manrope mt-2 text-[14px] text-[rgba(41,48,45,0.5)]">
+        {topics.length}
+        {topics.length === 1 ? "topic" : "topics"}
+      </p>
+    </div>
+
+    <div class="mb-2 border-b-2 border-[#c5f7d0] pb-3">
+      <span
+        class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase"
+      >
+        All Topics
+      </span>
+    </div>
+
+    <div>
+      {
+        topics.map(({ tag, count, slug, label }) => (
+          <a
+            href={`/topics/${slug}`}
+            class="group -mx-2 flex items-center gap-4 rounded-lg border-b border-[rgba(197,247,208,0.4)] px-2 py-4 transition-colors hover:bg-[rgba(197,247,208,0.06)]"
+          >
+            <span class="font-manrope rounded-full bg-[#ebf3ed] px-3 py-1 text-[11px] font-bold tracking-[0.06em] text-[#386547] uppercase transition-colors group-hover:bg-[#386547] group-hover:text-[#ccf05f]">
+              {tag}
+            </span>
+            <span class="font-manrope flex-1 text-[15px] font-semibold text-[#29302d]">
+              {label}
+            </span>
+            <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.4)]">
+              {count} {count === 1 ? "post" : "posts"}
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </main>
+</Layout>
