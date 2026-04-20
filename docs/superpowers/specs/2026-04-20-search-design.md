@@ -36,10 +36,11 @@ type SearchEntry = {
 
 ## SearchDropdown Behaviour
 
-- **Position:** `fixed`, `top: 64px`, full-width, max-width `680px`, centered
+- **Position:** `fixed`, `top: 64px`, full-width, max-width `680px`, centered, `mx-4` horizontal margin on mobile so it never bleeds to the edge
+- **On mobile (`< md`):** full-width minus `mx-4` margins, input font size `16px` minimum to prevent iOS auto-zoom
 - **On mount:** fetch `/search.json`, cache result, auto-focus input
 - **Filtering:** case-insensitive match on title + description + tags joined as a single string
-- **Results:** show up to 5 matches as mini cards (tag pill + title + excerpt snippet)
+- **Results:** show up to 5 matches as mini cards (tag pill + title + excerpt snippet); excerpt truncated to 1 line on mobile, 2 lines on desktop
 - **Empty state:** "No results for '…'" when query has no matches
 - **Default state:** show nothing (no query = no results shown, just the input)
 - **Close triggers:** Escape key, click outside the dropdown, clicking a result
