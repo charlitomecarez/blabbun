@@ -54,14 +54,42 @@ const featuredAuthor = "The Lunan";
       class="relative flex flex-col items-center overflow-hidden border-b border-[rgba(197,247,208,0.3)] px-4 pt-14 pb-10 text-center md:px-8 md:pt-20 md:pb-16"
     >
       <!-- background blob shapes -->
+      <!-- top-right large -->
       <div
-        class="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-[rgba(197,247,208,0.25)] md:h-64 md:w-64"
+        class="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-[rgba(197,247,208,0.55)] md:h-64 md:w-64"
+        style="animation: blob-float 6s ease-in-out infinite;"
       >
       </div>
+      <!-- bottom-left medium -->
       <div
-        class="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-[rgba(197,247,208,0.15)] md:h-44 md:w-44"
+        class="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-[rgba(197,247,208,0.45)] md:h-44 md:w-44"
+        style="animation: blob-float 8s ease-in-out 1.5s infinite;"
       >
       </div>
+      <!-- top-left small -->
+      <div
+        class="pointer-events-none absolute top-6 -left-6 h-20 w-20 rounded-full bg-[rgba(204,240,95,0.35)] md:h-28 md:w-28"
+        style="animation: blob-float 7s ease-in-out 0.8s infinite;"
+      >
+      </div>
+      <!-- bottom-right small -->
+      <div
+        class="pointer-events-none absolute right-10 -bottom-4 h-16 w-16 rounded-full bg-[rgba(204,240,95,0.3)] md:h-24 md:w-24"
+        style="animation: blob-float 9s ease-in-out 2.5s infinite;"
+      >
+      </div>
+
+      <style>
+        @keyframes blob-float {
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-16px);
+          }
+        }
+      </style>
 
       <span
         class="font-manrope mb-5 inline-block rounded-full bg-[#ccf05f] px-3 py-1 text-[10px] font-bold tracking-[3px] text-[#29302d] uppercase"

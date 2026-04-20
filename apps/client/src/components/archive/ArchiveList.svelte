@@ -9,6 +9,7 @@
     monthGroup: string;
     tag: string;
     href: string;
+    imageUrl?: string;
   }
 
   interface Props {
@@ -19,6 +20,7 @@
 
   const { posts, tags, lockedTag }: Props = $props();
 
+  // svelte-ignore state_referenced_locally
   let activeTag = $state(lockedTag ?? "all");
   let sortOrder = $state<"newest" | "oldest">("newest");
 
@@ -122,6 +124,7 @@
             date={post.pubDate}
             tag={post.tag}
             href={post.href}
+            imageUrl={post.imageUrl}
           />
         {/each}
       </div>

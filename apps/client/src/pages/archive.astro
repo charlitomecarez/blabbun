@@ -23,6 +23,7 @@ const postItems = allPosts.map((post) => ({
   }),
   tag: (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
   href: `/${post.id}`,
+  imageUrl: post.data.image,
 }));
 
 const allTags = [

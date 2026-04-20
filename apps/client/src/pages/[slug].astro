@@ -45,6 +45,23 @@ const hasImage = !!post.data.image;
               style="max-height: 480px;"
             />
           </div>
+          {post.data.imageSource && (
+            <p class="font-manrope mt-2 text-right text-[11px] text-[rgba(41,48,45,0.4)]">
+              Image:{" "}
+              {post.data.imageSourceUrl ? (
+                <a
+                  href={post.data.imageSourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="underline hover:text-[rgba(41,48,45,0.7)]"
+                >
+                  {post.data.imageSource}
+                </a>
+              ) : (
+                post.data.imageSource
+              )}
+            </p>
+          )}
         </div>
       )
     }
