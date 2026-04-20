@@ -4,6 +4,7 @@ import { getCollection, render } from "astro:content";
 
 import Layout from "@/layouts/Layout.astro";
 import ClapShare from "@/components/post/ClapShare.svelte";
+import Comments from "@/components/post/Comments.svelte";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts", ({ data }) => !data.draft);
@@ -149,6 +150,9 @@ const relatedPosts = shuffle(otherPosts)
       postUrl={postUrl}
       postTitle={post.data.title}
     />
+
+    <!-- ─── Comments ─────────────────────────────────────────────── -->
+    <Comments client:load postSlug={post.id} />
 
     <!-- ─── Related Posts ───────────────────────────────────────── -->
     {
