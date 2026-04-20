@@ -67,6 +67,10 @@
     );
     activeReplyId = null;
   }
+
+  function handleReplyToggle(id: string | null) {
+    activeReplyId = id;
+  }
 </script>
 
 <div
@@ -87,7 +91,7 @@
           <CommentItem
             {comment}
             {activeReplyId}
-            onReplyToggle={(id) => (activeReplyId = id)}
+            onReplyToggle={handleReplyToggle}
             onReplySubmit={addReply}
           />
           {#if i < comments.length - 1}
