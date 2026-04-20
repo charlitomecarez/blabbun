@@ -1,11 +1,11 @@
-# @openblobs/types
+# @thelunan/types
 
-Shared TypeScript types used across all openblobs apps and packages.
+Shared TypeScript types used across all thelunan apps and packages.
 
 ## Usage
 
 ```ts
-import type { Post } from "@openblobs/types";
+import type { Post } from "@thelunan/types";
 ```
 
 ## Navigation
