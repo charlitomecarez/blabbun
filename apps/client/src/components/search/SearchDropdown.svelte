@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
 
   interface SearchEntry {
     title: string;
@@ -12,33 +12,37 @@
   let open = $state(false);
   let query = $state("");
   let posts = $state<SearchEntry[]>([]);
-  let inputEl = $state<HTMLInputElement | null>(null);
-  let containerEl = $state<HTMLDivElement | null>(null);
+  let inputEl: HTMLInputElement | null = null;
+  let containerEl: HTMLDivElement | null = null;
+  let loaded = false;
 
-  const filtered = $derived(
-    query.trim().length === 0
-      ? []
-      : posts
-          .filter((p) => {
-            const haystack = [p.title, p.description, ...p.tags]
-              .join(" ")
-              .toLowerCase();
-            return haystack.includes(query.trim().toLowerCase());
-          })
-          .slice(0, 5)
-  );
+  const filtered = $derived.by(() => {
+    if (query.trim().length === 0) return [];
+    const normalized = query.trim().toLowerCase();
+    return posts
+      .filter((p) => {
+        const haystack = [p.title, p.description, ...p.tags]
+          .join(" ")
+          .toLowerCase();
+        return haystack.includes(normalized);
+      })
+      .slice(0, 5);
+  });
 
   async function loadPosts() {
-    if (posts.length > 0) return;
+    if (loaded) return;
     const res = await fetch("/search.json");
+    if (!res.ok) return;
     posts = await res.json();
+    loaded = true;
   }
 
-  function handleToggle() {
+  async function handleToggle() {
     open = !open;
     if (open) {
       loadPosts();
-      setTimeout(() => inputEl?.focus(), 0);
+      await tick();
+      inputEl?.focus();
     } else {
       query = "";
     }
@@ -73,6 +77,7 @@
 {#if open}
   <div
     bind:this={containerEl}
+    role="search"
     class="fixed top-[64px] left-1/2 z-40 w-[calc(100%-2rem)] max-w-[680px] -translate-x-1/2 rounded-b-[12px] border border-t-0 border-[rgba(197,247,208,0.5)] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
   >
     <!-- Input -->
@@ -82,6 +87,7 @@
         bind:value={query}
         type="search"
         placeholder="Search posts..."
+        aria-label="Search posts"
         class="font-manrope w-full rounded-[8px] border border-[rgba(197,247,208,0.6)] bg-[#f1f8f3] px-4 py-2.5 text-[16px] text-[#29302d] placeholder-[rgba(41,48,45,0.4)] outline-none focus:border-[#386547] md:text-[15px]"
       />
     </div>
