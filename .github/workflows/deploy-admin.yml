@@ -29,7 +29,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: pnpm --filter @openblobs/admin lint
+        run: pnpm --filter @thelunan/admin lint
 
   deploy:
     needs: lint
