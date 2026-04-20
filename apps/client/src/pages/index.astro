@@ -12,45 +12,7 @@ const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
 const featuredPost = posts[0] ?? null;
 const feedPosts = posts.slice(1);
 
-// Placeholders — used only when real posts are < 3; no image so feed adapts
-const placeholderFeed = [
-  {
-    author: "Arch Weaver",
-    date: "Apr 15, 2026",
-    title: "Living Systems and the Architecture of Change",
-    excerpt:
-      "How organisms adapt their internal scaffolding to environmental pressure — and what that means for software design patterns in distributed systems.",
-    tag: "TECHNICAL",
-    readTime: "8 min read",
-    imageUrl: undefined,
-    href: "#",
-  },
-  {
-    author: "Kai Fontana",
-    date: "Apr 10, 2026",
-    title: "The Geometry of Decentralized State",
-    excerpt:
-      "A spatial exploration of ledger mechanics through the lens of Euclidean geometry and modern cryptography.",
-    tag: "BLUEPRINTS",
-    readTime: "12 min read",
-    imageUrl: undefined,
-    href: "#",
-  },
-  {
-    author: "Mira Osei",
-    date: "Apr 5, 2026",
-    title: "Why We Still Print on Digital Paper",
-    excerpt:
-      'Questioning the obsession with "app-like" experiences when the world craves the intentionality of a physical journal.',
-    tag: "EDITORIAL",
-    readTime: "5 min read",
-    imageUrl: undefined,
-    href: "#",
-  },
-];
-
-// Real posts — only pass imageUrl if the frontmatter has one
-const realFeedItems = feedPosts.map((post) => ({
+const displayFeed = feedPosts.slice(0, 3).map((post) => ({
   author: "The Lunan",
   date: post.data.pubDate.toLocaleDateString("en-US", {
     month: "short",
@@ -64,8 +26,6 @@ const realFeedItems = feedPosts.map((post) => ({
   imageUrl: post.data.image,
   href: `/${post.id}`,
 }));
-
-const displayFeed = [...realFeedItems, ...placeholderFeed].slice(0, 3);
 
 // Featured post — image is optional
 const featuredHasImage = !!featuredPost?.data.image;
@@ -94,14 +54,42 @@ const featuredAuthor = "The Lunan";
       class="relative flex flex-col items-center overflow-hidden border-b border-[rgba(197,247,208,0.3)] px-4 pt-14 pb-10 text-center md:px-8 md:pt-20 md:pb-16"
     >
       <!-- background blob shapes -->
+      <!-- top-right large -->
       <div
-        class="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-[rgba(197,247,208,0.25)] md:h-64 md:w-64"
+        class="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-[rgba(197,247,208,0.55)] md:h-64 md:w-64"
+        style="animation: blob-float 6s ease-in-out infinite;"
       >
       </div>
+      <!-- bottom-left medium -->
       <div
-        class="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-[rgba(197,247,208,0.15)] md:h-44 md:w-44"
+        class="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-[rgba(197,247,208,0.45)] md:h-44 md:w-44"
+        style="animation: blob-float 8s ease-in-out 1.5s infinite;"
       >
       </div>
+      <!-- top-left small -->
+      <div
+        class="pointer-events-none absolute top-6 -left-6 h-20 w-20 rounded-full bg-[rgba(204,240,95,0.35)] md:h-28 md:w-28"
+        style="animation: blob-float 7s ease-in-out 0.8s infinite;"
+      >
+      </div>
+      <!-- bottom-right small -->
+      <div
+        class="pointer-events-none absolute right-10 -bottom-4 h-16 w-16 rounded-full bg-[rgba(204,240,95,0.3)] md:h-24 md:w-24"
+        style="animation: blob-float 9s ease-in-out 2.5s infinite;"
+      >
+      </div>
+
+      <style>
+        @keyframes blob-float {
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-16px);
+          }
+        }
+      </style>
 
       <span
         class="font-manrope mb-5 inline-block rounded-full bg-[#ccf05f] px-3 py-1 text-[10px] font-bold tracking-[3px] text-[#29302d] uppercase"

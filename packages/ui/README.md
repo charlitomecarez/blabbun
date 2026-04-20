@@ -1,14 +1,14 @@
-# @openblobs/ui
+# @thelunan/ui
 
-Shared Svelte component library used across all openblobs apps.
+Shared Svelte component library used across all thelunan apps.
 
 ## Usage
 
 Components are imported directly from source:
 
 ```ts
-import Button from "@openblobs/ui/components/buttons/Button.svelte";
-import "@openblobs/ui/styles/global.css";
+import Button from "@thelunan/ui/components/buttons/Button.svelte";
+import "@thelunan/ui/styles/global.css";
 ```
 
 ## Navigation

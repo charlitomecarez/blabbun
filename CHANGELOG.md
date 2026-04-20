@@ -19,10 +19,10 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - pnpm workspace monorepo setup with `apps/client`, `apps/admin`, `packages/ui`, `packages/types`
-- `@openblobs/types` shared package with `Post` type
-- `@openblobs/ui` shared package with components and global styles
+- `@thelunan/types` shared package with `Post` type
+- `@thelunan/ui` shared package with components and global styles
 - `apps/client` — Astro blog with dynamic routing, MDX, Playwright e2e test setup
 - `apps/admin` — Astro admin app on port 4322
-- Both apps wired to `@openblobs/ui` and `@openblobs/types` workspace packages
+- Both apps wired to `@thelunan/ui` and `@thelunan/types` workspace packages
 - Vercel deployment config (`vercel.json`) for both apps
 - ESLint, Prettier, Husky + lint-staged at workspace root

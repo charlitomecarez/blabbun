@@ -1,5 +1,5 @@
 ---
-import { PostHero } from "@thelunan/ui/components/cards";
+import { FeedItem, PostHero } from "@thelunan/ui/components/cards";
 import { getCollection, render } from "astro:content";
 
 import Layout from "@/layouts/Layout.astro";
@@ -19,6 +19,33 @@ const wordCount = post.body?.trim().split(/\s+/).length ?? 0;
 const readTime = `${Math.max(1, Math.round(wordCount / 200))} min read`;
 const tag = (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase();
 const hasImage = !!post.data.image;
+
+const allPosts = await getCollection("posts", ({ data }) => !data.draft);
+const otherPosts = allPosts.filter((p) => p.id !== post.id);
+
+const shuffle = <T,>(arr: T[]): T[] => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
+const relatedPosts = shuffle(otherPosts)
+  .slice(0, 3)
+  .map((p) => ({
+    title: p.data.title,
+    excerpt: p.data.description,
+    tag: (p.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
+    imageUrl: p.data.image,
+    href: `/${p.id}`,
+    date: p.data.pubDate.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }),
+  }));
 ---
 
 <Layout>
@@ -45,6 +72,23 @@ const hasImage = !!post.data.image;
               style="max-height: 480px;"
             />
           </div>
+          {post.data.imageSource && (
+            <p class="font-manrope mt-2 text-right text-[11px] text-[rgba(41,48,45,0.4)]">
+              Image:{" "}
+              {post.data.imageSourceUrl ? (
+                <a
+                  href={post.data.imageSourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="underline hover:text-[rgba(41,48,45,0.7)]"
+                >
+                  {post.data.imageSource}
+                </a>
+              ) : (
+                post.data.imageSource
+              )}
+            </p>
+          )}
         </div>
       )
     }
@@ -66,7 +110,7 @@ const hasImage = !!post.data.image;
       <footer class="mt-16 border-t border-[rgba(197,247,208,0.4)] pt-8">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <a
-            href="/"
+            href="/archive"
             class="font-manrope group inline-flex items-center gap-2 text-[13px] font-semibold text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547]"
           >
             <svg
@@ -95,5 +139,27 @@ const hasImage = !!post.data.image;
         </div>
       </footer>
     </article>
+
+    <!-- ─── Related Posts ───────────────────────────────────────── -->
+    {
+      relatedPosts.length > 0 && (
+        <section
+          aria-label="More from The Lunan"
+          class="mx-auto max-w-[1200px] px-4 pb-20 md:px-8"
+        >
+          <div class="mb-6 border-t-2 border-[#c5f7d0] pt-8">
+            <span class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase">
+              More from The Lunan
+            </span>
+          </div>
+
+          <div>
+            {relatedPosts.map((p) => (
+              <FeedItem {...p} />
+            ))}
+          </div>
+        </section>
+      )
+    }
   </div>
 </Layout>

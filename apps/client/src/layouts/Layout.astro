@@ -2,6 +2,15 @@
 import "@thelunan/ui/styles/global.css";
 
 import { Footer, Navbar } from "@thelunan/ui/components/layouts";
+
+import SearchDropdown from "@/components/search/SearchDropdown.svelte";
+
+const { pathname } = Astro.url;
+const navLinks = [
+  { label: "Archive", href: "/archive", active: pathname === "/archive" },
+  { label: "Topics", href: "/topics", active: pathname.startsWith("/topics") },
+  { label: "About", href: "/about", active: pathname === "/about" },
+];
 ---
 
 <!doctype html>
@@ -25,10 +34,15 @@ import { Footer, Navbar } from "@thelunan/ui/components/layouts";
       rel="stylesheet"
     />
   </head>
-  <body class="font-manrope bg-[#f1f8f3] text-[#29302d] antialiased">
-    <!-- Fixed navbar — pages use pt-[67px] to compensate -->
-    <Navbar client:load />
-    <slot />
+  <body
+    class="font-manrope flex min-h-screen flex-col bg-[#f1f8f3] text-[#29302d] antialiased"
+  >
+    <!-- Fixed navbar — pages use pt-[64px] to compensate -->
+    <Navbar client:load links={navLinks} />
+    <SearchDropdown client:load />
+    <div class="flex-1">
+      <slot />
+    </div>
     <Footer />
   </body>
 </html>

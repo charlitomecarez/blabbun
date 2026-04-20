@@ -1,0 +1,52 @@
+---
+import { getCollection } from "astro:content";
+
+import ArchiveList from "@/components/archive/ArchiveList.svelte";
+import Layout from "@/layouts/Layout.astro";
+
+const allPosts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const postItems = allPosts.map((post) => ({
+  title: post.data.title,
+  description: post.data.description,
+  pubDate: post.data.pubDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }),
+  pubDateRaw: post.data.pubDate.toISOString(),
+  monthGroup: post.data.pubDate.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  }),
+  tag: (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
+  href: `/${post.id}`,
+  imageUrl: post.data.image,
+}));
+
+const allTags = [
+  ...new Set(
+    allPosts.flatMap((p) => p.data.tags ?? []).map((t) => t.toUpperCase())
+  ),
+].sort();
+---
+
+<Layout>
+  <main class="mx-auto max-w-[1200px] px-4 pt-[64px] pb-20 md:px-8">
+    <!-- Page header -->
+    <div class="mb-10 pt-12 md:pt-16">
+      <h1
+        class="font-space-grotesk text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-[#2d5a3d] sm:text-[46px]"
+      >
+        Archive<span class="text-[#ccf05f]">.</span>
+      </h1>
+      <p class="font-manrope mt-2 text-[14px] text-[rgba(41,48,45,0.5)]">
+        {allPosts.length} posts
+      </p>
+    </div>
+
+    <ArchiveList posts={postItems} tags={allTags} client:load />
+  </main>
+</Layout>

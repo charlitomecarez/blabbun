@@ -1,6 +1,6 @@
-# @openblobs/admin
+# @thelunan/admin
 
-Admin dashboard for managing the openblobs blog.
+Admin dashboard for managing the thelunan blog.
 
 Runs at `localhost:4322` in development.
 

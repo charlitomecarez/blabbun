@@ -1,13 +1,21 @@
 # The Lunan
 
-A personal blog where I write about whatever's on my mind — rants, opinions, and my arguably somethings to blab about.
+The Lunan is home—a lunan, a spot, a place.
+
+It’s a space for unfiltered thoughts, like a friend who starts talking and just keeps going.
+
+Half ideas, half opinions, half things you probably wouldn’t say in a formal setting—but say anyway.
+
+No polishing, no pretending, no “perfect take.” Just honest yapping about life, people, late-night thoughts, and whatever’s stuck in the mind.
+
+If it sounds like a ramble, it probably belongs here.
 
 Built with [Astro](https://astro.build) and [Svelte](https://svelte.dev) as a pnpm monorepo.
 
 ## Structure
 
 ```
-openblobs/
+thelunan/
 ├── apps/
 │   ├── client/   # Public-facing blog (localhost:4321)
 │   └── admin/    # Admin dashboard (localhost:4322)
