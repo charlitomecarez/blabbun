@@ -8,11 +8,11 @@ export async function getStaticPaths() {
   const posts = await getCollection("posts", ({ data }) => !data.draft);
   return posts.map((post) => ({
     params: { slug: post.id },
-    props: { post },
+    props: { post, allPosts: posts },
   }));
 }
 
-const { post } = Astro.props;
+const { post, allPosts } = Astro.props;
 const { Content } = await render(post);
 
 const wordCount = post.body?.trim().split(/\s+/).length ?? 0;
@@ -20,7 +20,6 @@ const readTime = `${Math.max(1, Math.round(wordCount / 200))} min read`;
 const tag = (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase();
 const hasImage = !!post.data.image;
 
-const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 const otherPosts = allPosts.filter((p) => p.id !== post.id);
 
 const shuffle = <T,>(arr: T[]): T[] => {
@@ -138,14 +137,17 @@ const relatedPosts = shuffle(otherPosts)
     <!-- ─── Related Posts ───────────────────────────────────────── -->
     {
       relatedPosts.length > 0 && (
-        <section class="mx-auto max-w-[1200px] px-4 pb-20 md:px-8">
+        <section
+          aria-label="More from The Lunan"
+          class="mx-auto max-w-[1200px] px-4 pb-20 md:px-8"
+        >
           <div class="mb-6 border-t-2 border-[#c5f7d0] pt-8">
             <span class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase">
               More from The Lunan
             </span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
             {relatedPosts.map((p) => (
               <a
                 href={p.href}
@@ -154,7 +156,9 @@ const relatedPosts = shuffle(otherPosts)
                 {p.image ? (
                   <img
                     src={p.image}
-                    alt={p.title}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
                     class="h-[140px] w-full rounded-t-[12px] object-cover"
                   />
                 ) : (
