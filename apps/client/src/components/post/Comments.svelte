@@ -9,12 +9,6 @@
   // postSlug will be the Supabase query key when backend is integrated
   const { postSlug: _postSlug }: Props = $props();
 
-  const COMMENTS_PER_PAGE = 5;
-  let visibleCount = $state(COMMENTS_PER_PAGE);
-
-  const visibleComments = $derived(comments.slice(0, visibleCount));
-  const hasMore = $derived(visibleCount < comments.length);
-
   let comments = $state<Comment[]>([
     {
       id: "c1",
@@ -65,6 +59,12 @@
       replies: [],
     },
   ]);
+
+  const COMMENTS_PER_PAGE = 5;
+  let visibleCount = $state(COMMENTS_PER_PAGE);
+
+  const visibleComments = $derived(comments.slice(0, visibleCount));
+  const hasMore = $derived(visibleCount < comments.length);
 
   let activeReplyId = $state<string | null>(null);
   let newCommentBody = $state("");
