@@ -96,27 +96,6 @@
             />
           </svg>
         </button>
-
-        <button
-          aria-label="Write"
-          class="text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547]"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M13.5 2.5a1.5 1.5 0 012.121 2.121L5.5 14.742 2 15.5l.758-3.5L13.5 2.5z"
-              stroke="currentColor"
-              stroke-width="1.4"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </button>
       {/if}
 
       {#if subscribeHref}
