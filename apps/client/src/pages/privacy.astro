@@ -1,0 +1,143 @@
+---
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout>
+  <main class="pt-[64px]">
+    <div class="mx-auto max-w-[760px] px-4 py-16 md:px-8 md:py-24">
+      <!-- Pill badge -->
+      <span
+        class="font-manrope mb-6 inline-block rounded-full bg-[#ebf3ed] px-3 py-1 text-[10px] font-bold tracking-[3px] text-[#386547] uppercase"
+      >
+        Privacy
+      </span>
+
+      <!-- Heading -->
+      <h1
+        class="font-space-grotesk text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-[#29302d] sm:text-[46px] md:text-[52px]"
+      >
+        Privacy Policy
+      </h1>
+
+      <!-- Divider -->
+      <div class="my-6 h-[2px] w-10 rounded-full bg-[#c5f7d0]"></div>
+
+      <!-- Last updated -->
+      <p class="font-manrope mb-10 text-[13px] text-[rgba(41,48,45,0.4)]">
+        Last updated: April 2026
+      </p>
+
+      <!-- Body -->
+      <div class="space-y-8">
+        <section>
+          <h2
+            class="font-space-grotesk mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            The short version
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            This is a personal blog. I&apos;m not trying to harvest your data. I
+            don&apos;t run ads, I don&apos;t sell anything, and I have no
+            interest in tracking you around the internet.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            class="font-space-grotesk mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            What this site collects
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            The Lunan is a static site. It does not use cookies, does not
+            require an account, and does not collect personally identifiable
+            information by default. Comments on posts are anonymous &mdash; no
+            name, no email, nothing tied to you.
+          </p>
+          <p
+            class="font-manrope mt-4 text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            Basic server logs (IP address, browser, page visited) may be
+            retained by the hosting provider for operational purposes. I
+            don&apos;t access these unless something breaks.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            class="font-space-grotesk mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            Third-party services
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            This site loads fonts from Google Fonts. Google may log that
+            request. If that concerns you, most browsers let you block external
+            font loading. Share buttons (Facebook, X) open external sites in a
+            new tab &mdash; those sites have their own privacy policies.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            class="font-space-grotesk mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            Local storage
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            The clap feature saves your interaction (clapped or not, local
+            count) to your browser&apos;s local storage. This data stays on your
+            device and is never sent anywhere.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            class="font-space-grotesk mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            Questions
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            If you have questions about any of this, leave a comment on any post
+            or reach out through the links in the about page. I&apos;ll do my
+            best to respond.
+          </p>
+        </section>
+      </div>
+
+      <!-- Footer nav -->
+      <div class="mt-14 border-t border-[rgba(197,247,208,0.4)] pt-8">
+        <a
+          href="/"
+          class="font-manrope group inline-flex items-center gap-2 text-[13px] font-semibold text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547]"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            aria-hidden="true"
+            class="transition-transform group-hover:-translate-x-0.5"
+          >
+            <path
+              d="M13 7H1M6 2L1 7l5 5"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+          Back home
+        </a>
+      </div>
+    </div>
+  </main>
+</Layout>
