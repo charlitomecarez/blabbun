@@ -47,5 +47,9 @@
     "prettier-plugin-svelte": "^3.5.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "typescript-eslint": "^8.58.2"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.17.24",
+    "lodash": "^4.18.1"
   }
 }
