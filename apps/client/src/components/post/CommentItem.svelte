@@ -16,7 +16,8 @@
   const isReplying = $derived(activeReplyId === comment.id);
 
   function relativeTime(date: Date): string {
-    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    const d = date instanceof Date ? date : new Date(date as unknown as string);
+    const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
     if (seconds < 60) return "just now";
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
@@ -61,10 +62,11 @@
   <!-- Reply toggle button -->
   <button
     type="button"
+    aria-expanded={isReplying}
     onclick={() => onReplyToggle(isReplying ? null : comment.id)}
     class="font-manrope cursor-pointer border-none bg-transparent p-0 text-[12px] font-bold tracking-[0.04em] text-[#386547]"
   >
-    ↩ Reply
+    {isReplying ? "↩ Cancel reply" : "↩ Reply"}
   </button>
 
   <!-- Replies + inline reply form -->
@@ -93,6 +95,7 @@
           <textarea
             bind:value={replyBody}
             placeholder="Write a reply…"
+            aria-label="Reply text"
             rows="3"
             class="font-manrope w-full resize-none rounded-[8px] border-[1.5px] border-[rgba(197,247,208,0.8)] bg-white px-3 py-2.5 text-[14px] text-[#29302d] placeholder-[rgba(41,48,45,0.35)] outline-none focus:border-[#386547]"
           ></textarea>
