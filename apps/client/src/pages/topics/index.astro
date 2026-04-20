@@ -3,6 +3,7 @@
 import { getCollection } from "astro:content";
 
 import Layout from "@/layouts/Layout.astro";
+import { tagToLabel } from "@/utils/tags";
 
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 
@@ -21,10 +22,7 @@ const topics = [...tagMap.entries()]
     tag,
     count,
     slug: tag.toLowerCase(),
-    label: tag
-      .split(" ")
-      .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
-      .join(" "),
+    label: tagToLabel(tag),
   }));
 ---
 
@@ -55,6 +53,7 @@ const topics = [...tagMap.entries()]
         topics.map(({ tag, count, slug, label }) => (
           <a
             href={`/topics/${slug}`}
+            data-testid={`topic-link-${slug}`}
             class="group -mx-2 flex items-center gap-4 rounded-lg border-b border-[rgba(197,247,208,0.4)] px-2 py-4 transition-colors hover:bg-[rgba(197,247,208,0.06)]"
           >
             <span class="font-manrope rounded-full bg-[#ebf3ed] px-3 py-1 text-[11px] font-bold tracking-[0.06em] text-[#386547] uppercase transition-colors group-hover:bg-[#386547] group-hover:text-[#ccf05f]">

@@ -8,18 +8,18 @@ test("topics index renders heading", async ({ page }) => {
 
 test("topics index lists all tags", async ({ page }) => {
   await page.goto("/topics");
-  // All 3 tags from the demo posts must appear
-  await expect(page.getByText(/opinion/i).first()).toBeVisible();
-  await expect(page.getByText(/personal/i).first()).toBeVisible();
-  await expect(page.getByText(/meta/i).first()).toBeVisible();
+  await expect(
+    page.locator('[data-testid="topic-link-opinion"]')
+  ).toBeVisible();
+  await expect(
+    page.locator('[data-testid="topic-link-personal"]')
+  ).toBeVisible();
+  await expect(page.locator('[data-testid="topic-link-meta"]')).toBeVisible();
 });
 
 test("topics index links to topic detail page", async ({ page }) => {
   await page.goto("/topics");
-  await page
-    .getByRole("link", { name: /opinion/i })
-    .first()
-    .click();
+  await page.locator('[data-testid="topic-link-opinion"]').click();
   await expect(page).toHaveURL("/topics/opinion");
 });
 
@@ -50,7 +50,10 @@ test("topic detail has no filter pills", async ({ page }) => {
 
 test("topic detail back link goes to /topics", async ({ page }) => {
   await page.goto("/topics/opinion");
-  await page.getByRole("link", { name: /← topics/i }).click();
+  await page
+    .getByRole("link", { name: /topics/i })
+    .first()
+    .click();
   await expect(page).toHaveURL("/topics");
 });
 

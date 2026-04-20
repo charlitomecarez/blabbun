@@ -4,10 +4,19 @@ import { getCollection } from "astro:content";
 
 import ArchiveList from "@/components/archive/ArchiveList.svelte";
 import Layout from "@/layouts/Layout.astro";
+import { tagToLabel } from "@/utils/tags";
 
 export async function getStaticPaths() {
   const allPosts = await getCollection("posts", ({ data }) => !data.draft);
-  const tags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))];
+  const rawTags = allPosts.flatMap((p) => p.data.tags ?? []);
+  // Dedupe by normalized slug so casing drift in frontmatter never produces duplicate paths
+  const seen = new Set<string>();
+  const tags = rawTags.filter((t) => {
+    const slug = t.toLowerCase();
+    if (seen.has(slug)) return false;
+    seen.add(slug);
+    return true;
+  });
   return tags.map((tag) => ({
     params: { tag: tag.toLowerCase() },
     props: { tag: tag.toUpperCase() },
@@ -45,10 +54,7 @@ const postItems = tagPosts.map((post) => ({
   href: `/${post.id}`,
 }));
 
-const label = tag
-  .split(" ")
-  .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
-  .join(" ");
+const label = tagToLabel(tag);
 ---
 
 <Layout>
@@ -73,7 +79,7 @@ const label = tag
             stroke-linecap="round"
             stroke-linejoin="round"></path>
         </svg>
-        ← Topics
+        Topics
       </a>
 
       <div class="mt-4">
