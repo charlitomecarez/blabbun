@@ -16,6 +16,8 @@
   let clapped = $state(false);
   let animating = $state(false);
   let copied = $state(false);
+  let clapTimer: ReturnType<typeof setTimeout> | undefined;
+  let copyTimer: ReturnType<typeof setTimeout> | undefined;
 
   onMount(() => {
     try {
@@ -28,6 +30,10 @@
     } catch {
       // localStorage unavailable — use defaults
     }
+    return () => {
+      clearTimeout(clapTimer);
+      clearTimeout(copyTimer);
+    };
   });
 
   function saveToStorage() {
@@ -39,18 +45,21 @@
   }
 
   function handleClap() {
-    clapped = !clapped;
-    count = clapped ? count + 1 : count - 1;
+    const nowClapped = !clapped;
+    clapped = nowClapped;
+    count = nowClapped ? count + 1 : count - 1;
     animating = true;
     saveToStorage();
-    setTimeout(() => (animating = false), 200);
+    clearTimeout(clapTimer);
+    clapTimer = setTimeout(() => (animating = false), 200);
   }
 
   async function copyLink() {
     try {
       await navigator.clipboard.writeText(postUrl);
       copied = true;
-      setTimeout(() => (copied = false), 2000);
+      clearTimeout(copyTimer);
+      copyTimer = setTimeout(() => (copied = false), 2000);
     } catch {
       // clipboard not available
     }
@@ -69,13 +78,15 @@
 >
   <!-- Clap button -->
   <button
+    type="button"
     onclick={handleClap}
     aria-pressed={clapped}
     aria-label={clapped ? "Remove clap" : "Clap for this post"}
-    class="font-manrope mb-6 inline-flex cursor-pointer items-center gap-2 rounded-full border-none px-6 py-3 text-[15px] font-bold text-[#386547] transition-all duration-150"
+    class="font-manrope mb-6 inline-flex cursor-pointer items-center gap-2 rounded-full border-none px-6 py-3 text-[15px] font-bold text-[#386547] transition-transform duration-150"
     class:bg-[#c5f7d0]={clapped}
     class:bg-[#ebf3ed]={!clapped}
-    style={animating ? "transform: scale(1.15)" : "transform: scale(1)"}
+    class:scale-[1.15]={animating}
+    class:scale-100={!animating}
   >
     <span style="font-size:20px;" aria-hidden="true">👏</span>
     <span>Clap · {count}</span>
@@ -134,6 +145,7 @@
 
     <!-- Copy Link -->
     <button
+      type="button"
       onclick={copyLink}
       aria-label="Copy link"
       class="font-manrope flex h-[38px] cursor-pointer items-center justify-center gap-1.5 rounded-full border-none bg-[#ebf3ed] px-4 text-[12px] font-bold text-[#386547] transition-colors hover:bg-[#c5f7d0]"
