@@ -4,6 +4,7 @@ import "@thelunan/ui/styles/global.css";
 import { Footer, Navbar } from "@thelunan/ui/components/layouts";
 
 import SearchDropdown from "@/components/search/SearchDropdown.svelte";
+import ScrollToTop from "@/components/layouts/ScrollToTop.svelte";
 
 const { pathname } = Astro.url;
 const navLinks = [
@@ -40,6 +41,7 @@ const navLinks = [
     <!-- Fixed navbar — pages use pt-[64px] to compensate -->
     <Navbar client:load links={navLinks} />
     <SearchDropdown client:load />
+    <ScrollToTop client:load />
     <div class="flex-1">
       <slot />
     </div>
