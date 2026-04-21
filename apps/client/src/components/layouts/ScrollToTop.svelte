@@ -21,7 +21,7 @@
   type="button"
   onclick={scrollToTop}
   aria-label="Scroll to top"
-  aria-hidden={String(!visible)}
+  aria-hidden={visible ? undefined : true}
   tabindex={visible ? 0 : -1}
   class="fixed right-6 bottom-6 z-50 flex h-11 w-11 items-center justify-center
          rounded-full border border-[rgba(197,247,208,0.5)] bg-[#ebf3ed]

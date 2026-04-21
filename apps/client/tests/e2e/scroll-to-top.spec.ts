@@ -7,19 +7,31 @@ test.describe("scroll-to-top button", () => {
     await expect(button).toHaveCSS("opacity", "0");
   });
 
+  test("is not keyboard-focusable when hidden", async ({ page }) => {
+    await page.goto("/");
+    const button = page.getByRole("button", { name: "Scroll to top" });
+    await expect(button).toHaveAttribute("tabindex", "-1");
+  });
+
   test("appears after scrolling 300px", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => window.scrollTo({ top: 400 }));
-    await page.waitForFunction(() => window.scrollY >= 400);
     const button = page.getByRole("button", { name: "Scroll to top" });
-    await expect(button).toHaveCSS("opacity", "1");
+    await expect(button).toHaveCSS("opacity", "1", { timeout: 1000 });
+  });
+
+  test("is keyboard-focusable when visible", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.scrollTo({ top: 400 }));
+    const button = page.getByRole("button", { name: "Scroll to top" });
+    await expect(button).toHaveAttribute("tabindex", "0", { timeout: 1000 });
   });
 
   test("scrolls page to top when clicked", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => window.scrollTo({ top: 400 }));
-    await page.waitForFunction(() => window.scrollY >= 400);
     const button = page.getByRole("button", { name: "Scroll to top" });
+    await expect(button).toHaveCSS("opacity", "1", { timeout: 1000 });
     await button.click();
     await page.waitForFunction(() => window.scrollY === 0);
   });
