@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
+  import { join, toLower, trim } from "lodash-es";
 
   interface SearchEntry {
     title: string;
@@ -12,18 +13,21 @@
   let open = $state(false);
   let query = $state("");
   let posts = $state<SearchEntry[]>([]);
+  // svelte-ignore non_reactive_update
   let inputEl: HTMLInputElement | null = null;
+  // svelte-ignore non_reactive_update
   let containerEl: HTMLDivElement | null = null;
   let loaded = false;
 
   const filtered = $derived.by(() => {
-    if (query.trim().length === 0) return [];
-    const normalized = query.trim().toLowerCase();
+    const normalized = toLower(trim(query));
+    if (!normalized) return [];
+
     return posts
       .filter((p) => {
-        const haystack = [p.title, p.description, ...p.tags]
-          .join(" ")
-          .toLowerCase();
+        const haystack = toLower(
+          join([p.title, p.description, ...p.tags], " ")
+        );
         return haystack.includes(normalized);
       })
       .slice(0, 5);
@@ -66,6 +70,7 @@
     window.addEventListener("search:toggle", handleToggle);
     document.addEventListener("keydown", handleKeydown);
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       window.removeEventListener("search:toggle", handleToggle);
       document.removeEventListener("keydown", handleKeydown);
