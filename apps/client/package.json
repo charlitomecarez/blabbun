@@ -15,14 +15,16 @@
     "cd:root": "cd ../.. && $SHELL",
     "cd:admin": "cd ../admin && $SHELL",
     "cd:ui": "cd ../../packages/ui && $SHELL",
-    "cd:types": "cd ../../packages/types && $SHELL"
+    "cd:types": "cd ../../packages/types && $SHELL",
+    "cd:utils": "cd ../../packages/utils && $SHELL"
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.3",
     "@astrojs/svelte": "^8.0.5",
+    "@tailwindcss/vite": "^4.2.2",
     "@thelunan/types": "workspace:*",
     "@thelunan/ui": "workspace:*",
-    "@tailwindcss/vite": "^4.2.2",
+    "@thelunan/utils": "workspace:*",
     "astro": "^6.1.6",
     "svelte": "^5.55.4",
     "tailwindcss": "^4.2.2"
@@ -31,6 +33,7 @@
     "@astrojs/check": "^0.9.8",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/typography": "^0.5.19",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^25.6.0",
     "knip": "^6.4.1",
     "typescript": "^5.9.3"

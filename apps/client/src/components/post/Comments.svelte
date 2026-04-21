@@ -9,6 +9,7 @@
   // postSlug will be the Supabase query key when backend is integrated
   const { postSlug: _postSlug }: Props = $props();
 
+  // This is a sample mock data for now.. we will replace this with Supabase soonest
   let comments = $state<Comment[]>([
     {
       id: "c1",

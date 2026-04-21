@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { relativeTime } from "@thelunan/utils";
   import type { Comment } from "./types";
 
   interface Props {
@@ -14,20 +15,6 @@
   let replyBody = $state("");
 
   const isReplying = $derived(activeReplyId === comment.id);
-
-  function relativeTime(date: Date): string {
-    const d = date instanceof Date ? date : new Date(date as unknown as string);
-    const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
-    if (seconds < 60) return "just now";
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
-    const weeks = Math.floor(days / 7);
-    return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
-  }
 
   function handleReplySubmit() {
     if (!replyBody.trim()) return;

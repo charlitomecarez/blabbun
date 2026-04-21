@@ -17,7 +17,8 @@
     "cd:client": "cd apps/client && $SHELL",
     "cd:admin": "cd apps/admin && $SHELL",
     "cd:ui": "cd packages/ui && $SHELL",
-    "cd:types": "cd packages/types && $SHELL"
+    "cd:types": "cd packages/types && $SHELL",
+    "cd:utils": "cd packages/utils && $SHELL"
   },
   "lint-staged": {
     "*.{js,ts,mjs}": [
@@ -50,6 +51,6 @@
   },
   "dependencies": {
     "@types/lodash": "^4.17.24",
-    "lodash": "^4.18.1"
+    "lodash-es": "^4.18.1"
   }
 }

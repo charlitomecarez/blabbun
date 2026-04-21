@@ -10,6 +10,7 @@
   const { postSlug, postUrl, postTitle }: Props = $props();
 
   const SEED = 12;
+  // svelte-ignore state_referenced_locally
   const storageKey = `clap_${postSlug}`;
 
   let count = $state(SEED);

@@ -1,12 +1,12 @@
 export interface Reply {
   id: string;
   body: string;
-  createdAt: Date;
+  createdAt: Date | string;
 }
 
 export interface Comment {
   id: string;
   body: string;
-  createdAt: Date;
+  createdAt: Date | string;
   replies: Reply[];
 }
