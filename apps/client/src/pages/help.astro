@@ -1,0 +1,178 @@
+---
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout
+  title="Help"
+  description="Answers to common questions about reading, navigating, and getting the most out of The Lunan."
+>
+  <main class="pt-[64px]">
+    <div class="mx-auto max-w-[760px] px-4 py-16 md:px-8 md:py-24">
+      <!-- Pill badge -->
+      <span
+        class="font-manrope mb-6 inline-block rounded-full bg-[#ebf3ed] px-3 py-1 text-[10px] font-bold tracking-[3px] text-[#386547] uppercase"
+      >
+        Help
+      </span>
+
+      <!-- Heading -->
+      <h1
+        class="font-space-grotesk text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-[#29302d] sm:text-[46px] md:text-[52px]"
+      >
+        How this place works
+      </h1>
+
+      <!-- Divider -->
+      <div class="my-6 h-[2px] w-10 rounded-full bg-[#c5f7d0]"></div>
+
+      <p
+        class="font-manrope mb-10 text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+      >
+        The Lunan is a personal blog. No algorithm, no feed, no notifications.
+        Here&apos;s how to find your way around.
+      </p>
+
+      <!-- Body -->
+      <div class="space-y-8">
+        <section>
+          <h2
+            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            Reading posts
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            The home page shows the latest writing. Click any title to open the
+            full post. At the bottom of each post you&apos;ll find a clap button
+            (like a like, but better), share links, a comment section, and a few
+            related posts to keep reading.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            Archive
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            The <a
+              href="/archive"
+              class="font-semibold text-[#386547] hover:underline">Archive</a
+            > lists every post in one place, sorted by date. It&apos;s the best place
+            to catch up if you&apos;re new here.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            Topics
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            Posts are tagged by topic. Visit <a
+              href="/topics"
+              class="font-semibold text-[#386547] hover:underline">Topics</a
+            > to browse everything by category &mdash; useful if you only want to
+            read about a specific thing.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            Search
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            Hit the search icon in the top-right of the navbar (or press
+            <kbd
+              class="rounded-[4px] border border-[rgba(41,48,45,0.15)] bg-white px-1.5 py-0.5 font-mono text-[12px] text-[rgba(41,48,45,0.6)]"
+              >/</kbd
+            > on your keyboard) to search across all posts by title, description,
+            or tag.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            RSS feed
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            Prefer a feed reader? Subscribe via <a
+              href="/rss.xml"
+              class="font-semibold text-[#386547] hover:underline">RSS</a
+            >. Every new post shows up there automatically, no account needed.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            Comments
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            Each post has a comment section at the bottom. Comments are
+            anonymous &mdash; no account, no email, just type and post. You can
+            reply to any comment once. Keep it kind.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#29302d]"
+          >
+            Something broken?
+          </h2>
+          <p
+            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
+          >
+            If a page isn&apos;t loading, a link is dead, or something looks
+            wrong, drop a comment on any post and I&apos;ll take a look. This
+            site is a side project built from scratch &mdash; bugs happen.
+          </p>
+        </section>
+      </div>
+
+      <!-- Footer nav -->
+      <div class="mt-14 border-t border-[rgba(197,247,208,0.4)] pt-8">
+        <a
+          href="/"
+          class="font-manrope group inline-flex items-center gap-2 text-[13px] font-semibold text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547]"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            aria-hidden="true"
+            class="transition-transform group-hover:-translate-x-0.5"
+          >
+            <path
+              d="M13 7H1M6 2L1 7l5 5"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+          Back home
+        </a>
+      </div>
+    </div>
+  </main>
+</Layout>

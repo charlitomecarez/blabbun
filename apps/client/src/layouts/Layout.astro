@@ -4,6 +4,27 @@ import "@thelunan/ui/styles/global.css";
 import { Footer, Navbar } from "@thelunan/ui/components/layouts";
 
 import SearchDropdown from "@/components/search/SearchDropdown.svelte";
+import ScrollToTop from "@/components/layouts/ScrollToTop.svelte";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  ogType?: "website" | "article";
+}
+
+const {
+  title: rawTitle,
+  description = "A quiet corner of the internet where thoughts settle, drift, and take shape. Unfiltered reflections — no pressure to be complete.",
+  ogImage,
+  ogType = "website",
+} = Astro.props;
+
+const siteTitle = "The Lunan";
+const pageTitle = rawTitle ? `${rawTitle} · ${siteTitle}` : siteTitle;
+const canonicalUrl = Astro.url.href;
+const siteUrl =
+  Astro.site?.toString().replace(/\/$/, "") ?? "https://thelunan.com";
 
 const { pathname } = Astro.url;
 const navLinks = [
@@ -21,14 +42,57 @@ const navLinks = [
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
-    <title>The Lunan</title>
+
+    <!-- Primary SEO -->
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content={siteTitle} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    {
+      ogImage && (
+        <>
+          <meta
+            property="og:image"
+            content={
+              ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`
+            }
+          />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta property="og:image:alt" content={pageTitle} />
+        </>
+      )
+    }
+
+    <!-- Twitter Card -->
     <meta
-      name="description"
-      content="A quiet corner of the internet where thoughts settle, drift, and take shape. Unfiltered reflections — no pressure to be complete."
+      name="twitter:card"
+      content={ogImage ? "summary_large_image" : "summary"}
     />
-    <!-- Space Grotesk (headings) + Manrope (body) from Google Fonts -->
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    {
+      ogImage && (
+        <meta
+          name="twitter:image"
+          content={
+            ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`
+          }
+        />
+      )
+    }
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@400;700&display=swap"
       rel="stylesheet"
@@ -40,6 +104,7 @@ const navLinks = [
     <!-- Fixed navbar — pages use pt-[64px] to compensate -->
     <Navbar client:load links={navLinks} />
     <SearchDropdown client:load />
+    <ScrollToTop client:idle />
     <div class="flex-1">
       <slot />
     </div>
