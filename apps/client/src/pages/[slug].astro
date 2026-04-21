@@ -1,7 +1,10 @@
 ---
 import { FeedItem, PostHero } from "@thelunan/ui/components/cards";
 import { getCollection, render } from "astro:content";
+import { shuffle } from "lodash-es";
 
+import ClapShare from "@/components/post/ClapShare.svelte";
+import Comments from "@/components/post/Comments.svelte";
 import Layout from "@/layouts/Layout.astro";
 
 export async function getStaticPaths() {
@@ -18,19 +21,11 @@ const { Content } = await render(post);
 const wordCount = post.body?.trim().split(/\s+/).length ?? 0;
 const readTime = `${Math.max(1, Math.round(wordCount / 200))} min read`;
 const tag = (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase();
+const postUrl = `${Astro.site ?? "https://thelunan.com"}/${post.id}`;
 const hasImage = !!post.data.image;
 
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 const otherPosts = allPosts.filter((p) => p.id !== post.id);
-
-const shuffle = <T,>(arr: T[]): T[] => {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-};
 
 const relatedPosts = shuffle(otherPosts)
   .slice(0, 3)
@@ -48,7 +43,11 @@ const relatedPosts = shuffle(otherPosts)
   }));
 ---
 
-<Layout>
+<Layout
+  title={post.data.title}
+  description={post.data.description}
+  ogImage={post.data.image}
+>
   <div class="pt-[64px]">
     <!-- ─── Post Hero ─────────────────────────────────────────── -->
     <PostHero
@@ -139,6 +138,17 @@ const relatedPosts = shuffle(otherPosts)
         </div>
       </footer>
     </article>
+
+    <!-- ─── Clap + Share ──────────────────────────────────────────── -->
+    <ClapShare
+      client:load
+      postSlug={post.id}
+      postUrl={postUrl}
+      postTitle={post.data.title}
+    />
+
+    <!-- ─── Comments ─────────────────────────────────────────────── -->
+    <Comments client:load postSlug={post.id} />
 
     <!-- ─── Related Posts ───────────────────────────────────────── -->
     {

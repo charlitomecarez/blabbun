@@ -1,0 +1,26 @@
+{
+  "name": "@thelunan/utils",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "cd:root": "cd ../.. && $SHELL",
+    "cd:client": "cd ../../apps/client && $SHELL",
+    "cd:admin": "cd ../../apps/admin && $SHELL",
+    "cd:ui": "cd ../ui && $SHELL",
+    "cd:utils": "cd ../utils && $SHELL"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "lodash": "^4.18.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
