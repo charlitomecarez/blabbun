@@ -1,5 +1,7 @@
 ---
+import type { CommentRow } from "@thelunan/db";
 import { createSupabaseClient } from "@thelunan/db";
+
 import Layout from "../layouts/Layout.astro";
 
 const supabase = createSupabaseClient(
@@ -23,7 +25,7 @@ const { data: comments } = await supabase
       {
         comments && comments.length > 0 ? (
           <div class="space-y-4">
-            {comments.map((comment: any) => (
+            {comments.map((comment: CommentRow) => (
               <div
                 key={comment.id}
                 data-comment-id={comment.id}
@@ -96,6 +98,7 @@ const { data: comments } = await supabase
       }
     }
 
-    (window as any).deleteComment = deleteComment;
+    (window as Window & { deleteComment: typeof deleteComment }).deleteComment =
+      deleteComment;
   </script>
 </Layout>

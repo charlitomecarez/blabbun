@@ -9,8 +9,6 @@
 
   const { postSlug, postUrl, postTitle }: Props = $props();
 
-  const storageKey = `clap_${postSlug}`;
-
   let count = $state(0);
   let clapped = $state(false);
   let loading = $state(true);
@@ -22,16 +20,11 @@
 
   onMount(async () => {
     try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        const parsed = JSON.parse(saved) as { clapped: boolean };
-        clapped = parsed.clapped;
-      }
-
       const res = await fetch(`/api/claps/${postSlug}`);
       if (!res.ok) throw new Error("Failed to load clap count");
-      const data = await res.json();
+      const data = (await res.json()) as { count: number; hasClapped: boolean };
       count = data.count ?? 0;
+      clapped = data.hasClapped ?? false;
     } catch (e) {
       error = e instanceof Error ? e.message : "Unknown error";
     } finally {
@@ -44,33 +37,25 @@
     };
   });
 
-  function saveToStorage() {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify({ clapped }));
-    } catch {
-      // ignore
-    }
-  }
-
   async function handleClap() {
-    const nowClapped = !clapped;
-    clapped = nowClapped;
+    const optimistic = !clapped;
+    clapped = optimistic;
+    count = optimistic ? count + 1 : Math.max(0, count - 1);
     animating = true;
-    saveToStorage();
     clearTimeout(clapTimer);
     clapTimer = setTimeout(() => (animating = false), 200);
 
-    if (nowClapped) {
-      try {
-        const res = await fetch(`/api/claps/${postSlug}`, { method: "POST" });
-        if (!res.ok) throw new Error("Failed to clap");
-        const data = await res.json();
-        count = data.count;
-      } catch (e) {
-        error = e instanceof Error ? e.message : "Failed to clap";
-        clapped = false;
-        saveToStorage();
-      }
+    try {
+      const res = await fetch(`/api/claps/${postSlug}`, { method: "POST" });
+      if (!res.ok) throw new Error("Failed to clap");
+      const data = (await res.json()) as { count: number; hasClapped: boolean };
+      count = data.count;
+      clapped = data.hasClapped;
+    } catch (e) {
+      // Revert optimistic update on failure
+      clapped = !optimistic;
+      count = optimistic ? Math.max(0, count - 1) : count + 1;
+      error = e instanceof Error ? e.message : "Failed to clap";
     }
   }
 

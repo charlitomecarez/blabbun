@@ -88,18 +88,36 @@
   <p
     class="font-manrope mb-6 text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase"
   >
-    {#if loading}
-      Loading comments…
-    {:else}
+    {#if !loading}
       {comments.length} Comment{comments.length === 1 ? "" : "s"}
     {/if}
   </p>
 
   {#if error}
-    <p class="font-manrope mb-4 text-[14px] text-red-500">{error}</p>
-  {/if}
-
-  {#if !loading && comments.length > 0}
+    <div class="mb-6 rounded-[8px] border border-red-100 bg-red-50 px-4 py-3">
+      <p class="font-manrope text-[13px] text-red-500">
+        Could not load comments. Try refreshing the page.
+      </p>
+    </div>
+  {:else if loading}
+    <div class="mb-6 space-y-4">
+      {#each [1, 2] as n (n)}
+        <div class="animate-pulse">
+          <div class="mb-2 h-3 w-24 rounded bg-[rgba(197,247,208,0.6)]"></div>
+          <div class="h-4 w-full rounded bg-[rgba(197,247,208,0.4)]"></div>
+          <div
+            class="mt-1.5 h-4 w-3/4 rounded bg-[rgba(197,247,208,0.4)]"
+          ></div>
+        </div>
+      {/each}
+    </div>
+  {:else if comments.length === 0}
+    <div class="mb-6 rounded-[8px] bg-[#f7fbf8] px-5 py-6 text-center">
+      <p class="font-manrope text-[15px] text-[rgba(41,48,45,0.5)]">
+        No comments yet — be the first.
+      </p>
+    </div>
+  {:else}
     <div class="space-y-6">
       {#each visibleComments as comment, i (comment.id)}
         <div>

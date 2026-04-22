@@ -1,5 +1,7 @@
 ---
+import type { SubscriberRow } from "@thelunan/db";
 import { createSupabaseClient } from "@thelunan/db";
+
 import Layout from "../layouts/Layout.astro";
 
 const supabase = createSupabaseClient(
@@ -40,16 +42,18 @@ const { data: subscribers } = await supabase
                   </tr>
                 </thead>
                 <tbody>
-                  {subscribers.map((subscriber: any, index: number) => (
-                    <tr class={index % 2 === 0 ? "bg-white" : "bg-[#f7fbf8]"}>
-                      <td class="font-manrope border-t border-[rgba(197,247,208,0.4)] px-6 py-4 text-[14px] text-[#29302d]">
-                        {subscriber.email}
-                      </td>
-                      <td class="font-manrope border-t border-[rgba(197,247,208,0.4)] px-6 py-4 text-[14px] text-[rgba(41,48,45,0.6)]">
-                        {new Date(subscriber.subscribed_at).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
+                  {subscribers.map(
+                    (subscriber: SubscriberRow, index: number) => (
+                      <tr class={index % 2 === 0 ? "bg-white" : "bg-[#f7fbf8]"}>
+                        <td class="font-manrope border-t border-[rgba(197,247,208,0.4)] px-6 py-4 text-[14px] text-[#29302d]">
+                          {subscriber.email}
+                        </td>
+                        <td class="font-manrope border-t border-[rgba(197,247,208,0.4)] px-6 py-4 text-[14px] text-[rgba(41,48,45,0.6)]">
+                          {new Date(subscriber.subscribed_at).toLocaleString()}
+                        </td>
+                      </tr>
+                    )
+                  )}
                 </tbody>
               </table>
             </div>

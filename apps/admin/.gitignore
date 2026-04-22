@@ -36,3 +36,6 @@ apps/*/node_modules/
 
 # vercel
 .vercel
+
+# env vars
+.env.local

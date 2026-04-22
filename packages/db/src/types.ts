@@ -11,6 +11,12 @@ export interface PostClapRow {
   count: number;
 }
 
+export interface ClapVoteRow {
+  post_slug: string;
+  ip_hash: string;
+  created_at: string;
+}
+
 export interface SubscriberRow {
   id: string;
   email: string;
@@ -32,6 +38,11 @@ export interface Database {
         Row: PostClapRow;
         Insert: { post_slug: string; count?: number };
         Update: { count?: number };
+      };
+      clap_votes: {
+        Row: ClapVoteRow;
+        Insert: { post_slug: string; ip_hash: string; created_at?: string };
+        Update: never;
       };
       subscribers: {
         Row: SubscriberRow;

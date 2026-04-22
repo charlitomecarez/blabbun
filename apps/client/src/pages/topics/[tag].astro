@@ -6,28 +6,8 @@ import ArchiveList from "@/components/archive/ArchiveList.svelte";
 import Layout from "@/layouts/Layout.astro";
 import { tagToLabel } from "@/utils/tags";
 
-export async function getStaticPaths() {
-  const allPosts = await getCollection("posts", ({ data }) => !data.draft);
-  const rawTags = allPosts.flatMap((p) => p.data.tags ?? []);
-  // Dedupe by normalized slug so casing drift in frontmatter never produces duplicate paths
-  const seen = new Set<string>();
-  const tags = rawTags.filter((t) => {
-    const slug = t.toLowerCase();
-    if (seen.has(slug)) return false;
-    seen.add(slug);
-    return true;
-  });
-  return tags.map((tag) => ({
-    params: { tag: tag.toLowerCase() },
-    props: { tag: tag.toUpperCase() },
-  }));
-}
-
-interface Props {
-  tag: string;
-}
-
-const { tag } = Astro.props;
+const { tag: rawTag } = Astro.params;
+const tag = rawTag.toUpperCase();
 
 const allPosts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
@@ -58,49 +38,89 @@ const label = tagToLabel(tag);
 ---
 
 <Layout title={label} description={`All posts about ${label} on The Lunan.`}>
-  <main class="mx-auto max-w-[1200px] px-4 pt-[64px] pb-20 md:px-8">
-    <div class="mb-10 pt-12 md:pt-16">
-      <a
-        href="/topics"
-        class="font-manrope group mb-4 inline-flex items-center gap-2 text-[13px] font-semibold text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547]"
+  <main class="pt-[64px]">
+    <!-- Page hero -->
+    <section
+      class="relative overflow-hidden border-b border-[rgba(197,247,208,0.25)] px-4 pt-14 pb-12 md:px-8 md:pt-20 md:pb-16"
+    >
+      <div
+        class="pointer-events-none absolute inset-0"
+        style="background-image: linear-gradient(rgba(197,247,208,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(197,247,208,0.07) 1px, transparent 1px); background-size: 40px 40px;"
       >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 14 14"
-          fill="none"
-          aria-hidden="true"
-          class="transition-transform group-hover:-translate-x-0.5"
-        >
-          <path
-            d="M13 7H1M6 2L1 7l5 5"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"></path>
-        </svg>
-        Topics
-      </a>
-
-      <div class="mt-4">
-        <span
-          class="font-manrope rounded-full bg-[#ccf05f] px-3 py-1 text-[11px] font-bold tracking-[0.06em] text-[#29302d] uppercase"
-        >
-          {tag}
-        </span>
       </div>
-
-      <h1
-        class="font-space-grotesk mt-3 text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-[#2d5a3d] sm:text-[46px]"
+      <div
+        class="pointer-events-none absolute inset-0"
+        style="background: radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, white 100%);"
       >
-        {label}<span class="text-[#ccf05f]">.</span>
-      </h1>
-      <p class="font-manrope mt-2 text-[14px] text-[rgba(41,48,45,0.5)]">
-        {postItems.length}
-        {postItems.length === 1 ? "post" : "posts"}
-      </p>
-    </div>
+      </div>
+      <div
+        class="relative mx-auto flex max-w-[1200px] items-end justify-between gap-6"
+      >
+        <div>
+          <a
+            href="/topics"
+            class="font-manrope group mb-5 inline-flex items-center gap-1.5 text-[13px] font-bold text-[rgba(41,48,45,0.4)] transition-colors hover:text-[#386547]"
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 14 14"
+              fill="none"
+              aria-hidden="true"
+              class="transition-transform group-hover:-translate-x-0.5"
+            >
+              <path
+                d="M13 7H1M6 2L1 7l5 5"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+            Topics
+          </a>
+          <div class="mb-3">
+            <span
+              class="font-manrope rounded-full bg-[#ccf05f] px-3 py-1 text-[11px] font-bold tracking-[0.06em] text-[#29302d] uppercase"
+            >
+              {tag}
+            </span>
+          </div>
+          <h1
+            class="font-space-grotesk text-[48px] leading-[0.97] font-bold tracking-[-0.05em] text-[#1a2e22] sm:text-[64px] md:text-[80px]"
+          >
+            {label}<span class="text-[#ccf05f]">.</span>
+          </h1>
+          <p class="font-manrope mt-3 text-[14px] text-[rgba(41,48,45,0.45)]">
+            {postItems.length}
+            {postItems.length === 1 ? "post" : "posts"}
+          </p>
+        </div>
+        <a
+          href="/archive"
+          class="font-manrope group mb-1 hidden items-center gap-1.5 text-[13px] font-bold text-[rgba(41,48,45,0.4)] transition-colors hover:text-[#386547] md:inline-flex"
+        >
+          All posts
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 14 14"
+            fill="none"
+            aria-hidden="true"
+            class="transition-transform group-hover:translate-x-0.5"
+          >
+            <path
+              d="M1 7h12M8 2l5 5-5 5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+        </a>
+      </div>
+    </section>
 
-    <ArchiveList posts={postItems} tags={[]} lockedTag={tag} client:load />
+    <div class="mx-auto max-w-[1200px] px-4 py-12 md:px-8 md:py-16">
+      <ArchiveList posts={postItems} tags={[]} lockedTag={tag} client:load />
+    </div>
   </main>
 </Layout>
