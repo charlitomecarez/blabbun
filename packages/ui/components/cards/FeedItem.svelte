@@ -173,6 +173,10 @@
       <img
         src={imageUrl}
         alt=""
+        width="192"
+        height="128"
+        loading="lazy"
+        decoding="async"
         class="h-[96px] w-[140px] rounded-[8px] object-cover
                transition-opacity group-hover:opacity-80 md:h-[128px] md:w-[192px]"
       />
