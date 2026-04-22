@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@astrojs/svelte": "^8.0.5",
+    "@astrojs/vercel": "^10.0.4",
     "@tailwindcss/vite": "^4.2.2",
     "@thelunan/db": "workspace:*",
     "@thelunan/types": "workspace:*",
