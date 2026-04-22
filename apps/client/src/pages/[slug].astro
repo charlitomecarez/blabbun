@@ -161,14 +161,14 @@ const jsonLd = {
 
     <!-- ─── Clap + Share ──────────────────────────────────────────── -->
     <ClapShare
-      client:load
+      client:visible
       postSlug={post.id}
       postUrl={postUrl}
       postTitle={post.data.title}
     />
 
     <!-- ─── Comments ─────────────────────────────────────────────── -->
-    <Comments client:load postSlug={post.id} />
+    <Comments client:visible postSlug={post.id} />
 
     <!-- ─── Related Posts ───────────────────────────────────────── -->
     {
