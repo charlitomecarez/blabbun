@@ -35,7 +35,7 @@
       >Anonymous</span
     >
     <span class="font-manrope text-[11px] text-[rgba(41,48,45,0.4)]"
-      >{relativeTime(comment.createdAt)}</span
+      >{relativeTime(comment.created_at)}</span
     >
   </div>
 
@@ -66,7 +66,7 @@
               >Anonymous</span
             >
             <span class="font-manrope text-[11px] text-[rgba(41,48,45,0.4)]"
-              >{relativeTime(reply.createdAt)}</span
+              >{relativeTime(reply.created_at)}</span
             >
           </div>
           <p

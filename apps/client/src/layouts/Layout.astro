@@ -3,8 +3,8 @@ import "@thelunan/ui/styles/global.css";
 
 import { Footer, Navbar } from "@thelunan/ui/components/layouts";
 
-import SearchDropdown from "@/components/search/SearchDropdown.svelte";
 import ScrollToTop from "@/components/layouts/ScrollToTop.svelte";
+import SearchDropdown from "@/components/search/SearchDropdown.svelte";
 
 interface Props {
   title?: string;
@@ -88,6 +88,24 @@ const navLinks = [
         />
       )
     }
+
+    <!-- Structured data: WebSite (every page) -->
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: siteTitle,
+        url: siteUrl,
+        description: description,
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${siteUrl}/archive?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
+      })}
+    />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

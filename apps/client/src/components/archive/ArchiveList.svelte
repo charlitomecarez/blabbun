@@ -10,6 +10,8 @@
     tag: string;
     href: string;
     imageUrl?: string;
+    claps?: number;
+    commentCount?: number;
   }
 
   interface Props {
@@ -125,6 +127,8 @@
             tag={post.tag}
             href={post.href}
             imageUrl={post.imageUrl}
+            claps={post.claps}
+            commentCount={post.commentCount}
           />
         {/each}
       </div>
