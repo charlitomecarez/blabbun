@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import type { Comment } from "./types";
   import CommentItem from "./CommentItem.svelte";
 
@@ -6,60 +7,11 @@
     postSlug: string;
   }
 
-  // postSlug will be the Supabase query key when backend is integrated
-  const { postSlug: _postSlug }: Props = $props();
+  const { postSlug }: Props = $props();
 
-  // This is a sample mock data for now.. we will replace this with Supabase soonest
-  let comments = $state<Comment[]>([
-    {
-      id: "c1",
-      body: "This really resonated with me. The part about letting thoughts settle without forcing them to be complete — that's something I needed to read today.",
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      replies: [
-        {
-          id: "r1",
-          body: "Same here. Bookmarked this one.",
-          createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        },
-      ],
-    },
-    {
-      id: "c2",
-      body: "Beautifully written. The Lunan always finds a way to put words to things I couldn't articulate.",
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      replies: [],
-    },
-    {
-      id: "c3",
-      body: "Found this through a friend. Glad I did.",
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-      replies: [],
-    },
-    {
-      id: "c4",
-      body: "The quiet honesty here is rare. Most writing online is performing — this isn't.",
-      createdAt: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
-      replies: [],
-    },
-    {
-      id: "c5",
-      body: "I've been coming back to this post all week. Something about it keeps pulling me in.",
-      createdAt: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000),
-      replies: [],
-    },
-    {
-      id: "c6",
-      body: "Needed this today. Thank you for putting it into words.",
-      createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-      replies: [],
-    },
-    {
-      id: "c7",
-      body: "Just discovered The Lunan. Already reading through the archive.",
-      createdAt: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000),
-      replies: [],
-    },
-  ]);
+  let comments = $state<Comment[]>([]);
+  let loading = $state(true);
+  let error = $state<string | null>(null);
 
   const COMMENTS_PER_PAGE = 5;
   let visibleCount = $state(COMMENTS_PER_PAGE);
@@ -69,33 +21,55 @@
 
   let activeReplyId = $state<string | null>(null);
   let newCommentBody = $state("");
+  let submitting = $state(false);
 
-  function addComment() {
-    if (!newCommentBody.trim()) return;
-    comments = [
-      {
-        id: crypto.randomUUID(),
-        body: newCommentBody.trim(),
-        createdAt: new Date(),
-        replies: [],
-      },
-      ...comments,
-    ];
-    newCommentBody = "";
+  onMount(async () => {
+    try {
+      const res = await fetch(`/api/comments/${postSlug}`);
+      if (!res.ok) throw new Error("Failed to load comments");
+      comments = await res.json();
+    } catch (e) {
+      error = e instanceof Error ? e.message : "Unknown error";
+    } finally {
+      loading = false;
+    }
+  });
+
+  async function addComment() {
+    if (!newCommentBody.trim() || submitting) return;
+    submitting = true;
+    try {
+      const res = await fetch(`/api/comments/${postSlug}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: newCommentBody.trim() }),
+      });
+      if (!res.ok) throw new Error("Failed to post comment");
+      const created = await res.json();
+      comments = [{ ...created, replies: [] }, ...comments];
+      newCommentBody = "";
+    } catch (e) {
+      error = e instanceof Error ? e.message : "Unknown error";
+    } finally {
+      submitting = false;
+    }
   }
 
-  function addReply(commentId: string, body: string) {
-    comments = comments.map((c) =>
-      c.id === commentId
-        ? {
-            ...c,
-            replies: [
-              ...c.replies,
-              { id: crypto.randomUUID(), body, createdAt: new Date() },
-            ],
-          }
-        : c
-    );
+  async function addReply(commentId: string, body: string) {
+    try {
+      const res = await fetch(`/api/comments/${postSlug}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body, parent_id: commentId }),
+      });
+      if (!res.ok) throw new Error("Failed to post reply");
+      const created = await res.json();
+      comments = comments.map((c) =>
+        c.id === commentId ? { ...c, replies: [...c.replies, created] } : c
+      );
+    } catch (e) {
+      error = e instanceof Error ? e.message : "Unknown error";
+    }
     activeReplyId = null;
   }
 
@@ -111,15 +85,21 @@
 <div
   class="mx-auto max-w-[760px] border-t-2 border-[#c5f7d0] px-4 pt-10 pb-12 md:px-8"
 >
-  <!-- Section header -->
   <p
     class="font-manrope mb-6 text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase"
   >
-    {comments.length} Comment{comments.length === 1 ? "" : "s"}
+    {#if loading}
+      Loading comments…
+    {:else}
+      {comments.length} Comment{comments.length === 1 ? "" : "s"}
+    {/if}
   </p>
 
-  <!-- Comment list -->
-  {#if comments.length > 0}
+  {#if error}
+    <p class="font-manrope mb-4 text-[14px] text-red-500">{error}</p>
+  {/if}
+
+  {#if !loading && comments.length > 0}
     <div class="space-y-6">
       {#each visibleComments as comment, i (comment.id)}
         <div>
@@ -167,10 +147,10 @@
       <button
         type="button"
         onclick={addComment}
-        disabled={!newCommentBody.trim()}
+        disabled={!newCommentBody.trim() || submitting}
         class="font-manrope cursor-pointer rounded-full bg-[#386547] px-5 py-2 text-[14px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
       >
-        Post comment
+        {submitting ? "Posting…" : "Post comment"}
       </button>
     </div>
   </div>
