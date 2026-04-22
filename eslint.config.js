@@ -26,6 +26,7 @@ export default [
       "**/dist/**",
       "**/node_modules/**",
       "**/.astro/**",
+      "**/.vercel/**",
       "**/playwright-report/**",
       "**/test-results/**",
     ],

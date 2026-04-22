@@ -4,6 +4,7 @@ import { getCollection } from "astro:content";
 
 import NewsletterBar from "@/components/home/NewsletterBar.svelte";
 import Layout from "@/layouts/Layout.astro";
+import { fetchPostStats } from "@/lib/stats";
 
 const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
@@ -12,7 +13,14 @@ const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
 const featuredPost = posts[0] ?? null;
 const feedPosts = posts.slice(1);
 
-const displayFeed = feedPosts.slice(0, 3).map((post) => ({
+const feedSlice = feedPosts.slice(0, 3);
+const allStatSlugs = [
+  ...(featuredPost ? [featuredPost.id] : []),
+  ...feedSlice.map((p) => p.id),
+];
+const stats = await fetchPostStats(allStatSlugs);
+
+const displayFeed = feedSlice.map((post) => ({
   author: "The Lunan",
   date: post.data.pubDate.toLocaleDateString("en-US", {
     month: "short",
@@ -25,17 +33,18 @@ const displayFeed = feedPosts.slice(0, 3).map((post) => ({
   readTime: "5 min read",
   imageUrl: post.data.image,
   href: `/${post.id}`,
+  claps: stats[post.id]?.claps,
+  commentCount: stats[post.id]?.commentCount,
 }));
 
-// Featured post — image is optional
+// Featured post
 const featuredHasImage = !!featuredPost?.data.image;
 const featuredImageUrl = featuredPost?.data.image ?? null;
-
 const featuredTitle =
   featuredPost?.data.title ?? "Living Systems and the New Architecture";
 const featuredExcerpt =
   featuredPost?.data.description ??
-  "Exploring the convergence of generative algorithms and organic structuralism — how the blob aesthetic is redefining modern infrastructure.";
+  "Exploring the convergence of generative algorithms and organic structuralism.";
 const featuredHref = featuredPost ? `/${featuredPost.id}` : "#";
 const featuredDate = featuredPost
   ? featuredPost.data.pubDate.toLocaleDateString("en-US", {
@@ -44,194 +53,181 @@ const featuredDate = featuredPost
       year: "numeric",
     })
   : "Apr 15, 2026";
-const featuredAuthor = "The Lunan";
+const featuredTag = featuredPost
+  ? (featuredPost.data.tags?.[0] ?? "EDITORIAL").toUpperCase()
+  : "EDITORIAL";
+const featuredWordCount = featuredPost?.body?.trim().split(/\s+/).length ?? 0;
+const featuredReadTime = `${Math.max(1, Math.round(featuredWordCount / 200))} min read`;
+const featuredClaps = featuredPost ? (stats[featuredPost.id]?.claps ?? 0) : 0;
+const featuredComments = featuredPost
+  ? (stats[featuredPost.id]?.commentCount ?? 0)
+  : 0;
 ---
 
 <Layout>
   <main class="pt-[64px]">
-    <!-- ─── Compact Hero ───────────────────────────────────────── -->
+    <!-- ─── Hero ───────────────────────────────────────────────── -->
     <section
-      class="relative flex flex-col items-center overflow-hidden border-b border-[rgba(197,247,208,0.3)] px-4 pt-14 pb-10 text-center md:px-8 md:pt-20 md:pb-16"
+      class="relative overflow-hidden border-b border-[rgba(197,247,208,0.25)] px-4 pt-16 pb-14 md:px-8 md:pt-24 md:pb-20"
     >
-      <!-- background blob shapes -->
-      <!-- top-right large -->
+      <!-- subtle grid texture -->
       <div
-        class="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-[rgba(197,247,208,0.55)] md:h-64 md:w-64"
-        style="animation: blob-float 6s ease-in-out infinite;"
+        class="pointer-events-none absolute inset-0"
+        style="background-image: linear-gradient(rgba(197,247,208,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(197,247,208,0.07) 1px, transparent 1px); background-size: 40px 40px;"
       >
       </div>
-      <!-- bottom-left medium -->
-      <div
-        class="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-[rgba(197,247,208,0.45)] md:h-44 md:w-44"
-        style="animation: blob-float 8s ease-in-out 1.5s infinite;"
-      >
+      <!-- radial fade so grid softens at edges -->
+      <div class="pointer-events-none absolute inset-0"></div>
+
+      <div class="relative mx-auto max-w-[760px] text-center">
+        <span
+          class="font-manrope mb-5 inline-flex items-center gap-2 rounded-full border border-[rgba(56,101,71,0.15)] bg-[rgba(197,247,208,0.4)] px-3.5 py-1.5 text-[11px] font-bold tracking-[0.12em] text-[#386547] uppercase"
+        >
+          <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-[#386547]"
+          ></span>
+          Personal Blog
+        </span>
+
+        <h1
+          class="font-space-grotesk text-[48px] leading-[0.97] font-bold tracking-[-0.05em] text-[#2d5a3d] sm:text-[64px] md:text-[80px] lg:text-[96px]"
+        >
+          The Lunan<span class="text-[#ccf05f]">.</span>
+        </h1>
+
+        <p
+          class="font-manrope mx-auto mt-5 max-w-[420px] text-[15px] leading-[1.7] text-[rgba(41,48,45,0.55)] md:text-[16px]"
+        >
+          A quiet corner for unfiltered reflections — half-finished ideas,
+          late-night opinions, and the kind of takes you only say when you're
+          not trying to impress anyone.
+        </p>
+
+        <div class="mt-6 flex items-center justify-center gap-3">
+          <a
+            href="/archive"
+            class="font-manrope inline-flex items-center gap-1.5 text-[13px] font-bold text-[#386547] underline decoration-[rgba(56,101,71,0.3)] underline-offset-3 transition-colors hover:decoration-[#386547]"
+          >
+            Browse all posts
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 14 14"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M1 7h12M8 2l5 5-5 5"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+          </a>
+          <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.35)]"
+            >·</span
+          >
+          <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.4)]"
+            >{posts.length} entries</span
+          >
+        </div>
       </div>
-      <!-- top-left small -->
-      <div
-        class="pointer-events-none absolute top-6 -left-6 h-20 w-20 rounded-full bg-[rgba(204,240,95,0.35)] md:h-28 md:w-28"
-        style="animation: blob-float 7s ease-in-out 0.8s infinite;"
-      >
-      </div>
-      <!-- bottom-right small -->
-      <div
-        class="pointer-events-none absolute right-10 -bottom-4 h-16 w-16 rounded-full bg-[rgba(204,240,95,0.3)] md:h-24 md:w-24"
-        style="animation: blob-float 9s ease-in-out 2.5s infinite;"
-      >
-      </div>
-
-      <style>
-        @keyframes blob-float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-16px);
-          }
-        }
-      </style>
-
-      <span
-        class="font-manrope mb-5 inline-block rounded-full bg-[#ccf05f] px-3 py-1 text-[10px] font-bold tracking-[3px] text-[#29302d] uppercase"
-      >
-        Personal Blog
-      </span>
-
-      <h1
-        class="font-space-grotesk text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-[#2d5a3d] sm:text-[46px] md:text-[52px]"
-      >
-        The Lunan<span class="text-[#ccf05f]">.</span>
-      </h1>
-
-      <div class="my-4 h-[2px] w-10 rounded-full bg-[#386547]"></div>
-
-      <p
-        class="font-manrope max-w-[540px] text-[15px] leading-[1.65] text-[rgba(41,48,45,0.6)] md:text-[17px]"
-      >
-        A quiet corner for unfiltered reflections — half-finished ideas,
-        late-night opinions, and the kind of takes you only really say when
-        you&apos;re not trying to impress anyone.
-      </p>
     </section>
 
     <!-- ─── Newsletter Bar ──────────────────────────────────────── -->
-    <NewsletterBar client:load />
+    <NewsletterBar client:visible />
 
     <!-- ─── Hero Featured Card ────────────────────────────────── -->
     <section class="mx-auto max-w-[1200px] px-4 pt-8 pb-4 md:px-8 md:pt-12">
-      <div
-        class="group relative overflow-hidden rounded-[12px] bg-[#e1eae5] transition-colors hover:bg-[#d8e5dd]"
-      >
-        {
-          featuredHasImage ? (
-            /* ── With image: text left (7 cols) + image right (5 cols) ── */
-            <div class="flex flex-col md:grid md:grid-cols-12">
-              <div class="flex flex-col justify-center gap-4 p-7 md:col-span-7 md:gap-5 md:p-10">
-                <span class="font-manrope inline-flex w-fit rounded-full bg-[#ccf05f] px-3 py-1 text-[11px] font-bold tracking-[0.08em] text-[#29302d] uppercase">
-                  FEATURED
-                </span>
+      {
+        featuredHasImage ? (
+          /* ── With image: full-bleed cover with gradient overlay ── */
+          <div class="group relative min-h-[380px] overflow-hidden rounded-[16px] md:min-h-[480px]">
+            <img
+              src={featuredImageUrl}
+              alt={featuredTitle}
+              class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            />
 
-                <a
-                  href={featuredHref}
-                  class="after:absolute after:inset-0 after:z-0"
-                  aria-label={featuredTitle}
-                />
+            {/* layered gradient: dark bottom + subtle top vignette */}
+            <div class="absolute inset-0 bg-[linear-gradient(to_top,rgba(20,32,26,0.92)_0%,rgba(20,32,26,0.4)_50%,rgba(20,32,26,0.1)_100%)]" />
 
-                <h2 class="font-space-grotesk text-[28px] leading-[1.1] font-bold tracking-[-0.04em] text-[#29302d] transition-colors group-hover:text-[#386547] sm:text-[36px] md:text-[42px]">
-                  {featuredTitle}
-                </h2>
+            {/* stretched link */}
+            <a
+              href={featuredHref}
+              class="absolute inset-0 z-0"
+              aria-label={featuredTitle}
+            />
 
-                <p class="font-manrope max-w-[480px] text-[14px] leading-[1.65] text-[rgba(41,48,45,0.65)] md:text-[15px]">
-                  {featuredExcerpt}
-                </p>
-
-                <div class="flex items-center gap-3">
-                  <div class="font-space-grotesk flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#c5f7d0] text-[12px] font-bold text-[#386547]">
-                    TL
-                  </div>
-                  <span class="font-manrope text-[13px] font-medium text-[rgba(41,48,45,0.6)]">
-                    {featuredAuthor}
-                  </span>
-                  <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.35)]">
-                    {featuredDate}
-                  </span>
-                </div>
-
-                <a
-                  href={featuredHref}
-                  class="font-manrope relative z-10 inline-flex w-fit items-center gap-2 rounded-full bg-[#386547] px-5 py-2.5 text-[13px] font-bold text-[#ccffd8] transition-colors hover:bg-[#2d5a3d] md:px-6 md:py-3"
-                >
-                  Read entry
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M1 7h12M8 2l5 5-5 5"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </a>
-              </div>
-
-              <div class="relative min-h-[200px] overflow-hidden md:col-span-5 md:min-h-0">
-                <div class="absolute inset-y-0 left-0 z-10 hidden w-16 bg-[linear-gradient(to_right,#e1eae5,transparent)] md:block" />
-                <img
-                  src={featuredImageUrl || ""}
-                  alt={featuredTitle}
-                  class="h-full w-full object-cover"
-                  style="min-height:200px;"
-                />
-              </div>
-            </div>
-          ) : (
-            /* ── No image: full-width text with larger excerpt ── */
-            <div class="flex flex-col gap-5 p-7 md:max-w-[720px] md:p-12">
-              <span class="font-manrope inline-flex w-fit rounded-full bg-[#ccf05f] px-3 py-1 text-[11px] font-bold tracking-[0.08em] text-[#29302d] uppercase">
+            {/* top badges */}
+            <div class="absolute top-5 left-5 z-10 flex items-center gap-2 md:top-7 md:left-7">
+              <span class="font-manrope rounded-full bg-[#ccf05f] px-3 py-1 text-[10px] font-bold tracking-[0.1em] text-[#29302d] uppercase">
                 FEATURED
               </span>
+              <span class="font-manrope rounded-full bg-[rgba(255,255,255,0.15)] px-3 py-1 text-[10px] font-bold tracking-[0.1em] text-white uppercase backdrop-blur-sm">
+                {featuredTag}
+              </span>
+            </div>
 
-              <a
-                href={featuredHref}
-                class="after:absolute after:inset-0 after:z-0"
-                aria-label={featuredTitle}
-              />
-
-              <h2 class="font-space-grotesk text-[30px] leading-[1.08] font-bold tracking-[-0.04em] text-[#29302d] transition-colors group-hover:text-[#386547] sm:text-[40px] md:text-[48px]">
+            {/* bottom content */}
+            <div class="absolute right-0 bottom-0 left-0 z-10 p-6 md:p-10">
+              <h2 class="font-space-grotesk mb-3 text-[26px] leading-[1.1] font-bold tracking-[-0.04em] text-white sm:text-[34px] md:mb-4 md:text-[44px]">
                 {featuredTitle}
               </h2>
 
-              <p class="font-manrope max-w-[600px] text-[15px] leading-[1.7] text-[rgba(41,48,45,0.65)] md:text-[17px]">
+              <p class="font-manrope mb-5 hidden max-w-[600px] text-[14px] leading-[1.65] text-[rgba(255,255,255,0.75)] md:block md:text-[15px]">
                 {featuredExcerpt}
               </p>
 
-              <div class="flex flex-wrap items-center gap-4">
+              <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                  <div class="font-space-grotesk flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#c5f7d0] text-[12px] font-bold text-[#386547]">
+                  <div class="font-space-grotesk flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(197,247,208,0.25)] text-[11px] font-bold text-white backdrop-blur-sm">
                     TL
                   </div>
-                  <span class="font-manrope text-[13px] font-medium text-[rgba(41,48,45,0.6)]">
-                    {featuredAuthor}
+                  <span class="font-manrope text-[13px] font-medium text-[rgba(255,255,255,0.8)]">
+                    The Lunan
                   </span>
-                  <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.35)]">
+                  <span class="font-manrope text-[rgba(255,255,255,0.5)]">
+                    ·
+                  </span>
+                  <span class="font-manrope text-[13px] text-[rgba(255,255,255,0.6)]">
                     {featuredDate}
                   </span>
+                  <span class="font-manrope text-[rgba(255,255,255,0.5)]">
+                    ·
+                  </span>
+                  <span class="font-manrope text-[13px] text-[rgba(255,255,255,0.6)]">
+                    {featuredReadTime}
+                  </span>
+                  {featuredClaps > 0 && (
+                    <>
+                      <span class="font-manrope text-[rgba(255,255,255,0.5)]">
+                        ·
+                      </span>
+                      <span class="font-manrope text-[13px] text-[rgba(255,255,255,0.6)]">
+                        👏 {featuredClaps}
+                      </span>
+                    </>
+                  )}
+                  {featuredComments > 0 && (
+                    <>
+                      <span class="font-manrope text-[rgba(255,255,255,0.5)]">
+                        ·
+                      </span>
+                      <span class="font-manrope text-[13px] text-[rgba(255,255,255,0.6)]">
+                        💬 {featuredComments}
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 <a
                   href={featuredHref}
-                  class="font-manrope relative z-10 inline-flex items-center gap-2 rounded-full bg-[#386547] px-5 py-2.5 text-[13px] font-bold text-[#ccffd8] transition-colors hover:bg-[#2d5a3d]"
+                  class="font-manrope relative z-10 inline-flex items-center gap-2 rounded-full bg-[#ccf05f] px-5 py-2.5 text-[13px] font-bold text-[#1a2e22] transition-all hover:bg-white focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                   Read entry
                   <svg
-                    width="14"
-                    height="14"
+                    width="13"
+                    height="13"
                     viewBox="0 0 14 14"
                     fill="none"
                     aria-hidden="true"
@@ -239,7 +235,7 @@ const featuredAuthor = "The Lunan";
                     <path
                       d="M1 7h12M8 2l5 5-5 5"
                       stroke="currentColor"
-                      stroke-width="1.5"
+                      stroke-width="1.8"
                       stroke-linecap="round"
                       stroke-linejoin="round"
                     />
@@ -247,32 +243,176 @@ const featuredAuthor = "The Lunan";
                 </a>
               </div>
             </div>
-          )
-        }
-      </div>
+          </div>
+        ) : (
+          /* ── No image: editorial gradient card ── */
+          <div class="group relative overflow-hidden rounded-[16px] bg-[#1a2e22]">
+            {/* decorative background elements */}
+            <div class="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[rgba(197,247,208,0.07)]" />
+            <div class="pointer-events-none absolute -bottom-16 -left-16 h-52 w-52 rounded-full bg-[rgba(204,240,95,0.06)]" />
+            <div class="pointer-events-none absolute top-1/2 right-1/4 h-32 w-32 -translate-y-1/2 rounded-full bg-[rgba(197,247,208,0.04)]" />
+
+            {/* stretched link */}
+            <a
+              href={featuredHref}
+              class="absolute inset-0 z-0"
+              aria-label={featuredTitle}
+            />
+
+            <div class="relative z-10 p-8 md:p-12">
+              {/* top row */}
+              <div class="mb-6 flex items-center gap-2 md:mb-8">
+                <span class="font-manrope rounded-full bg-[#ccf05f] px-3 py-1 text-[10px] font-bold tracking-[0.1em] text-[#29302d] uppercase">
+                  FEATURED
+                </span>
+                <span class="font-manrope rounded-full border border-[rgba(197,247,208,0.2)] px-3 py-1 text-[10px] font-bold tracking-[0.1em] text-[rgba(197,247,208,0.6)] uppercase">
+                  {featuredTag}
+                </span>
+              </div>
+
+              {/* large decorative quotemark */}
+              <div class="font-space-grotesk pointer-events-none absolute top-6 right-8 text-[140px] leading-none font-bold text-[rgba(197,247,208,0.05)] select-none md:text-[200px]">
+                "
+              </div>
+
+              <h2 class="font-space-grotesk mb-4 max-w-[700px] text-[28px] leading-[1.08] font-bold tracking-[-0.04em] text-white transition-colors group-hover:text-[#ccf05f] sm:text-[38px] md:mb-6 md:text-[50px]">
+                {featuredTitle}
+              </h2>
+
+              <p class="font-manrope mb-8 max-w-[560px] text-[15px] leading-[1.7] text-[rgba(197,247,208,0.65)] md:mb-10 md:text-[17px]">
+                {featuredExcerpt}
+              </p>
+
+              <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <div class="font-space-grotesk flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(197,247,208,0.15)] text-[11px] font-bold text-[#c5f7d0]">
+                    TL
+                  </div>
+                  <span class="font-manrope text-[13px] font-medium text-[rgba(197,247,208,0.7)]">
+                    The Lunan
+                  </span>
+                  <span class="text-[rgba(197,247,208,0.3)]">·</span>
+                  <span class="font-manrope text-[13px] text-[rgba(197,247,208,0.5)]">
+                    {featuredDate}
+                  </span>
+                  <span class="text-[rgba(197,247,208,0.3)]">·</span>
+                  <span class="font-manrope text-[13px] text-[rgba(197,247,208,0.5)]">
+                    {featuredReadTime}
+                  </span>
+                  {featuredClaps > 0 && (
+                    <>
+                      <span class="text-[rgba(197,247,208,0.3)]">·</span>
+                      <span class="font-manrope text-[13px] text-[rgba(197,247,208,0.5)]">
+                        👏 {featuredClaps}
+                      </span>
+                    </>
+                  )}
+                  {featuredComments > 0 && (
+                    <>
+                      <span class="text-[rgba(197,247,208,0.3)]">·</span>
+                      <span class="font-manrope text-[13px] text-[rgba(197,247,208,0.5)]">
+                        💬 {featuredComments}
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                <a
+                  href={featuredHref}
+                  class="font-manrope relative z-10 inline-flex items-center gap-2 rounded-full bg-[#ccf05f] px-5 py-2.5 text-[13px] font-bold text-[#1a2e22] transition-all hover:bg-white focus-visible:ring-2 focus-visible:ring-[#ccf05f] focus-visible:outline-none"
+                >
+                  Read entry
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 7h12M8 2l5 5-5 5"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        )
+      }
     </section>
 
     <!-- ─── Latest Entries Feed ───────────────────────────────── -->
-    <section class="mx-auto max-w-[1200px] px-4 pt-12 pb-12 md:px-8 md:pt-16">
-      <div class="mb-2 border-b-2 border-[#c5f7d0] pb-3">
-        <span
-          class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase"
+    <section class="mx-auto max-w-[1200px] px-4 pt-14 pb-16 md:px-8 md:pt-20">
+      <!-- Section header -->
+      <div class="mb-8 flex items-center justify-between md:mb-10">
+        <div class="flex items-center gap-3">
+          <span
+            class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.45)] uppercase"
+          >
+            Latest Entries
+          </span>
+          <span
+            class="font-manrope rounded-full bg-[#ebf3ed] px-2.5 py-0.5 text-[11px] font-bold text-[#386547]"
+          >
+            {feedPosts.length}
+          </span>
+        </div>
+        <a
+          href="/archive"
+          class="font-manrope group flex items-center gap-1.5 text-[13px] font-bold text-[rgba(41,48,45,0.4)] transition-colors hover:text-[#386547]"
         >
-          LATEST ENTRIES
-        </span>
+          View all
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 14 14"
+            fill="none"
+            aria-hidden="true"
+            class="transition-transform group-hover:translate-x-0.5"
+          >
+            <path
+              d="M1 7h12M8 2l5 5-5 5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+        </a>
       </div>
 
-      <div>
+      <div class="divide-y-0">
         {displayFeed.map((item) => <FeedItem {...item} />)}
       </div>
 
-      <div class="mt-10 flex justify-center">
+      <!-- CTA -->
+      <div class="mt-12 flex items-center gap-4">
+        <div class="h-px flex-1 bg-[rgba(197,247,208,0.4)]"></div>
         <a
           href="/archive"
-          class="font-manrope rounded-[8px] border-2 border-[rgba(56,101,71,0.12)] bg-white px-6 py-3 text-[14px] font-bold text-[#386547] transition-colors hover:border-[#386547] md:px-8 md:text-[15px]"
+          class="font-manrope group inline-flex items-center gap-2 rounded-full bg-[#1a2e22] px-6 py-3 text-[13px] font-bold text-[#ccf05f] transition-all hover:bg-[#2d5a3d] focus-visible:ring-2 focus-visible:ring-[#386547] focus-visible:outline-none"
         >
-          Load more entries
+          Browse all {posts.length} entries
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 14 14"
+            fill="none"
+            aria-hidden="true"
+            class="transition-transform group-hover:translate-x-0.5"
+          >
+            <path
+              d="M1 7h12M8 2l5 5-5 5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
         </a>
+        <div class="h-px flex-1 bg-[rgba(197,247,208,0.4)]"></div>
       </div>
     </section>
   </main>

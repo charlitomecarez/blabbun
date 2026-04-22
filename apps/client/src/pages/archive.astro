@@ -3,10 +3,13 @@ import { getCollection } from "astro:content";
 
 import ArchiveList from "@/components/archive/ArchiveList.svelte";
 import Layout from "@/layouts/Layout.astro";
+import { fetchPostStats } from "@/lib/stats";
 
 const allPosts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+
+const stats = await fetchPostStats(allPosts.map((p) => p.id));
 
 const postItems = allPosts.map((post) => ({
   title: post.data.title,
@@ -24,6 +27,8 @@ const postItems = allPosts.map((post) => ({
   tag: (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
   href: `/${post.id}`,
   imageUrl: post.data.image,
+  claps: stats[post.id]?.claps,
+  commentCount: stats[post.id]?.commentCount,
 }));
 
 const allTags = [

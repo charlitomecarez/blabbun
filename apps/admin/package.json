@@ -17,9 +17,11 @@
   },
   "dependencies": {
     "@astrojs/svelte": "^8.0.5",
+    "@astrojs/vercel": "^10.0.4",
+    "@tailwindcss/vite": "^4.2.2",
+    "@thelunan/db": "workspace:*",
     "@thelunan/types": "workspace:*",
     "@thelunan/ui": "workspace:*",
-    "@tailwindcss/vite": "^4.2.2",
     "astro": "^6.1.6",
     "svelte": "^5.55.4",
     "tailwindcss": "^4.2.2",
