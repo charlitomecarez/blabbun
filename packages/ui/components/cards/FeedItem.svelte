@@ -59,9 +59,10 @@
         {author}
       </span>
       {#if date}
-        <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.4)]">·</span
+        <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.55)]"
+          >·</span
         >
-        <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.4)]"
+        <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.55)]"
           >{date}</span
         >
       {/if}
@@ -98,7 +99,7 @@
       >
         {tag}
       </span>
-      <span class="font-manrope text-[12px] text-[rgba(41,48,45,0.4)]"
+      <span class="font-manrope text-[12px] text-[rgba(41,48,45,0.55)]"
         >{readTime}</span
       >
 

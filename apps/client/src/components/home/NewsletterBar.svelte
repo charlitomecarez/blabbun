@@ -95,7 +95,7 @@
                 required
                 class="w-full px-3 py-3 text-[15px] tracking-normal
                        normal-case placeholder:tracking-normal
-                       placeholder:text-[rgba(41,48,45,0.35)] placeholder:normal-case"
+                       placeholder:text-[rgba(41,48,45,0.5)] placeholder:normal-case"
               />
             </div>
             <button
