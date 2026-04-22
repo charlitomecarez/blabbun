@@ -9,28 +9,35 @@
 
   const { postSlug, postUrl, postTitle }: Props = $props();
 
-  const SEED = 12;
-  // svelte-ignore state_referenced_locally
   const storageKey = `clap_${postSlug}`;
 
-  let count = $state(SEED);
+  let count = $state(0);
   let clapped = $state(false);
+  let loading = $state(true);
   let animating = $state(false);
   let copied = $state(false);
+  let error = $state<string | null>(null);
   let clapTimer: ReturnType<typeof setTimeout> | undefined;
   let copyTimer: ReturnType<typeof setTimeout> | undefined;
 
-  onMount(() => {
+  onMount(async () => {
     try {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
-        const parsed = JSON.parse(saved) as { count: number; clapped: boolean };
-        count = parsed.count;
+        const parsed = JSON.parse(saved) as { clapped: boolean };
         clapped = parsed.clapped;
       }
-    } catch {
-      // localStorage unavailable — use defaults
+
+      const res = await fetch(`/api/claps/${postSlug}`);
+      if (!res.ok) throw new Error("Failed to load clap count");
+      const data = await res.json();
+      count = data.count ?? 0;
+    } catch (e) {
+      error = e instanceof Error ? e.message : "Unknown error";
+    } finally {
+      loading = false;
     }
+
     return () => {
       clearTimeout(clapTimer);
       clearTimeout(copyTimer);
@@ -39,20 +46,32 @@
 
   function saveToStorage() {
     try {
-      localStorage.setItem(storageKey, JSON.stringify({ count, clapped }));
+      localStorage.setItem(storageKey, JSON.stringify({ clapped }));
     } catch {
       // ignore
     }
   }
 
-  function handleClap() {
+  async function handleClap() {
     const nowClapped = !clapped;
     clapped = nowClapped;
-    count = nowClapped ? count + 1 : count - 1;
     animating = true;
     saveToStorage();
     clearTimeout(clapTimer);
     clapTimer = setTimeout(() => (animating = false), 200);
+
+    if (nowClapped) {
+      try {
+        const res = await fetch(`/api/claps/${postSlug}`, { method: "POST" });
+        if (!res.ok) throw new Error("Failed to clap");
+        const data = await res.json();
+        count = data.count;
+      } catch (e) {
+        error = e instanceof Error ? e.message : "Failed to clap";
+        clapped = false;
+        saveToStorage();
+      }
+    }
   }
 
   async function copyLink() {
@@ -77,20 +96,25 @@
 <div
   class="mx-auto max-w-[760px] border-t-2 border-[#c5f7d0] px-4 pt-10 pb-12 text-center md:px-8"
 >
+  {#if error}
+    <p class="font-manrope mb-6 text-[14px] text-red-500">{error}</p>
+  {/if}
+
   <!-- Clap button -->
   <button
     type="button"
     onclick={handleClap}
+    disabled={loading}
     aria-pressed={clapped}
     aria-label={clapped ? "Remove clap" : "Clap for this post"}
-    class="font-manrope mb-6 inline-flex cursor-pointer items-center gap-2 rounded-full border-none px-6 py-3 text-[15px] font-bold text-[#386547] transition-transform duration-150"
+    class="font-manrope mb-6 inline-flex cursor-pointer items-center gap-2 rounded-full border-none px-6 py-3 text-[15px] font-bold text-[#386547] transition-transform duration-150 disabled:cursor-not-allowed disabled:opacity-50"
     class:bg-[#c5f7d0]={clapped}
     class:bg-[#ebf3ed]={!clapped}
     class:scale-[1.15]={animating}
     class:scale-100={!animating}
   >
     <span style="font-size:20px;" aria-hidden="true">👏</span>
-    <span>Clap · {count}</span>
+    <span>{loading ? "Loading…" : `Clap · ${count}`}</span>
   </button>
 
   <!-- Share label -->
