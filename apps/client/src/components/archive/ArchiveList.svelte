@@ -181,7 +181,7 @@
   .archive-link {
     position: absolute;
     inset: 0;
-    z-index: 0;
+    z-index: 2;
   }
   .archive-meta {
     display: flex;
