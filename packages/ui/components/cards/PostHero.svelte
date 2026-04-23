@@ -15,7 +15,7 @@
     tag = "EDITORIAL",
     readTime = "5 min read",
     pubDate,
-    author = "The Lunan",
+    author = "Blab Bun",
     backHref = "/",
   }: Props = $props();
 

@@ -11,8 +11,8 @@
   }
 
   const {
-    brandName = "The Lunan",
-    copyright = `© ${new Date().getFullYear()} The Lunan`,
+    brandName = "Blab Bun",
+    copyright = `© ${new Date().getFullYear()} Blab Bun`,
     links = [
       { label: "Terms", href: "/terms" },
       { label: "Privacy", href: "/privacy" },

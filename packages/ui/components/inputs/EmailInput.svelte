@@ -18,7 +18,7 @@
 </script>
 
 <!--
-  Standalone email input following the thelunan design system.
+  Standalone email input following the blabbun design system.
   Pairs with a submit button inside a shared bottom-border container —
   see NewsletterBar for the full HorizontalBorder pattern.
 -->

@@ -90,9 +90,9 @@ Open `apps/client/src/layouts/Layout.astro`. The current imports section (lines 
 
 ```astro
 ---
-import "@thelunan/ui/styles/global.css";
+import "@blabbun/ui/styles/global.css";
 
-import { Footer, Navbar } from "@thelunan/ui/components/layouts";
+import { Footer, Navbar } from "@blabbun/ui/components/layouts";
 
 import SearchDropdown from "@/components/search/SearchDropdown.svelte";
 ---
@@ -102,9 +102,9 @@ Add the ScrollToTop import so it becomes:
 
 ```astro
 ---
-import "@thelunan/ui/styles/global.css";
+import "@blabbun/ui/styles/global.css";
 
-import { Footer, Navbar } from "@thelunan/ui/components/layouts";
+import { Footer, Navbar } from "@blabbun/ui/components/layouts";
 
 import SearchDropdown from "@/components/search/SearchDropdown.svelte";
 import ScrollToTop from "@/components/layouts/ScrollToTop.svelte";

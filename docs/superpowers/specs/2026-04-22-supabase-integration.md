@@ -2,7 +2,7 @@
 
 ## Overview
 
-Replace all mock/localStorage data in the client app with Supabase-backed persistence. Add a shared `@thelunan/db` package for the typed Supabase client. Add server-side Astro API routes for all data mutation. Add basic admin views for comment moderation and subscriber management.
+Replace all mock/localStorage data in the client app with Supabase-backed persistence. Add a shared `@blabbun/db` package for the typed Supabase client. Add server-side Astro API routes for all data mutation. Add basic admin views for comment moderation and subscriber management.
 
 ## Goals
 
@@ -20,14 +20,14 @@ Replace all mock/localStorage data in the client app with Supabase-backed persis
 
 ## Architecture
 
-### Shared package: `@thelunan/db`
+### Shared package: `@blabbun/db`
 
 A new `packages/db` workspace package exports:
 
 - `createSupabaseClient(url, key)` — typed Supabase client factory
 - TypeScript interfaces for every DB table row/insert/update shape
 
-Both `apps/client` and `apps/admin` add `@thelunan/db` as a workspace dependency.
+Both `apps/client` and `apps/admin` add `@blabbun/db` as a workspace dependency.
 
 ### Server-side API routes (`apps/client`)
 

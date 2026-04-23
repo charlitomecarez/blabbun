@@ -6,7 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://thelunan.com",
+  site: "https://blabbun.com",
   output: "server",
   adapter: vercel(),
   integrations: [svelte(), mdx()],

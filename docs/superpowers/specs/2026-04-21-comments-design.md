@@ -51,7 +51,7 @@ const mockComments: Comment[] = [
   },
   {
     id: "c2",
-    body: "Beautifully written. The Lunan always finds a way to put words to things I couldn't articulate.",
+    body: "Beautifully written. Blab Bun always finds a way to put words to things I couldn't articulate.",
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
     replies: [],
   },

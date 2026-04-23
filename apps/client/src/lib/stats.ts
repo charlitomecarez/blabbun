@@ -1,5 +1,5 @@
-import type { CommentRow, PostClapRow } from "@thelunan/db";
-import { createSupabaseClient } from "@thelunan/db";
+import type { CommentRow, PostClapRow } from "@blabbun/db";
+import { createSupabaseClient } from "@blabbun/db";
 
 export interface PostStats {
   claps: number;

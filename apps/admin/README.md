@@ -1,6 +1,6 @@
-# @thelunan/admin
+# @blabbun/admin
 
-Admin dashboard for managing the thelunan blog.
+Admin dashboard for managing the blabbun blog.
 
 Runs at `localhost:4322` in development.
 

@@ -14,7 +14,7 @@
   }
 
   const {
-    author = "The Lunan",
+    author = "Blab Bun",
     date = "",
     title,
     excerpt = "",

@@ -1,5 +1,5 @@
 ---
-import { FeedItem, PostHero } from "@thelunan/ui/components/cards";
+import { FeedItem, PostHero } from "@blabbun/ui/components/cards";
 import { getCollection, render } from "astro:content";
 import { shuffle } from "lodash-es";
 
@@ -21,7 +21,7 @@ const { Content } = await render(post);
 const wordCount = post.body?.trim().split(/\s+/).length ?? 0;
 const readTime = `${Math.max(1, Math.round(wordCount / 200))} min read`;
 const tag = (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase();
-const postUrl = `${Astro.site ?? "https://thelunan.com"}/${post.id}`;
+const postUrl = `${Astro.site ?? "https://blabbun.com"}/${post.id}`;
 const hasImage = !!post.data.image;
 
 const otherPosts = allPosts.filter((p) => p.id !== post.id);
@@ -52,13 +52,13 @@ const jsonLd = {
   datePublished: post.data.pubDate.toISOString(),
   author: {
     "@type": "Person",
-    name: "The Lunan",
-    url: `${Astro.site ?? "https://thelunan.com"}/about`,
+    name: "Blab Bun",
+    url: `${Astro.site ?? "https://blabbun.com"}/about`,
   },
   publisher: {
     "@type": "Organization",
-    name: "The Lunan",
-    url: Astro.site ?? "https://thelunan.com",
+    name: "Blab Bun",
+    url: Astro.site ?? "https://blabbun.com",
   },
   ...(post.data.image ? { image: post.data.image } : {}),
 };
@@ -179,12 +179,12 @@ const jsonLd = {
     {
       relatedPosts.length > 0 && (
         <section
-          aria-label="More from The Lunan"
+          aria-label="More from Blab Bun"
           class="mx-auto max-w-[1200px] px-4 pb-20 md:px-8"
         >
           <div class="mb-6 border-t-2 border-[#c5f7d0] pt-8">
             <span class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase">
-              More from The Lunan
+              More from Blab Bun
             </span>
           </div>
 

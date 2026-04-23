@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { relativeTime } from "@thelunan/utils";
+  import { relativeTime } from "@blabbun/utils";
   import type { Comment } from "./types";
 
   interface Props {

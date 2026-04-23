@@ -1,6 +1,6 @@
-# The Lunan
+# Blab Bun
 
-The Lunan is home—a lunan, a spot, a place.
+Blab Bun is home—a bub, a spot, a place.
 
 It’s a space for unfiltered thoughts, like a friend who starts talking and just keeps going.
 
@@ -15,7 +15,7 @@ Built with [Astro](https://astro.build) and [Svelte](https://svelte.dev) as a pn
 ## Structure
 
 ```
-thelunan/
+blabbun/
 ├── apps/
 │   ├── client/   # Public-facing blog (localhost:4321)
 │   └── admin/    # Admin dashboard (localhost:4322)

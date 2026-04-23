@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FeedItem } from "@thelunan/ui/components/cards";
+  import { FeedItem } from "@blabbun/ui/components/cards";
 
   interface PostItem {
     title: string;

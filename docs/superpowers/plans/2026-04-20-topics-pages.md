@@ -6,7 +6,7 @@
 
 **Architecture:** `ArchiveList.svelte` gains an optional `lockedTag` prop that hides filter pills and pre-filters to one tag. Two static Astro pages consume it: `topics/index.astro` lists all tags, `topics/[tag].astro` renders a locked filtered list. All data loaded at build time.
 
-**Tech Stack:** Astro 6, Svelte 5 (`$props`, `$state`), Tailwind CSS 4, Playwright (e2e tests), `@thelunan/ui` FeedItem.
+**Tech Stack:** Astro 6, Svelte 5 (`$props`, `$state`), Tailwind CSS 4, Playwright (e2e tests), `@blabbun/ui` FeedItem.
 
 ---
 

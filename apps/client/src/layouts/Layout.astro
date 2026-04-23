@@ -1,7 +1,7 @@
 ---
-import "@thelunan/ui/styles/global.css";
+import "@blabbun/ui/styles/global.css";
 
-import { Footer, Navbar } from "@thelunan/ui/components/layouts";
+import { Footer, Navbar } from "@blabbun/ui/components/layouts";
 
 import ScrollToTop from "@/components/layouts/ScrollToTop.svelte";
 import SearchDropdown from "@/components/search/SearchDropdown.svelte";
@@ -20,11 +20,11 @@ const {
   ogType = "website",
 } = Astro.props;
 
-const siteTitle = "The Lunan";
+const siteTitle = "Blab Bun";
 const pageTitle = rawTitle ? `${rawTitle} · ${siteTitle}` : siteTitle;
 const canonicalUrl = Astro.url.href;
 const siteUrl =
-  Astro.site?.toString().replace(/\/$/, "") ?? "https://thelunan.com";
+  Astro.site?.toString().replace(/\/$/, "") ?? "https://blabbun.com";
 
 const { pathname } = Astro.url;
 const navLinks = [

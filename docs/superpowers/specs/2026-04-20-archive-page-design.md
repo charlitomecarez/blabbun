@@ -5,7 +5,7 @@
 
 ## Overview
 
-A `/archive` page for The Lunan blog that displays all published posts with client-side tag filtering and sort order control. Posts are grouped by month.
+A `/archive` page for Blab Bun blog that displays all published posts with client-side tag filtering and sort order control. Posts are grouped by month.
 
 ## Route
 
@@ -18,7 +18,7 @@ Page header with "Archive" title and total post count. Below that:
 - **Tag filter pills** — "All" pill (active by default) plus one pill per unique tag collected from all posts, sorted alphabetically. Clicking a pill filters the list to posts with that tag.
 - **Sort dropdown** — "Newest first" (default) / "Oldest first". Controls the order within and across month groups.
 - **Post list** — posts grouped by month+year (e.g. "April 2026"). Each group shows a small uppercase month label (matching the homepage "LATEST ENTRIES" style) followed by post rows.
-- Each post row uses the existing `FeedItem` component from `@thelunan/ui`.
+- Each post row uses the existing `FeedItem` component from `@blabbun/ui`.
 
 ## Components
 

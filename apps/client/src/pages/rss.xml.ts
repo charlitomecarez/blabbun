@@ -8,7 +8,7 @@ export const GET: APIRoute = async ({ site }) => {
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
   );
 
-  const baseUrl = (site?.toString() ?? "https://thelunan.com").replace(
+  const baseUrl = (site?.toString() ?? "https://blabbun.com").replace(
     /\/$/,
     ""
   );
@@ -29,7 +29,7 @@ export const GET: APIRoute = async ({ site }) => {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>The Lunan</title>
+    <title>Blab Bun</title>
     <link>${baseUrl}</link>
     <description>A quiet corner of the internet where thoughts settle, drift, and take shape.</description>
     <language>en-us</language>

@@ -6,7 +6,7 @@
 
 **Architecture:** Static Astro page loads all posts at build time and passes them to a Svelte 5 component (`ArchiveList.svelte`) that owns filter/sort state. No client fetching — all data is baked in at build time.
 
-**Tech Stack:** Astro 6, Svelte 5 (`$state`/`$derived`), Tailwind CSS 4, Playwright (e2e tests), `@thelunan/ui` FeedItem component.
+**Tech Stack:** Astro 6, Svelte 5 (`$state`/`$derived`), Tailwind CSS 4, Playwright (e2e tests), `@blabbun/ui` FeedItem component.
 
 ---
 
@@ -103,7 +103,7 @@ git commit -m "test: add failing e2e tests for archive page"
 ```svelte
 <!-- apps/client/src/components/archive/ArchiveList.svelte -->
 <script lang="ts">
-  import { FeedItem } from "@thelunan/ui/components/cards";
+  import { FeedItem } from "@blabbun/ui/components/cards";
 
   interface PostItem {
     title: string;

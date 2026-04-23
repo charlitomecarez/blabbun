@@ -1,5 +1,5 @@
-import type { CommentRow } from "@thelunan/db";
-import { createSupabaseClient } from "@thelunan/db";
+import type { CommentRow } from "@blabbun/db";
+import { createSupabaseClient } from "@blabbun/db";
 import type { APIRoute } from "astro";
 
 export const prerender = false;

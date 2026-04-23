@@ -1,5 +1,5 @@
 ---
-import { FeedItem } from "@thelunan/ui/components/cards";
+import { FeedItem } from "@blabbun/ui/components/cards";
 import { getCollection } from "astro:content";
 
 import NewsletterBar from "@/components/home/NewsletterBar.svelte";
@@ -21,7 +21,7 @@ const allStatSlugs = [
 const stats = await fetchPostStats(allStatSlugs);
 
 const displayFeed = feedSlice.map((post) => ({
-  author: "The Lunan",
+  author: "Blab Bun",
   date: post.data.pubDate.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -91,7 +91,7 @@ const featuredComments = featuredPost
         <h1
           class="font-space-grotesk text-[48px] leading-[0.97] font-bold tracking-[-0.05em] text-[#2d5a3d] sm:text-[64px] md:text-[80px] lg:text-[96px]"
         >
-          The Lunan<span class="text-[#ccf05f]">.</span>
+          Blab Bun<span class="text-[#ccf05f]">.</span>
         </h1>
 
         <p
@@ -184,7 +184,7 @@ const featuredComments = featuredPost
                     TL
                   </div>
                   <span class="font-manrope text-[13px] font-medium text-[rgba(255,255,255,0.8)]">
-                    The Lunan
+                    Blab Bun
                   </span>
                   <span class="font-manrope text-[rgba(255,255,255,0.5)]">
                     ·
@@ -289,7 +289,7 @@ const featuredComments = featuredPost
                     TL
                   </div>
                   <span class="font-manrope text-[13px] font-medium text-[rgba(197,247,208,0.7)]">
-                    The Lunan
+                    Blab Bun
                   </span>
                   <span class="text-[rgba(197,247,208,0.3)]">·</span>
                   <span class="font-manrope text-[13px] text-[rgba(197,247,208,0.5)]">

@@ -14,7 +14,7 @@
   }
 
   const {
-    brandName = "The Lunan",
+    brandName = "Blab Bun",
     brandHref = "/",
     links = [
       { label: "Archive", href: "/archive" },

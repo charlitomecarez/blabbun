@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EmailInput } from "@thelunan/ui/components/inputs";
+  import { EmailInput } from "@blabbun/ui/components/inputs";
 
   let email = $state("");
   let status = $state<"idle" | "loading" | "success" | "error">("idle");

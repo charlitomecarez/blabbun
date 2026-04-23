@@ -225,7 +225,7 @@ The full import block should look like:
 
 ```astro
 ---
-import { FeedItem, PostHero } from "@thelunan/ui/components/cards";
+import { FeedItem, PostHero } from "@blabbun/ui/components/cards";
 import { getCollection, render } from "astro:content";
 
 import Layout from "@/layouts/Layout.astro";
@@ -238,7 +238,7 @@ import ClapShare from "@/components/post/ClapShare.svelte";
 Inside the frontmatter (after `const tag = ...`), add:
 
 ```astro
-const postUrl = `${Astro.site ?? "https://thelunan.com"}/${post.id}`;
+const postUrl = `${Astro.site ?? "https://blabbun.com"}/${post.id}`;
 ```
 
 - [ ] **Step 3: Insert the component between `</article>` and Related Posts**

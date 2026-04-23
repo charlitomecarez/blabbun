@@ -1,7 +1,7 @@
 <script lang="ts">
-  // Moved to @thelunan/ui/components/cards/ArticleCard.svelte
+  // Moved to @blabbun/ui/components/cards/ArticleCard.svelte
   // index.astro and any other pages should import from there:
-  //   import { ArticleCard } from "@thelunan/ui/components/cards";
+  //   import { ArticleCard } from "@blabbun/ui/components/cards";
 </script>
 
 <!-- This file intentionally left as a passthrough. -->

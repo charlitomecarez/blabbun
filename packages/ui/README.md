@@ -1,14 +1,14 @@
-# @thelunan/ui
+# @blabbun/ui
 
-Shared Svelte component library used across all thelunan apps.
+Shared Svelte component library used across all blabbun apps.
 
 ## Usage
 
 Components are imported directly from source:
 
 ```ts
-import Button from "@thelunan/ui/components/buttons/Button.svelte";
-import "@thelunan/ui/styles/global.css";
+import Button from "@blabbun/ui/components/buttons/Button.svelte";
+import "@blabbun/ui/styles/global.css";
 ```
 
 ## Navigation
