@@ -53,6 +53,8 @@
       <img
         src={imageUrl}
         alt=""
+        width="616"
+        height="140"
         loading="lazy"
         decoding="async"
         class="feed-img"

@@ -9,8 +9,17 @@ export default defineConfig({
   site: "https://blabbun.com",
   output: "server",
   adapter: vercel(),
+  devToolbar: { enabled: false },
   integrations: [svelte(), mdx()],
+  image: {
+    domains: ["images.unsplash.com"],
+    remotePatterns: [{ protocol: "https" }],
+  },
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      cssMinify: true,
+    },
   },
+  compressHTML: true,
 });

@@ -1,8 +1,17 @@
 <script lang="ts">
+  import { join, toLower, trim } from "lodash-es";
+
   interface NavLink {
     label: string;
     href: string;
     active?: boolean;
+  }
+
+  interface SearchEntry {
+    title: string;
+    description: string;
+    tags: string[];
+    href: string;
   }
 
   interface Props {
@@ -25,6 +34,30 @@
   let search = $state("");
   let mobileOpen = $state(false);
 
+  // Mobile-local search state
+  let mobilePosts = $state<SearchEntry[]>([]);
+  let mobileSearchLoaded = false;
+  let mobileQuery = $state("");
+
+  const mobileFiltered = $derived.by(() => {
+    const q = toLower(trim(mobileQuery));
+    if (!q) return [];
+    return mobilePosts
+      .filter((p) => {
+        const hay = toLower(join([p.title, p.description, ...p.tags], " "));
+        return hay.includes(q);
+      })
+      .slice(0, 5);
+  });
+
+  async function loadMobilePosts() {
+    if (mobileSearchLoaded) return;
+    const res = await fetch("/search.json");
+    if (!res.ok) return;
+    mobilePosts = await res.json();
+    mobileSearchLoaded = true;
+  }
+
   function toggleTheme() {
     isDark = !isDark;
     const t = isDark ? "dark" : "light";
@@ -32,7 +65,7 @@
     localStorage.setItem("bb-theme", t);
   }
 
-  function handleSearch(e: Event) {
+  function handleDesktopSearch(e: Event) {
     search = (e.target as HTMLInputElement).value;
     if (search) {
       window.dispatchEvent(
@@ -44,12 +77,23 @@
     }
   }
 
-  function handleSearchKey(e: KeyboardEvent) {
+  function handleDesktopSearchKey(e: KeyboardEvent) {
     if (e.key === "Escape") {
       search = "";
       window.dispatchEvent(new CustomEvent("search:close", { bubbles: true }));
       (e.target as HTMLInputElement).blur();
     }
+  }
+
+  function handleMobileSearch(e: Event) {
+    mobileQuery = (e.target as HTMLInputElement).value;
+    if (mobileQuery) loadMobilePosts();
+  }
+
+  function handleMobileMenu() {
+    mobileOpen = !mobileOpen;
+    if (mobileOpen) loadMobilePosts();
+    else mobileQuery = "";
   }
 
   let bookmarkCount = $state(0);
@@ -79,9 +123,10 @@
   <div
     style="
       max-width:680px;margin:0 auto;
-      padding:12px 32px;
+      padding:12px 16px;
       display:flex;align-items:center;gap:20px;
     "
+    class="sm:px-8"
   >
     <!-- Logo -->
     <a
@@ -102,10 +147,7 @@
     </a>
 
     <!-- Nav links (desktop) -->
-    <nav
-      style="display:flex;gap:16px;align-items:center;flex:1"
-      class="hidden md:flex"
-    >
+    <nav style="gap:16px;align-items:center;flex:1" class="hidden md:flex">
       {#each links as link}
         <a
           href={link.href}
@@ -122,9 +164,9 @@
       {/each}
     </nav>
 
-    <!-- Right: search + saved + theme -->
+    <!-- Right: search + saved + theme (desktop) -->
     <div
-      style="display:flex;align-items:center;gap:10px;flex-shrink:0"
+      style="align-items:center;gap:10px;flex-shrink:0"
       class="hidden md:flex"
     >
       <!-- Inline search bar -->
@@ -135,8 +177,8 @@
         >
         <input
           value={search}
-          oninput={handleSearch}
-          onkeydown={handleSearchKey}
+          oninput={handleDesktopSearch}
+          onkeydown={handleDesktopSearchKey}
           placeholder="search..."
           type="search"
           aria-label="Search posts"
@@ -191,6 +233,36 @@
         {isDark ? "☀" : "◑"}
       </button>
     </div>
+
+    <!-- Mobile right: theme + hamburger -->
+    <div
+      style="align-items:center;gap:8px;flex-shrink:0;margin-left:auto"
+      class="flex md:hidden"
+    >
+      <button
+        onclick={toggleTheme}
+        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+        style="
+          background:none;border:1px solid var(--border);border-radius:3px;
+          padding:5px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;
+          font-family:inherit;
+        "
+      >
+        {isDark ? "☀" : "◑"}
+      </button>
+      <button
+        onclick={handleMobileMenu}
+        aria-label={mobileOpen ? "Close menu" : "Open menu"}
+        aria-expanded={mobileOpen}
+        style="
+          background:none;border:1px solid var(--border);border-radius:3px;
+          padding:5px 9px;font-size:0.8rem;color:var(--muted);cursor:pointer;
+          font-family:inherit;line-height:1;
+        "
+      >
+        {mobileOpen ? "✕" : "☰"}
+      </button>
+    </div>
   </div>
 
   <!-- Mobile dropdown -->
@@ -202,6 +274,67 @@
       <div
         style="display:flex;flex-direction:column;gap:2px;padding:8px 24px 14px"
       >
+        <!-- Mobile search -->
+        <div style="padding:6px 0 2px">
+          <div style="position:relative">
+            <span
+              style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.85rem;pointer-events:none"
+              >⌕</span
+            >
+            <input
+              value={mobileQuery}
+              oninput={handleMobileSearch}
+              placeholder="search posts..."
+              type="search"
+              aria-label="Search posts"
+              style="
+                width:100%;background:var(--input-bg);
+                border:1px solid var(--border);border-radius:4px;
+                padding:9px 12px 9px 30px;font-size:0.82rem;
+                font-family:inherit;color:var(--text);outline:none;
+              "
+            />
+          </div>
+          <!-- Inline results -->
+          {#if mobileFiltered.length > 0}
+            <div
+              style="margin-top:6px;border:1px solid var(--border);border-radius:4px;overflow:hidden"
+            >
+              {#each mobileFiltered as post}
+                <a
+                  href={post.href}
+                  onclick={() => {
+                    mobileOpen = false;
+                    mobileQuery = "";
+                  }}
+                  style="
+                    display:block;padding:10px 12px;
+                    text-decoration:none;
+                    border-bottom:1px solid var(--divider);
+                    background:var(--bg);
+                  "
+                >
+                  <p
+                    style="font-size:0.82rem;font-weight:500;color:var(--text);line-height:1.35"
+                  >
+                    {post.title}
+                  </p>
+                  {#if post.description}
+                    <p
+                      style="font-size:0.7rem;color:var(--muted);margin-top:2px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden"
+                    >
+                      {post.description}
+                    </p>
+                  {/if}
+                </a>
+              {/each}
+            </div>
+          {:else if mobileQuery.length > 0}
+            <p style="font-size:0.72rem;color:var(--muted);padding:8px 2px">
+              no results for "{mobileQuery}"
+            </p>
+          {/if}
+        </div>
         {#each links as link}
           <a
             href={link.href}
@@ -210,7 +343,7 @@
               font-size:0.82rem;padding:9px 6px;
               text-decoration:none;transition:color 0.1s;
               color:{link.active ? 'var(--accent)' : 'var(--muted)'};
-              font-family:inherit;
+              font-family:inherit;border-bottom:1px solid var(--divider);
             "
           >
             {link.label}
@@ -218,9 +351,18 @@
         {/each}
         <a
           href="/saved"
-          style="font-size:0.82rem;padding:9px 6px;text-decoration:none;color:var(--muted)"
-          >🔖 saved</a
+          onclick={() => (mobileOpen = false)}
+          style="font-size:0.82rem;padding:9px 6px;text-decoration:none;color:var(--muted);font-family:inherit"
         >
+          🔖 saved
+          {#if bookmarkCount > 0}
+            <span
+              style="font-size:0.55rem;background:var(--accent);color:#fff;border-radius:8px;padding:0 4px;line-height:1.7;margin-left:4px"
+            >
+              {bookmarkCount}
+            </span>
+          {/if}
+        </a>
       </div>
     </div>
   {/if}
