@@ -1,3 +1,4 @@
+import tsParser from "@typescript-eslint/parser";
 import eslintPluginAstro from "eslint-plugin-astro";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
@@ -17,8 +18,16 @@ export default [
   },
   {
     files: ["**/*.astro"],
+    languageOptions: {
+      parser: eslintPluginAstro.processors ? undefined : tsParser,
+      parserOptions: {
+        parser: tsParser,
+        extraFileExtensions: [".astro"],
+      },
+    },
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
   {
