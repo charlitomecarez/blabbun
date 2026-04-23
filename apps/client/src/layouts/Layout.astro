@@ -1,9 +1,11 @@
 ---
 import "@blabbun/ui/styles/global.css";
+
 import { Footer, Navbar } from "@blabbun/ui/components/layouts";
+import { getCollection } from "astro:content";
+
 import ScrollToTop from "@/components/layouts/ScrollToTop.svelte";
 import SearchDropdown from "@/components/search/SearchDropdown.svelte";
-import { getCollection } from "astro:content";
 
 interface Props {
   title?: string;
@@ -57,7 +59,7 @@ const totalWords = allPosts.reduce(
     <!-- Prevent theme flash: set body class before paint -->
     <script is:inline>
       (function () {
-        var t = localStorage.getItem("bb-theme") || "light";
+        const t = localStorage.getItem("bb-theme") || "light";
         document.documentElement.setAttribute("data-theme-loading", t);
       })();
     </script>

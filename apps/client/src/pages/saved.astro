@@ -84,5 +84,5 @@ import Layout from "@/layouts/Layout.astro";
     }
     window.dispatchEvent(new Event("storage"));
   }
-  (window as any).updateCount = updateCount;
+  (window as Window & { updateCount?: () => void }).updateCount = updateCount;
 </script>
