@@ -1,4 +1,6 @@
 <script lang="ts">
+  import BunLogo from "./BunLogo.svelte";
+
   interface NavLink {
     label: string;
     href: string;
@@ -6,218 +8,222 @@
   }
 
   interface Props {
-    brandName?: string;
-    brandHref?: string;
     links?: NavLink[];
-    subscribeHref?: string | null;
-    showSearch?: boolean;
   }
 
   const {
-    brandName = "Blab Bun",
-    brandHref = "/",
     links = [
-      { label: "Archive", href: "/archive" },
-      { label: "Topics", href: "/topics" },
-      { label: "About", href: "/about" },
+      { label: "archive", href: "/archive" },
+      { label: "topics", href: "/topics" },
+      { label: "about", href: "/about" },
     ],
-    subscribeHref = "/subscribe",
-    showSearch = true,
   }: Props = $props();
 
+  let isDark = $state(
+    typeof document !== "undefined"
+      ? document.body.classList.contains("dark")
+      : false
+  );
+  let search = $state("");
   let mobileOpen = $state(false);
+
+  function toggleTheme() {
+    isDark = !isDark;
+    const t = isDark ? "dark" : "light";
+    document.body.className = t;
+    localStorage.setItem("bb-theme", t);
+  }
+
+  function handleSearch(e: Event) {
+    search = (e.target as HTMLInputElement).value;
+    if (search) {
+      window.dispatchEvent(
+        new CustomEvent("search:query", { detail: search, bubbles: true })
+      );
+      window.dispatchEvent(new CustomEvent("search:open", { bubbles: true }));
+    } else {
+      window.dispatchEvent(new CustomEvent("search:close", { bubbles: true }));
+    }
+  }
+
+  function handleSearchKey(e: KeyboardEvent) {
+    if (e.key === "Escape") {
+      search = "";
+      window.dispatchEvent(new CustomEvent("search:close", { bubbles: true }));
+      (e.target as HTMLInputElement).blur();
+    }
+  }
+
+  let bookmarkCount = $state(0);
+  $effect(() => {
+    function updateCount() {
+      const keys = Object.keys(localStorage).filter((k) =>
+        k.startsWith("bb-bookmark-")
+      );
+      bookmarkCount = keys.filter(
+        (k) => localStorage.getItem(k) === "1"
+      ).length;
+    }
+    updateCount();
+    window.addEventListener("storage", updateCount);
+    return () => window.removeEventListener("storage", updateCount);
+  });
 </script>
 
-<nav
-  class="fixed top-0 right-0 left-0 z-50
-         border-b border-[rgba(197,247,208,0.2)]
-         bg-[rgba(241,248,243,0.85)] backdrop-blur-[12px]"
+<header
+  style="
+    border-bottom:1px solid var(--divider);
+    position:sticky;top:0;z-index:100;
+    background:var(--bg);
+    backdrop-filter:blur(8px);
+  "
 >
   <div
-    class="mx-auto flex max-w-[1200px] items-center
-           justify-between px-4 py-4 md:px-8"
+    style="
+      max-width:680px;margin:0 auto;
+      padding:12px 32px;
+      display:flex;align-items:center;gap:20px;
+    "
   >
-    <!-- Brand -->
+    <!-- Logo -->
     <a
-      href={brandHref}
-      class="font-space-grotesk text-[20px] font-bold tracking-[-0.04em]
-             text-[#386547] md:text-[22px]"
+      href="/"
+      style="
+        background:none;border:none;cursor:pointer;padding:0;
+        font-family:inherit;
+        display:flex;align-items:center;gap:9px;flex-shrink:0;
+        text-decoration:none;
+      "
     >
-      {brandName}<span class="text-[#ccf05f]">.</span>
+      <BunLogo size={30} />
+      <span
+        style="font-size:0.95rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)"
+      >
+        blab bun<span style="color:var(--accent)">.</span>
+      </span>
     </a>
 
-    <!-- Desktop nav links -->
-    <div class="hidden items-center gap-8 md:flex">
+    <!-- Nav links (desktop) -->
+    <nav
+      style="display:flex;gap:16px;align-items:center;flex:1"
+      class="hidden md:flex"
+    >
       {#each links as link}
         <a
           href={link.href}
-          class={[
-            "font-manrope text-[14px] font-medium transition-colors",
-            link.active
-              ? "text-[#386547]"
-              : "text-[rgba(41,48,45,0.6)] hover:text-[#29302d]",
-          ].join(" ")}
+          style="
+            background:none;border:none;font-size:0.7rem;
+            font-family:inherit;cursor:pointer;letter-spacing:0.03em;
+            text-decoration:none;
+            color:{link.active ? 'var(--accent)' : 'var(--muted)'};
+            transition:color 0.15s;
+          "
         >
           {link.label}
         </a>
       {/each}
-    </div>
+    </nav>
 
-    <!-- Desktop right: search + write + subscribe -->
-    <div class="hidden items-center gap-4 md:flex">
-      {#if showSearch}
-        <button
-          aria-label="Search"
-          onclick={() =>
-            window.dispatchEvent(
-              new CustomEvent("search:toggle", { bubbles: true })
-            )}
-          class="text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547]"
+    <!-- Right: search + saved + theme -->
+    <div
+      style="display:flex;align-items:center;gap:10px;flex-shrink:0"
+      class="hidden md:flex"
+    >
+      <!-- Inline search bar -->
+      <div style="position:relative;flex:1;max-width:200px">
+        <span
+          style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.85rem;pointer-events:none"
+          >⌕</span
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            aria-hidden="true"
+        <input
+          value={search}
+          oninput={handleSearch}
+          onkeydown={handleSearchKey}
+          placeholder="search..."
+          type="search"
+          aria-label="Search posts"
+          style="
+            width:100%;background:var(--input-bg);
+            border:1px solid var(--border);border-radius:3px;
+            padding:6px 24px 6px 26px;font-size:0.74rem;
+            font-family:inherit;color:var(--text);outline:none;
+          "
+        />
+        {#if !search}
+          <span
+            style="position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:0.6rem;color:var(--muted2);pointer-events:none"
+            >/</span
           >
-            <circle
-              cx="8"
-              cy="8"
-              r="6.5"
-              stroke="currentColor"
-              stroke-width="1.4"
-            />
-            <path
-              d="M13 13l4 4"
-              stroke="currentColor"
-              stroke-width="1.4"
-              stroke-linecap="round"
-            />
-          </svg>
-        </button>
-      {/if}
-
-      {#if subscribeHref}
-        <a
-          href={subscribeHref}
-          class="font-manrope rounded-full bg-[#386547] px-5 py-2
-                 text-[13px] font-bold text-[#ccffd8]
-                 transition-colors hover:bg-[#2d5a3d]"
-        >
-          Subscribe
-        </a>
-      {/if}
-    </div>
-
-    <!-- Mobile right: search + subscribe pill + hamburger -->
-    <div class="flex items-center gap-3 md:hidden">
-      {#if showSearch}
-        <button
-          aria-label="Search"
-          onclick={() =>
-            window.dispatchEvent(
-              new CustomEvent("search:toggle", { bubbles: true })
-            )}
-          class="text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547]"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            aria-hidden="true"
-          >
-            <circle
-              cx="8"
-              cy="8"
-              r="6.5"
-              stroke="currentColor"
-              stroke-width="1.4"
-            />
-            <path
-              d="M13 13l4 4"
-              stroke="currentColor"
-              stroke-width="1.4"
-              stroke-linecap="round"
-            />
-          </svg>
-        </button>
-      {/if}
-      {#if subscribeHref}
-        <a
-          href={subscribeHref}
-          class="font-manrope rounded-full bg-[#386547] px-4 py-1.5
-                 text-[12px] font-bold text-[#ccffd8]
-                 transition-colors hover:bg-[#2d5a3d]"
-        >
-          Subscribe
-        </a>
-      {/if}
-
-      <button
-        onclick={() => (mobileOpen = !mobileOpen)}
-        aria-label={mobileOpen ? "Close menu" : "Open menu"}
-        class="text-[rgba(41,48,45,0.6)] transition-colors hover:text-[#386547]"
-      >
-        {#if mobileOpen}
-          <!-- X icon -->
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 22 22"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M5 5l12 12M17 5L5 17"
-              stroke="currentColor"
-              stroke-width="1.6"
-              stroke-linecap="round"
-            />
-          </svg>
-        {:else}
-          <!-- Hamburger icon -->
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 22 22"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M3 6h16M3 11h16M3 16h16"
-              stroke="currentColor"
-              stroke-width="1.6"
-              stroke-linecap="round"
-            />
-          </svg>
         {/if}
+      </div>
+
+      <!-- Saved / bookmarks -->
+      <a
+        href="/saved"
+        title="saved posts"
+        style="
+          background:none;border:1px solid var(--border);border-radius:3px;
+          padding:5px 8px;font-size:0.72rem;cursor:pointer;
+          color:var(--muted);
+          display:flex;align-items:center;gap:4px;
+          text-decoration:none;white-space:nowrap;position:relative;
+          font-family:inherit;
+        "
+      >
+        🔖
+        {#if bookmarkCount > 0}
+          <span
+            style="font-size:0.55rem;background:var(--accent);color:#fff;border-radius:8px;padding:0 4px;line-height:1.7;margin-left:1px"
+          >
+            {bookmarkCount}
+          </span>
+        {/if}
+      </a>
+
+      <!-- Theme toggle -->
+      <button
+        onclick={toggleTheme}
+        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+        style="
+          background:none;border:1px solid var(--border);border-radius:3px;
+          padding:5px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;
+          font-family:inherit;letter-spacing:0.04em;white-space:nowrap;
+        "
+      >
+        {isDark ? "☀" : "◑"}
       </button>
     </div>
   </div>
 
-  <!-- Mobile dropdown menu -->
+  <!-- Mobile dropdown -->
   {#if mobileOpen}
     <div
-      class="border-t border-[rgba(197,247,208,0.3)] bg-[rgba(241,248,243,0.97)] md:hidden"
+      style="border-top:1px solid var(--divider);background:var(--bg)"
+      class="md:hidden"
     >
-      <div class="flex flex-col gap-1 px-4 py-4">
+      <div
+        style="display:flex;flex-direction:column;gap:2px;padding:8px 24px 14px"
+      >
         {#each links as link}
           <a
             href={link.href}
             onclick={() => (mobileOpen = false)}
-            class={[
-              "font-manrope rounded-lg px-2 py-3 text-[15px] font-medium transition-colors",
-              link.active
-                ? "bg-[rgba(197,247,208,0.2)] text-[#386547]"
-                : "text-[rgba(41,48,45,0.7)] hover:bg-[rgba(197,247,208,0.15)] hover:text-[#29302d]",
-            ].join(" ")}
+            style="
+              font-size:0.82rem;padding:9px 6px;
+              text-decoration:none;transition:color 0.1s;
+              color:{link.active ? 'var(--accent)' : 'var(--muted)'};
+              font-family:inherit;
+            "
           >
             {link.label}
           </a>
         {/each}
+        <a
+          href="/saved"
+          style="font-size:0.82rem;padding:9px 6px;text-decoration:none;color:var(--muted)"
+          >🔖 saved</a
+        >
       </div>
     </div>
   {/if}
-</nav>
+</header>

@@ -1,5 +1,10 @@
 ---
-import { FeedItem, PostHero } from "@blabbun/ui/components/cards";
+import { PostHero } from "@blabbun/ui/components/cards";
+import {
+  BookmarkButton,
+  ReactionBar,
+  ReadingProgress,
+} from "@blabbun/ui/components/post";
 import { getCollection, render } from "astro:content";
 import { shuffle } from "lodash-es";
 
@@ -8,13 +13,24 @@ import Comments from "@/components/post/Comments.svelte";
 import Layout from "@/layouts/Layout.astro";
 import { fetchPostStats } from "@/lib/stats";
 
+function tagClass(t: string): string {
+  const map: Record<string, string> = {
+    RANTS: "tag-rants",
+    TAKES: "tag-takes",
+    "HALF-BAKED IDEAS": "tag-halfbaked",
+    "LIFE STUFF": "tag-lifestuff",
+    CULTURE: "tag-culture",
+    EDITORIAL: "tag-editorial",
+    TECHNICAL: "tag-technical",
+  };
+  return map[t.toUpperCase()] ?? "tag-default";
+}
+
 const { slug } = Astro.params;
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 const post = allPosts.find((p) => p.id === slug);
 
-if (!post) {
-  return new Response(null, { status: 404 });
-}
+if (!post) return new Response(null, { status: 404 });
 
 const { Content } = await render(post);
 
@@ -32,7 +48,6 @@ const relatedPosts = relatedSlice.map((p) => ({
   title: p.data.title,
   excerpt: p.data.description,
   tag: (p.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
-  imageUrl: p.data.image,
   href: `/${p.id}`,
   date: p.data.pubDate.toLocaleDateString("en-US", {
     month: "short",
@@ -69,42 +84,42 @@ const jsonLd = {
   description={post.data.description}
   ogImage={post.data.image}
 >
-  <div class="pt-[64px]">
-    <!-- ─── Post Hero ─────────────────────────────────────────── -->
+  <ReadingProgress client:load />
+
+  <main
+    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
+  >
+    <!-- Post header (matches PostDetailView) -->
     <PostHero
       title={post.data.title}
-      description={post.data.description}
       tag={tag}
       readTime={readTime}
       pubDate={post.data.pubDate}
       backHref="/"
     />
 
+    <!-- Optional image -->
     {
       hasImage && (
-        /* ── Hero image — only rendered when the post supplies one ── */
-        <div class="mx-auto max-w-[1200px] px-4 pt-8 md:px-8 md:pt-10">
-          <div class="overflow-hidden rounded-[12px]">
-            <img
-              src={post.data.image}
-              alt={post.data.title}
-              width="1200"
-              height="480"
-              loading="lazy"
-              decoding="async"
-              class="w-full object-cover"
-              style="max-height: 480px;"
-            />
-          </div>
+        <div style="margin-bottom:24px">
+          <img
+            src={post.data.image}
+            alt={post.data.title}
+            width="616"
+            height="280"
+            loading="lazy"
+            decoding="async"
+            style="width:100%;border-radius:3px;object-fit:cover;max-height:280px"
+          />
           {post.data.imageSource && (
-            <p class="font-manrope mt-2 text-right text-[11px] text-[rgba(41,48,45,0.4)]">
-              Image:{" "}
+            <p style="font-size:0.62rem;text-align:right;margin-top:4px;color:var(--muted2)">
+              image:{" "}
               {post.data.imageSourceUrl ? (
                 <a
                   href={post.data.imageSourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="underline hover:text-[rgba(41,48,45,0.7)]"
+                  style="color:var(--accent)"
                 >
                   {post.data.imageSource}
                 </a>
@@ -117,91 +132,179 @@ const jsonLd = {
       )
     }
 
-    <!-- ─── Article Body ──────────────────────────────────────── -->
-    <article
-      class:list={[
-        "mx-auto max-w-[760px] px-4 pb-20 md:px-8",
-        hasImage ? "pt-12 md:pt-16" : "pt-10 md:pt-14",
-      ]}
-    >
+    <!-- Article body — matches design's content paragraphs -->
+    <div style="border-top:1px solid var(--divider);padding-top:26px">
       <div
-        class="prose prose-lg prose-headings:font-space-grotesk prose-headings:font-bold prose-headings:tracking-[-0.03em] prose-headings:text-[#29302d] prose-h2:text-[28px] prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-[22px] prose-h3:mt-8 prose-h3:mb-3 prose-p:font-manrope prose-p:text-[17px] prose-p:leading-[1.75] prose-p:text-[rgba(41,48,45,0.75)] prose-a:text-[#386547] prose-a:font-semibold prose-a:no-underline hover:prose-a:underline prose-strong:text-[#29302d] prose-code:font-mono prose-code:text-[#29302d] prose-code:bg-[rgba(197,247,208,0.3)] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-[4px] prose-code:text-[0.875em] prose-blockquote:border-l-[3px] prose-blockquote:border-[#c5f7d0] prose-blockquote:bg-[rgba(197,247,208,0.1)] prose-blockquote:rounded-r-[8px] prose-blockquote:px-6 prose-blockquote:py-1 prose-blockquote:text-[rgba(41,48,45,0.65)] prose-blockquote:not-italic prose-hr:border-[rgba(197,247,208,0.5)] prose-hr:my-12 prose-img:rounded-[8px] max-w-none"
+        class="prose prose-p:font-mono prose-p:text-[0.88rem] prose-p:leading-[1.9] prose-p:mb-5 prose-p:text-[var(--muted)] prose-p:text-wrap-pretty prose-headings:font-mono prose-headings:font-semibold prose-headings:text-[var(--text)] prose-h2:text-[1.1rem] prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-[0.95rem] prose-h3:mt-7 prose-h3:mb-3 prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:underline prose-strong:text-[var(--text)] prose-strong:font-600 prose-code:font-mono prose-code:text-[var(--text)] prose-code:bg-[var(--bg2)] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.82em] prose-blockquote:border-l-2 prose-blockquote:border-[var(--accent)] prose-blockquote:bg-[var(--bg2)] prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-[var(--muted)] prose-blockquote:not-italic prose-hr:border-[var(--divider)] prose-hr:my-8 prose-img:rounded max-w-none"
       >
         <Content />
       </div>
+    </div>
 
-      <!-- ─── Article Footer ────────────────────────────────── -->
-      <footer class="mt-16 border-t border-[rgba(197,247,208,0.4)] pt-8">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <a
-            href="/archive"
-            class="font-manrope group inline-flex items-center gap-2 text-[13px] font-semibold text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547]"
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
-              aria-hidden="true"
-              class="transition-transform group-hover:-translate-x-0.5"
-            >
-              <path
-                d="M13 7H1M6 2L1 7l5 5"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"></path>
-            </svg>
-            Back to archive
-          </a>
+    <!-- Reactions -->
+    <ReactionBar client:visible postSlug={post.id} />
 
-          <span
-            class="font-manrope rounded-full bg-[#ebf3ed] px-4 py-1.5 text-[11px] font-bold tracking-[0.08em] text-[#386547] uppercase"
-          >
-            {tag}
-          </span>
-        </div>
-      </footer>
-    </article>
+    <!-- Actions: ClapButton + SharePanel + 🔖 (margin-left:auto) — exact PostDetailView layout -->
+    <div
+      style="display:flex;align-items:center;gap:14px;margin-top:28px;padding-top:24px;border-top:1px solid var(--divider);flex-wrap:wrap"
+    >
+      <ClapShare
+        client:visible
+        postSlug={post.id}
+        postUrl={postUrl}
+        postTitle={post.data.title}
+      >
+        <BookmarkButton
+          client:visible
+          slug={post.id}
+          style="margin-left:auto;font-size:1.1rem"
+        />
+      </ClapShare>
+    </div>
 
-    <!-- ─── Clap + Share ──────────────────────────────────────────── -->
-    <ClapShare
-      client:visible
-      postSlug={post.id}
-      postUrl={postUrl}
-      postTitle={post.data.title}
-    />
-
-    <!-- ─── Comments ─────────────────────────────────────────────── -->
+    <!-- Comments -->
     <Comments client:visible postSlug={post.id} />
 
-    <!-- ─── Related Posts ───────────────────────────────────────── -->
+    <!-- Related posts -->
     {
       relatedPosts.length > 0 && (
-        <section
-          aria-label="More from Blab Bun"
-          class="mx-auto max-w-[1200px] px-4 pb-20 md:px-8"
-        >
-          <div class="mb-6 border-t-2 border-[#c5f7d0] pt-8">
-            <span class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase">
-              More from Blab Bun
-            </span>
+        <div style="margin-top:48px;padding-top:24px;border-top:1px solid var(--divider)">
+          <div style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:20px;text-transform:uppercase">
+            more from blab bun
           </div>
-
           <div>
             {relatedPosts.map((p) => (
-              <FeedItem {...p} />
+              <div class="rel-row">
+                <a
+                  href={p.href}
+                  class="absolute inset-0 z-0"
+                  aria-label={p.title}
+                />
+
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:5px">
+                  <span style="font-size:0.65rem;color:var(--muted)">
+                    {p.date}
+                  </span>
+                  <span class={`rel-badge ${tagClass(p.tag)}`}>{p.tag}</span>
+                </div>
+
+                <div class="rel-title">{p.title}</div>
+              </div>
             ))}
           </div>
-        </section>
+        </div>
       )
     }
+  </main>
 
-    <!-- BlogPosting structured data -->
-    <script
-      type="application/ld+json"
-      is:inline
-      set:html={JSON.stringify(jsonLd)}
-    />
-  </div>
+  <script
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(jsonLd)}
+  />
+
+  <style>
+    /* ─── Related posts hover ──────────────────────────────────── */
+    .rel-row {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--divider);
+      cursor: pointer;
+      position: relative;
+    }
+    .rel-title {
+      font-size: 0.84rem;
+      font-weight: 500;
+      line-height: 1.45;
+      color: var(--text);
+      transition: color 0.15s;
+      text-wrap: pretty;
+    }
+    .rel-row:hover .rel-title {
+      color: var(--accent);
+    }
+
+    /* ─── Small tag badge ──────────────────────────────────────── */
+    .rel-badge {
+      font-size: 0.64rem;
+      padding: 1px 6px;
+      border-radius: 2px;
+      letter-spacing: 0.04em;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .tag-rants {
+      background: #fce8e8;
+      color: #9b2121;
+    }
+    .tag-takes {
+      background: #e8f0fc;
+      color: #1a3a8c;
+    }
+    .tag-halfbaked {
+      background: #fef3e2;
+      color: #8a5a00;
+    }
+    .tag-lifestuff {
+      background: #e8f8ee;
+      color: #1a6b3a;
+    }
+    .tag-culture {
+      background: #f3e8fc;
+      color: #6a1a8c;
+    }
+    .tag-editorial {
+      background: #faebd7;
+      color: #8a5a00;
+    }
+    .tag-technical {
+      background: #e8f0fc;
+      color: #1a3a8c;
+    }
+    .tag-default {
+      background: #f0ede8;
+      color: #6b5e4e;
+    }
+
+    :global(body.dark) .tag-rants {
+      background: #2a1414;
+      color: #d47070;
+    }
+    :global(body.dark) .tag-takes {
+      background: #111a2a;
+      color: #6a96d4;
+    }
+    :global(body.dark) .tag-halfbaked {
+      background: #241a08;
+      color: #c49040;
+    }
+    :global(body.dark) .tag-lifestuff {
+      background: #0e2218;
+      color: #5aab78;
+    }
+    :global(body.dark) .tag-culture {
+      background: #1e1228;
+      color: #a870d4;
+    }
+    :global(body.dark) .tag-editorial {
+      background: #241a08;
+      color: #c49040;
+    }
+    :global(body.dark) .tag-technical {
+      background: #111a2a;
+      color: #6a96d4;
+    }
+    :global(body.dark) .tag-default {
+      background: #1e1a14;
+      color: #a09080;
+    }
+  </style>
+
+  <!-- Esc key → back -->
+  <script is:inline>
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !e.target.closest("input, textarea")) {
+        history.back();
+      }
+    });
+  </script>
 </Layout>

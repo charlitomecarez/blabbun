@@ -2,9 +2,121 @@
 @source "../components";
 @plugin "@tailwindcss/typography";
 
-/* Custom font families available as `font-space-grotesk`, `font-inter`, `font-manrope` utilities */
+/*
+  All font utilities (font-space-grotesk, font-manrope, font-inter, font-mono)
+  resolve to IBM Plex Mono — no component class changes needed.
+*/
 @theme {
-  --font-space-grotesk: "Space Grotesk", sans-serif;
-  --font-inter: "Inter", sans-serif;
-  --font-manrope: "Manrope", sans-serif;
+  --font-space-grotesk: "IBM Plex Mono", monospace;
+  --font-manrope: "IBM Plex Mono", monospace;
+  --font-inter: "IBM Plex Mono", monospace;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+/* ─── Reset ───────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-size: 15px;
+}
+
+/* ─── Base ────────────────────────────────────────────────────────────────── */
+body {
+  font-family: "IBM Plex Mono", monospace;
+  transition:
+    background 0.3s,
+    color 0.3s;
+}
+
+input,
+textarea,
+select {
+  font-family: "IBM Plex Mono", monospace;
+}
+
+/* ─── Light mode ──────────────────────────────────────────────────────────── */
+body.light {
+  --bg: #fdf9f4;
+  --bg2: #f5ede0;
+  --bg3: #ede0ce;
+  --text: #231e17;
+  --muted: #9c8b78;
+  --muted2: #c5b8a8;
+  --accent: #c4832a;
+  --accent-soft: #faebd7;
+  --border: #e0d4c0;
+  --divider: #ece0ce;
+  --card-bg: #f5f0e8;
+  --input-bg: #f0e8d8;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ─── Dark mode ───────────────────────────────────────────────────────────── */
+body.dark {
+  --bg: #16120e;
+  --bg2: #1f1a14;
+  --bg3: #261f17;
+  --text: #e6ddd1;
+  --muted: #7a6e60;
+  --muted2: #4a4038;
+  --accent: #d4a040;
+  --accent-soft: #2a1e0a;
+  --border: #2c241c;
+  --divider: #261f17;
+  --card-bg: #1c1710;
+  --input-bg: #1f1a14;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ─── Globals ─────────────────────────────────────────────────────────────── */
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+select option {
+  background: var(--bg);
+}
+a:hover {
+  color: var(--accent) !important;
 }

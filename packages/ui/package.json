@@ -24,6 +24,11 @@
       "types": "./components/cards/index.ts",
       "default": "./components/cards/index.ts"
     },
+    "./components/post": {
+      "svelte": "./components/post/index.ts",
+      "types": "./components/post/index.ts",
+      "default": "./components/post/index.ts"
+    },
     "./styles/*": "./styles/*"
   },
   "peerDependencies": {

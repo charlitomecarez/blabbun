@@ -1,5 +1,4 @@
 ---
-// apps/client/src/pages/topics/index.astro
 import { getCollection } from "astro:content";
 
 import Layout from "@/layouts/Layout.astro";
@@ -7,7 +6,6 @@ import { tagToLabel } from "@/utils/tags";
 
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 
-// Build tag → post count map, uppercase keys, sorted alphabetically
 const tagMap = new Map<string, number>();
 for (const post of allPosts) {
   for (const raw of post.data.tags ?? []) {
@@ -30,24 +28,28 @@ const topics = [...tagMap.entries()]
   title="Topics"
   description="Browse all topics written about on Blab Bun."
 >
-  <main class="mx-auto max-w-[1200px] px-4 pt-[64px] pb-20 md:px-8">
-    <div class="mb-10 pt-12 md:pt-16">
+  <main
+    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
+  >
+    <div style="padding-top:48px;padding-bottom:32px">
       <h1
-        class="font-space-grotesk text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-[#2d5a3d] sm:text-[46px]"
+        style="font-size:1.6rem;font-weight:700;letter-spacing:-0.03em;color:var(--text);margin-bottom:6px"
       >
-        Topics<span class="text-[#ccf05f]">.</span>
+        topics<span style="color:var(--accent)">.</span>
       </h1>
-      <p class="font-manrope mt-2 text-[14px] text-[rgba(41,48,45,0.5)]">
+      <p style="font-size:0.72rem;color:var(--muted2)">
         {topics.length}
         {topics.length === 1 ? "topic" : "topics"}
       </p>
     </div>
 
-    <div class="mb-2 border-b-2 border-[#c5f7d0] pb-3">
+    <div
+      style="border-bottom:1px solid var(--accent);padding-bottom:8px;margin-bottom:4px"
+    >
       <span
-        class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase"
+        style="font-size:0.62rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted2)"
       >
-        All Topics
+        all topics
       </span>
     </div>
 
@@ -57,15 +59,26 @@ const topics = [...tagMap.entries()]
           <a
             href={`/topics/${slug}`}
             data-testid={`topic-link-${slug}`}
-            class="group -mx-2 flex items-center gap-4 rounded-lg border-b border-[rgba(197,247,208,0.4)] px-2 py-4 transition-colors hover:bg-[rgba(197,247,208,0.06)]"
+            style="
+              display:flex;align-items:center;gap:14px;
+              padding:14px 0;
+              border-bottom:1px solid var(--divider);
+              text-decoration:none;transition:background 0.1s;
+            "
           >
-            <span class="font-manrope rounded-full bg-[#ebf3ed] px-3 py-1 text-[11px] font-bold tracking-[0.06em] text-[#386547] uppercase transition-colors group-hover:bg-[#386547] group-hover:text-[#ccf05f]">
+            <span
+              style="
+                font-size:0.65rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+                background:var(--accent-soft);color:var(--accent);
+                border-radius:3px;padding:3px 8px;flex-shrink:0;
+              "
+            >
               {tag}
             </span>
-            <span class="font-manrope flex-1 text-[15px] font-semibold text-[#29302d]">
+            <span style="flex:1;font-size:0.88rem;font-weight:500;color:var(--text)">
               {label}
             </span>
-            <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.4)]">
+            <span style="font-size:0.72rem;color:var(--muted2)">
               {count} {count === 1 ? "post" : "posts"}
             </span>
           </a>

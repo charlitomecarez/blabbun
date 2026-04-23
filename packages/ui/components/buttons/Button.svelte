@@ -1,10 +1,3 @@
-<!--
-
-Base button
-Will be used across different components
-
--->
-
 <script lang="ts">
   import type { Snippet } from "svelte";
 
@@ -17,19 +10,18 @@ Will be used across different components
 
   const { href, onclick, variant = "primary", children }: Props = $props();
 
-  const base =
-    "inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors";
-  const variants = {
-    primary: "bg-gray-900 text-white hover:bg-gray-700",
-    ghost: "text-gray-600 hover:text-gray-900 hover:bg-gray-100",
-  };
-
-  // svelte-ignore state_referenced_locally
-  const classes = `${base} ${variants[variant]}`;
+  const baseStyle =
+    "display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:3px;font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;transition:opacity 0.15s;border:none;text-decoration:none";
+  const variantStyle =
+    variant === "primary"
+      ? "background:var(--accent);color:#fff"
+      : "background:transparent;color:var(--text-muted);border:1px solid var(--border)";
 </script>
 
 {#if href}
-  <a {href} class={classes}>{@render children()}</a>
+  <a {href} style="{baseStyle};{variantStyle}">{@render children()}</a>
 {:else}
-  <button {onclick} class={classes}>{@render children()}</button>
+  <button {onclick} style="{baseStyle};{variantStyle}"
+    >{@render children()}</button
+  >
 {/if}

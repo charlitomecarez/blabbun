@@ -1,10 +1,9 @@
 ---
 import "@blabbun/ui/styles/global.css";
-
 import { Footer, Navbar } from "@blabbun/ui/components/layouts";
-
 import ScrollToTop from "@/components/layouts/ScrollToTop.svelte";
 import SearchDropdown from "@/components/search/SearchDropdown.svelte";
+import { getCollection } from "astro:content";
 
 interface Props {
   title?: string;
@@ -27,11 +26,23 @@ const siteUrl =
   Astro.site?.toString().replace(/\/$/, "") ?? "https://blabbun.com";
 
 const { pathname } = Astro.url;
+// Nav matches design exactly: "home" | "all posts"
 const navLinks = [
-  { label: "Archive", href: "/archive", active: pathname === "/archive" },
-  { label: "Topics", href: "/topics", active: pathname.startsWith("/topics") },
-  { label: "About", href: "/about", active: pathname === "/about" },
+  { label: "home", href: "/", active: pathname === "/" },
+  {
+    label: "all posts",
+    href: "/archive",
+    active: pathname === "/archive" || pathname.startsWith("/topics"),
+  },
+  { label: "about", href: "/about", active: pathname === "/about" },
 ];
+
+// Word count for footer
+const allPosts = await getCollection("posts", ({ data }) => !data.draft);
+const totalWords = allPosts.reduce(
+  (a, p) => a + (p.body?.trim().split(/\s+/).length ?? 0),
+  0
+);
 ---
 
 <!doctype html>
@@ -43,12 +54,27 @@ const navLinks = [
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Primary SEO -->
+    <!-- Prevent theme flash: set body class before paint -->
+    <script is:inline>
+      (function () {
+        var t = localStorage.getItem("bb-theme") || "light";
+        document.documentElement.setAttribute("data-theme-loading", t);
+      })();
+    </script>
+    <style is:inline>
+      html[data-theme-loading="dark"] {
+        background: #16120e;
+        color: #e6ddd1;
+      }
+      html[data-theme-loading="light"] {
+        background: #fdf9f4;
+        color: #231e17;
+      }
+    </style>
+
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
-
-    <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content={siteTitle} />
@@ -70,8 +96,6 @@ const navLinks = [
         </>
       )
     }
-
-    <!-- Twitter Card -->
     <meta
       name="twitter:card"
       content={ogImage ? "summary_large_image" : "summary"}
@@ -88,8 +112,6 @@ const navLinks = [
         />
       )
     }
-
-    <!-- Structured data: WebSite (every page) -->
     <script
       type="application/ld+json"
       is:inline
@@ -98,7 +120,7 @@ const navLinks = [
         "@type": "WebSite",
         name: siteTitle,
         url: siteUrl,
-        description: description,
+        description,
         potentialAction: {
           "@type": "SearchAction",
           target: `${siteUrl}/archive?q={search_term_string}`,
@@ -107,25 +129,27 @@ const navLinks = [
       })}
     />
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap"
       rel="stylesheet"
     />
   </head>
   <body
-    class="font-manrope flex min-h-screen flex-col bg-[#f1f8f3] text-[#29302d] antialiased"
+    class="light"
+    style="min-height:100vh;display:flex;flex-direction:column"
   >
-    <!-- Fixed navbar — pages use pt-[64px] to compensate -->
+    <script is:inline>
+      document.body.className = localStorage.getItem("bb-theme") || "light";
+    </script>
     <Navbar client:load links={navLinks} />
     <SearchDropdown client:load />
     <ScrollToTop client:idle />
-    <div class="flex-1">
+    <div style="flex:1">
       <slot />
     </div>
-    <Footer />
+    <Footer wordCount={totalWords} />
   </body>
 </html>

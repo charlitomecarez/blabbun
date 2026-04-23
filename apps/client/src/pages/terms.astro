@@ -2,140 +2,83 @@
 import Layout from "@/layouts/Layout.astro";
 ---
 
-<Layout title="Terms of Service" description="Terms of service for Blab Bun.">
-  <main class="pt-[64px]">
-    <!-- Page hero -->
-    <section
-      class="relative overflow-hidden border-b border-[rgba(197,247,208,0.25)] px-4 pt-14 pb-12 md:px-8 md:pt-20 md:pb-16"
-    >
-      <div
-        class="pointer-events-none absolute inset-0"
-        style="background-image: linear-gradient(rgba(197,247,208,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(197,247,208,0.07) 1px, transparent 1px); background-size: 40px 40px;"
+<Layout title="terms" description="Terms, privacy, and help for Blab Bun.">
+  <main
+    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
+  >
+    <div style="animation:fadeIn 0.2s ease">
+      <a
+        href="/"
+        style="background:none;border:none;color:var(--accent);font-size:0.76rem;cursor:pointer;font-family:inherit;padding:0;margin-bottom:28px;display:inline-block;text-decoration:none"
       >
-      </div>
-      <div
-        class="pointer-events-none absolute inset-0"
-        style="background: radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, white 100%);"
+        ← back
+      </a>
+      <h1
+        style="font-size:1.05rem;font-weight:600;margin-bottom:24px;margin-top:20px"
       >
-      </div>
-      <div class="relative mx-auto max-w-[760px] text-center">
-        <span
-          class="font-manrope mb-4 inline-block rounded-full bg-[#ebf3ed] px-3 py-1 text-[10px] font-bold tracking-[3px] text-[#386547] uppercase"
-        >
-          Terms
-        </span>
-        <h1
-          class="font-space-grotesk text-[48px] leading-[0.97] font-bold tracking-[-0.05em] text-[#1a2e22] sm:text-[64px] md:text-[80px]"
-        >
-          Terms of Use<span class="text-[#ccf05f]">.</span>
-        </h1>
-        <p class="font-manrope mt-3 text-[13px] text-[rgba(41,48,45,0.4)]">
-          Last updated: April 2026
+        terms
+      </h1>
+      <div
+        style="font-size:0.82rem;color:var(--muted);line-height:1.9;max-width:540px"
+      >
+        <p style="margin-bottom:14px">
+          this is a personal blog. i write what i think. that means sometimes
+          i'm wrong, sometimes i'm sloppy, and occasionally i write something at
+          11pm that probably needed one more edit.
         </p>
-      </div>
-    </section>
+        <p style="margin-bottom:14px">
+          by reading this you agree to take everything here with at least a
+          small grain of salt. none of this is legal, medical, financial, or
+          professional advice of any kind.
+        </p>
+        <p style="margin-bottom:28px">
+          if something i wrote genuinely bothered you, you're welcome to leave
+          an anonymous comment. i read all of them.
+        </p>
 
-    <div class="mx-auto max-w-[760px] px-4 py-14 md:px-8 md:py-20">
-      <div class="space-y-8">
-        <section>
-          <h2
-            class="font-space-grotesk mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#1a2e22]"
-          >
-            Just reading? You&apos;re fine.
-          </h2>
-          <p
-            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
-          >
-            This is a personal blog. By reading it, you agree to nothing
-            complicated. Browse freely, share things you like, and move on with
-            your day.
-          </p>
-        </section>
-
-        <section>
-          <h2
-            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#1a2e22]"
-          >
-            Content ownership
-          </h2>
-          <p
-            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
-          >
-            Everything written here &mdash; essays, thoughts, half-baked ideas
-            &mdash; belongs to me. You&apos;re welcome to quote and link with
-            credit. Please don&apos;t reproduce full posts elsewhere without
-            asking first.
-          </p>
-        </section>
-
-        <section>
-          <h2
-            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#1a2e22]"
-          >
-            No warranties
-          </h2>
-          <p
-            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
-          >
-            The thoughts here are my own, written in good faith, but I&apos;m
-            not an expert on everything I write about. Nothing on this site
-            constitutes professional advice &mdash; legal, medical, financial,
-            or otherwise. Use your own judgment.
-          </p>
-        </section>
-
-        <section>
-          <h2
-            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#1a2e22]"
-          >
-            External links
-          </h2>
-          <p
-            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
-          >
-            Posts sometimes link to other sites. I&apos;m not responsible for
-            their content, availability, or what they do with your data once you
-            leave here.
-          </p>
-        </section>
-
-        <section>
-          <h2
-            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#1a2e22]"
-          >
-            Changes
-          </h2>
-          <p
-            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
-          >
-            These terms may change as the site evolves. If something shifts
-            meaningfully, I&apos;ll update the date above.
-          </p>
-        </section>
-      </div>
-
-      <div class="mt-14 border-t border-[rgba(197,247,208,0.4)] pt-8">
-        <a
-          href="/"
-          class="font-manrope group inline-flex items-center gap-2 text-[13px] font-bold text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547]"
+        <div
+          style="border-top:1px solid var(--divider);padding-top:24px;display:flex;flex-direction:column;gap:16px"
         >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-            aria-hidden="true"
-            class="transition-transform group-hover:-translate-x-0.5"
-          >
-            <path
-              d="M13 7H1M6 2L1 7l5 5"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"></path>
-          </svg>
-          Back home
-        </a>
+          <div>
+            <div
+              style="font-size:0.65rem;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:8px;color:var(--muted)"
+            >
+              privacy
+            </div>
+            <p style="margin-bottom:8px">
+              i don't collect your data. i don't have analytics. i can't see who
+              you are or where you're from.
+            </p>
+            <p style="margin-bottom:8px">
+              if you subscribe to the newsletter, i get your email address and
+              nothing else. i won't sell it, share it, or use it for anything
+              other than sending you the occasional post.
+            </p>
+            <p>
+              comments are anonymous and stored locally in your browser. they're
+              yours.
+            </p>
+          </div>
+          <div style="border-top:1px solid var(--divider);padding-top:16px">
+            <div
+              style="font-size:0.65rem;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:8px;color:var(--muted)"
+            >
+              help
+            </div>
+            <p style="margin-bottom:8px">
+              got a question? something broken? something you disagree with and
+              want to talk about?
+            </p>
+            <p style="margin-bottom:8px">
+              leave an anonymous comment on any post — it's the best way to
+              reach me. i read all of them.
+            </p>
+            <p>
+              if it's something bigger, you can probably find me on the internet
+              somewhere. i'm not hard to locate if you actually look.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </main>

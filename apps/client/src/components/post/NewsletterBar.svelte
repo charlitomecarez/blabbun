@@ -1,34 +1,30 @@
 <script lang="ts">
   let email = $state("");
-  let submitting = $state(false);
   let submitted = $state(false);
-  let error = $state<string | null>(null);
-  let successTimer: ReturnType<typeof setTimeout> | undefined;
+  let err = $state("");
+  let submitting = $state(false);
 
-  async function handleSubmit() {
-    if (!email.trim() || submitting) return;
-
+  async function submit(e: Event) {
+    e.preventDefault();
+    if (!email.includes("@")) {
+      err = "that doesn't look like an email";
+      return;
+    }
+    err = "";
     submitting = true;
-    error = null;
-
     try {
       const res = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim() }),
       });
-
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to subscribe");
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(d.error);
       }
-
       submitted = true;
-      email = "";
-      clearTimeout(successTimer);
-      successTimer = setTimeout(() => (submitted = false), 3000);
-    } catch (e) {
-      error = e instanceof Error ? e.message : "Failed to subscribe";
+    } catch (ex) {
+      err = ex instanceof Error ? ex.message : "something went wrong";
     } finally {
       submitting = false;
     }
@@ -36,40 +32,49 @@
 </script>
 
 <div
-  class="mx-auto max-w-[760px] border-t-2 border-[#c5f7d0] px-4 pt-10 pb-12 md:px-8"
+  style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:26px 28px;margin:40px 0"
 >
-  <p
-    class="font-manrope mb-4 text-[11px] font-bold tracking-[0.12em] text-[rgba(41,48,45,0.5)] uppercase"
-  >
-    Subscribe to our newsletter
-  </p>
-
-  {#if error}
-    <p class="font-manrope mb-4 text-[14px] text-red-500">{error}</p>
-  {/if}
-
   {#if submitted}
-    <p class="font-manrope mb-4 text-[14px] text-green-600">
-      ✓ Successfully subscribed! Check your email for updates.
-    </p>
+    <div
+      style="font-size:0.85rem;font-weight:500;margin-bottom:5px;color:var(--text)"
+    >
+      you're in.
+    </div>
+    <div style="font-size:0.76rem;color:var(--muted);line-height:1.6">
+      i'll send the next one when i have something worth saying.
+    </div>
   {:else}
-    <div class="flex flex-col gap-3 sm:flex-row">
+    <div
+      style="font-size:0.85rem;font-weight:500;margin-bottom:4px;color:var(--text)"
+    >
+      get new posts in your inbox
+    </div>
+    <div
+      style="font-size:0.74rem;color:var(--muted);margin-bottom:16px;line-height:1.6"
+    >
+      no schedule. no issues. just an email when something new drops.
+    </div>
+    {#if err}<div
+        style="font-size:0.7rem;color:var(--accent);margin-bottom:8px"
+      >
+        ! {err}
+      </div>{/if}
+    <form onsubmit={submit} style="display:flex;gap:10px;flex-wrap:wrap">
       <input
-        type="email"
         bind:value={email}
-        placeholder="Enter your email"
-        aria-label="Email address"
-        disabled={submitting}
-        class="font-manrope flex-1 rounded-[8px] border-[1.5px] border-[rgba(197,247,208,0.8)] bg-white px-3.5 py-3 text-[14px] text-[#29302d] placeholder-[rgba(41,48,45,0.35)] outline-none focus:border-[#386547] disabled:cursor-not-allowed disabled:opacity-50"
+        placeholder="your@email.com"
+        type="email"
+        style="flex:1;min-width:200px;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:9px 14px;font-size:0.78rem;font-family:inherit;color:var(--text);outline:none"
       />
       <button
-        type="button"
-        onclick={handleSubmit}
-        disabled={!email.trim() || submitting}
-        class="font-manrope cursor-pointer rounded-[8px] bg-[#386547] px-6 py-3 text-[14px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+        type="submit"
+        disabled={submitting}
+        style="background:var(--accent);border:none;border-radius:3px;padding:9px 20px;font-size:0.74rem;font-family:inherit;color:#fff;cursor:pointer;white-space:nowrap;opacity:{submitting
+          ? '0.6'
+          : '1'}"
       >
-        {submitting ? "Subscribing…" : "Subscribe"}
+        {submitting ? "…" : "subscribe"}
       </button>
-    </div>
+    </form>
   {/if}
 </div>

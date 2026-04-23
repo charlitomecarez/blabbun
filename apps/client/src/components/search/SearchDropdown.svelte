@@ -14,15 +14,12 @@
   let query = $state("");
   let posts = $state<SearchEntry[]>([]);
   // svelte-ignore non_reactive_update
-  let inputEl: HTMLInputElement | null = null;
-  // svelte-ignore non_reactive_update
   let containerEl: HTMLDivElement | null = null;
   let loaded = false;
 
   const filtered = $derived.by(() => {
     const normalized = toLower(trim(query));
     if (!normalized) return [];
-
     return posts
       .filter((p) => {
         const haystack = toLower(
@@ -30,7 +27,7 @@
         );
         return haystack.includes(normalized);
       })
-      .slice(0, 5);
+      .slice(0, 6);
   });
 
   async function loadPosts() {
@@ -41,111 +38,104 @@
     loaded = true;
   }
 
-  async function handleToggle() {
-    open = !open;
-    if (open) {
-      loadPosts();
-      await tick();
-      inputEl?.focus();
-    } else {
-      query = "";
-    }
-  }
-
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key === "Escape") {
-      open = false;
-      query = "";
-    }
+  function close() {
+    open = false;
+    query = "";
   }
 
   function handleClickOutside(e: MouseEvent) {
-    if (open && containerEl && !containerEl.contains(e.target as Node)) {
-      open = false;
-      query = "";
-    }
+    if (open && containerEl && !containerEl.contains(e.target as Node)) close();
   }
 
   onMount(() => {
-    window.addEventListener("search:toggle", handleToggle);
-    document.addEventListener("keydown", handleKeydown);
+    // listen to inline search from Navbar
+    window.addEventListener("search:query", ((e: CustomEvent) => {
+      query = e.detail as string;
+      if (query) {
+        open = true;
+        loadPosts();
+      } else close();
+    }) as EventListener);
+    window.addEventListener("search:open", () => {
+      open = true;
+      loadPosts();
+    });
+    window.addEventListener("search:close", close);
+    // legacy toggle (mobile)
+    window.addEventListener("search:toggle", async () => {
+      open = !open;
+      if (open) loadPosts();
+      else query = "";
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") close();
+      // "/" shortcut focuses the navbar search input
+      if (
+        e.key === "/" &&
+        (e.target as HTMLElement).tagName !== "INPUT" &&
+        (e.target as HTMLElement).tagName !== "TEXTAREA"
+      ) {
+        e.preventDefault();
+        const inp = document.querySelector<HTMLInputElement>(
+          "header input[type=search]"
+        );
+        inp?.focus();
+      }
+    });
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      window.removeEventListener("search:toggle", handleToggle);
-      document.removeEventListener("keydown", handleKeydown);
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
   });
 </script>
 
-{#if open}
+{#if open && filtered.length > 0}
   <div
     bind:this={containerEl}
-    role="search"
-    class="fixed top-[64px] left-1/2 z-40 w-[calc(100%-2rem)] max-w-[680px] -translate-x-1/2 rounded-b-[12px] border border-t-0 border-[rgba(197,247,208,0.5)] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+    style="
+      position:fixed;top:49px;left:50%;z-index:99;
+      width:calc(100% - 2rem);max-width:640px;
+      transform:translateX(-50%);
+      border:1px solid var(--border);border-top:none;
+      border-radius:0 0 4px 4px;
+      background:var(--bg);
+      box-shadow:0 8px 24px rgba(0,0,0,0.12);
+    "
   >
-    <!-- Input -->
-    <div class="px-4 pt-4 pb-3">
-      <input
-        bind:this={inputEl}
-        bind:value={query}
-        type="search"
-        placeholder="Search posts..."
-        aria-label="Search posts"
-        class="font-manrope w-full rounded-[8px] border border-[rgba(197,247,208,0.6)] bg-[#f1f8f3] px-4 py-2.5 text-[16px] text-[#29302d] placeholder-[rgba(41,48,45,0.4)] outline-none focus:border-[#386547] md:text-[15px]"
-      />
-    </div>
-
-    <!-- Results -->
-    {#if query.trim().length > 0}
-      <div class="border-t border-[rgba(197,247,208,0.3)] pb-2">
-        {#if filtered.length === 0}
+    {#each filtered as post}
+      <a
+        href={post.href}
+        onclick={close}
+        style="
+          display:flex;align-items:start;gap:12px;
+          padding:10px 16px;text-decoration:none;
+          border-bottom:1px solid var(--divider);
+          transition:background 0.1s;
+        "
+        onmouseenter={(e) => {
+          (e.currentTarget as HTMLElement).style.background = "var(--bg2)";
+        }}
+        onmouseleave={(e) => {
+          (e.currentTarget as HTMLElement).style.background = "transparent";
+        }}
+      >
+        <div style="flex:1;min-width:0">
           <p
-            class="font-manrope px-4 py-4 text-[14px] text-[rgba(41,48,45,0.45)]"
+            style="font-size:0.88rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
           >
-            No results for &ldquo;{query}&rdquo;
+            {post.title}
           </p>
-        {:else}
-          {#each filtered as post}
-            <a
-              href={post.href}
-              onclick={() => {
-                open = false;
-                query = "";
-              }}
-              class="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-[rgba(197,247,208,0.12)]"
-            >
-              <div class="min-w-0 flex-1">
-                <div class="mb-1">
-                  <span
-                    class="font-manrope inline-block rounded-full bg-[#ebf3ed] px-2.5 py-0.5 text-[10px] font-bold tracking-[0.06em] text-[#386547] uppercase"
-                  >
-                    {post.tags[0] ?? "EDITORIAL"}
-                  </span>
-                </div>
-                <p
-                  class="font-space-grotesk line-clamp-1 text-[15px] font-bold text-[#29302d] md:text-[16px]"
-                >
-                  {post.title}
-                </p>
-                <p
-                  class="font-manrope mt-0.5 line-clamp-1 text-[13px] text-[rgba(41,48,45,0.55)] md:line-clamp-2"
-                >
-                  {post.description}
-                </p>
-              </div>
-              {#if post.image}
-                <img
-                  src={post.image}
-                  alt=""
-                  class="hidden h-12 w-16 shrink-0 rounded-[6px] object-cover sm:block"
-                />
-              {/if}
-            </a>
-          {/each}
+          <p
+            style="font-size:0.72rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
+          >
+            {post.description}
+          </p>
+        </div>
+        {#if post.image}
+          <img
+            src={post.image}
+            alt=""
+            style="width:44px;height:30px;border-radius:2px;object-fit:cover;flex-shrink:0;opacity:0.85"
+          />
         {/if}
-      </div>
-    {/if}
+      </a>
+    {/each}
   </div>
 {/if}

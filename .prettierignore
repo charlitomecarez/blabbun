@@ -7,3 +7,4 @@ apps/*/dist/
 apps/*/.astro/
 apps/*/.vercel/
 apps/*/test-results/
+docs/superpowers/
