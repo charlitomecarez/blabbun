@@ -30,7 +30,7 @@
   <div
     style="font-size:0.7rem;font-weight:500;color:var(--accent);margin-bottom:6px"
   >
-    anonymous
+    {comment.anon_name ?? "anonymous"}
     <span style="color:var(--muted2);font-weight:400;margin-left:8px"
       >{relativeTime(comment.created_at)}</span
     >
@@ -62,7 +62,7 @@
           <div
             style="font-size:0.68rem;font-weight:500;color:var(--accent);margin-bottom:4px"
           >
-            anonymous
+            {reply.anon_name ?? "anonymous"}
             <span style="color:var(--muted2);font-weight:400;margin-left:6px"
               >{relativeTime(reply.created_at)}</span
             >

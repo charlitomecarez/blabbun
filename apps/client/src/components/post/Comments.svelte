@@ -25,6 +25,14 @@
   );
 
   onMount(async () => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      yourName = saved;
+    } else {
+      yourName = anonName(((Date.now() / 10000) | 0) % 120);
+      localStorage.setItem(STORAGE_KEY, yourName);
+    }
+
     try {
       const res = await fetch(`/api/comments/${postSlug}`);
       if (!res.ok) throw new Error();
@@ -48,7 +56,7 @@
       const res = await fetch(`/api/comments/${postSlug}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: text.trim() }),
+        body: JSON.stringify({ body: text.trim(), anon_name: yourName }),
       });
       if (!res.ok) throw new Error();
       const created = await res.json();
@@ -68,7 +76,11 @@
       const res = await fetch(`/api/comments/${postSlug}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body, parent_id: commentId }),
+        body: JSON.stringify({
+          body,
+          parent_id: commentId,
+          anon_name: yourName,
+        }),
       });
       if (!res.ok) throw new Error();
       const created = await res.json();
@@ -80,6 +92,42 @@
     }
     activeReplyId = null;
   }
+
+  const BUN_ADJS = [
+    "sleepy",
+    "cozy",
+    "golden",
+    "toasty",
+    "fluffy",
+    "crusty",
+    "warm",
+    "soft",
+    "crispy",
+    "doughy",
+    "puffy",
+    "sesame",
+  ];
+  const BUN_NOUNS = [
+    "loaf",
+    "bun",
+    "roll",
+    "crumb",
+    "muffin",
+    "scone",
+    "pretzel",
+    "bagel",
+    "biscuit",
+    "brioche",
+  ];
+  function anonName(seed: number) {
+    return (
+      BUN_ADJS[seed % BUN_ADJS.length] +
+      "-" +
+      BUN_NOUNS[Math.floor(seed / BUN_ADJS.length) % BUN_NOUNS.length]
+    );
+  }
+  const STORAGE_KEY = "blabbun-anon-name";
+  let yourName = $state("");
 
   const inputStyle =
     "background:var(--input-bg);border:1px solid var(--border);border-radius:3px;padding:10px 12px;font-size:0.8rem;color:var(--text);width:100%;outline:none;resize:vertical;font-family:inherit;line-height:1.6";
@@ -147,7 +195,9 @@
     <div
       style="font-size:0.7rem;color:var(--muted);margin-bottom:12px;letter-spacing:0.04em"
     >
-      leave a comment — you'll be anonymous
+      leave a comment — you'll be anonymous <span style="color:var(--accent)"
+        >({yourName})</span
+      >
     </div>
     {#if err}
       <div style="font-size:0.7rem;color:var(--accent);margin-bottom:8px">

@@ -30,11 +30,11 @@ const { pathname } = Astro.url;
 const navLinks = [
   { label: "home", href: "/", active: pathname === "/" },
   {
-    label: "all posts",
+    label: "posts",
     href: "/archive",
     active: pathname === "/archive" || pathname.startsWith("/topics"),
   },
-  { label: "about", href: "/about", active: pathname === "/about" },
+  // { label: "about", href: "/about", active: pathname === "/about" },
 ];
 
 // Word count for footer

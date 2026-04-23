@@ -4,6 +4,7 @@ export interface CommentRow {
   body: string;
   created_at: string;
   parent_id: string | null;
+  anon_name: string | null;
 }
 
 export interface PostClapRow {

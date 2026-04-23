@@ -1,6 +1,4 @@
 <script lang="ts">
-  import BunLogo from "./BunLogo.svelte";
-
   interface NavLink {
     label: string;
     href: string;
@@ -95,7 +93,7 @@
         text-decoration:none;
       "
     >
-      <BunLogo size={30} />
+      <span style="font-size:1.35rem;line-height:1">🍞</span>
       <span
         style="font-size:0.95rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)"
       >
