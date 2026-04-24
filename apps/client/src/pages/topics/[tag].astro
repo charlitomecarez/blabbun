@@ -1,19 +1,19 @@
 ---
+import { tagToLabel } from "@blabbun/utils";
 import { getCollection } from "astro:content";
 
 import ArchiveList from "@/components/archive/ArchiveList.svelte";
 import Layout from "@/layouts/Layout.astro";
-import { tagToLabel } from "@/utils/tags";
 
 const { tag: rawTag } = Astro.params;
-const tag = rawTag.toUpperCase();
+const tag = rawTag || "";
 
 const allPosts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
 const tagPosts = allPosts.filter((p) =>
-  p.data.tags?.map((t) => t.toUpperCase()).includes(tag)
+  p.data.tags?.map((t) => t.toUpperCase()).includes(tag || "")
 );
 
 const postItems = tagPosts.map((post) => ({

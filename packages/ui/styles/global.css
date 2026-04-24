@@ -119,3 +119,78 @@ select option {
 a:hover {
   color: var(--accent) !important;
 }
+
+/* ─── Tag badge colours — single source of truth for all components ──────── */
+/*
+ * These rules must stay global (not component-scoped) because tag classes
+ * are applied via dynamic expressions (e.g. `class="badge {tagClass(tag)}"`).
+ * Svelte does not hash dynamically-constructed class names, so a component-
+ * scoped rule would not match them at runtime.
+ */
+/* Light mode */
+.tag-rants {
+  background: #fce8e8;
+  color: #9b2121;
+}
+.tag-takes {
+  background: #e8f0fc;
+  color: #1a3a8c;
+}
+.tag-halfbaked {
+  background: #fef3e2;
+  color: #8a5a00;
+}
+.tag-lifestuff {
+  background: #e8f8ee;
+  color: #1a6b3a;
+}
+.tag-culture {
+  background: #f3e8fc;
+  color: #6a1a8c;
+}
+.tag-editorial {
+  background: #faebd7;
+  color: #8a5a00;
+}
+.tag-technical {
+  background: #e8f0fc;
+  color: #1a3a8c;
+}
+.tag-default {
+  background: #f0ede8;
+  color: #6b5e4e;
+}
+
+/* Dark mode */
+body.dark .tag-rants {
+  background: #2a1414;
+  color: #d47070;
+}
+body.dark .tag-takes {
+  background: #111a2a;
+  color: #6a96d4;
+}
+body.dark .tag-halfbaked {
+  background: #241a08;
+  color: #c49040;
+}
+body.dark .tag-lifestuff {
+  background: #0e2218;
+  color: #5aab78;
+}
+body.dark .tag-culture {
+  background: #1e1228;
+  color: #a870d4;
+}
+body.dark .tag-editorial {
+  background: #241a08;
+  color: #c49040;
+}
+body.dark .tag-technical {
+  background: #111a2a;
+  color: #6a96d4;
+}
+body.dark .tag-default {
+  background: #1e1a14;
+  color: #a09080;
+}

@@ -1,8 +1,8 @@
 ---
+import { tagToLabel } from "@blabbun/utils";
 import { getCollection } from "astro:content";
 
 import Layout from "@/layouts/Layout.astro";
-import { tagToLabel } from "@/utils/tags";
 
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 

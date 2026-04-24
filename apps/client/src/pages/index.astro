@@ -1,5 +1,6 @@
 ---
 import { FeedItem } from "@blabbun/ui/components/cards";
+import { readTime } from "@blabbun/utils";
 import { getCollection } from "astro:content";
 
 import NewsletterBar from "@/components/home/NewsletterBar.svelte";
@@ -21,7 +22,7 @@ const feedItems = posts.map((post) => ({
   title: post.data.title,
   excerpt: post.data.description,
   tag: (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
-  readTime: `${Math.max(1, Math.round((post.body?.trim().split(/\s+/).length ?? 0) / 200))} min read`,
+  readTime: readTime(post.body ?? ""),
   imageUrl: post.data.image,
   href: `/${post.id}`,
   claps: stats[post.id]?.claps,
