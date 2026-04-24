@@ -1,35 +1,22 @@
-import { createSupabaseClient } from "@blabbun/db";
 import type { APIRoute } from "astro";
+
+import { getSupabaseClient, jsonResponse } from "@/lib/api";
 
 export const prerender = false;
 
-function getClient() {
-  return createSupabaseClient(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
-  );
-}
-
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
+/** Basic email format check — full validation happens at the DB constraint level. */
 function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 export const POST: APIRoute = async ({ request }) => {
   const body = (await request.json()) as { email?: string };
 
   if (!body.email?.trim() || !isValidEmail(body.email)) {
-    return json({ error: "Valid email is required" }, 400);
+    return jsonResponse({ error: "Valid email is required" }, 400);
   }
 
-  const supabase = getClient();
+  const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from("subscribers")
     .insert({ email: body.email.trim() })
@@ -37,11 +24,12 @@ export const POST: APIRoute = async ({ request }) => {
     .single();
 
   if (error) {
+    // Postgres unique-violation code — email already in the subscribers table.
     if (error.code === "23505") {
-      return json({ error: "Email already subscribed" }, 409);
+      return jsonResponse({ error: "Email already subscribed" }, 409);
     }
-    return json({ error: error.message }, 500);
+    return jsonResponse({ error: error.message }, 500);
   }
 
-  return json(data, 201);
+  return jsonResponse(data, 201);
 };
