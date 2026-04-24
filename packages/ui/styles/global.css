@@ -121,6 +121,12 @@ a:hover {
 }
 
 /* ─── Tag badge colours — single source of truth for all components ──────── */
+/*
+ * These rules must stay global (not component-scoped) because tag classes
+ * are applied via dynamic expressions (e.g. `class="badge {tagClass(tag)}"`).
+ * Svelte does not hash dynamically-constructed class names, so a component-
+ * scoped rule would not match them at runtime.
+ */
 /* Light mode */
 .tag-rants {
   background: #fce8e8;
