@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="apps/client/assets/blabbun.png" alt="Blab Bun" width="96" />
+  <img src="apps/client/public/blabbun.png" alt="Blab Bun" width="96" />
   <h1>blab bun.</h1>
   <p>unfiltered takes & half-baked thoughts — probably should've kept to myself</p>
   <p>
