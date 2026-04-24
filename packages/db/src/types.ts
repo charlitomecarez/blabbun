@@ -34,16 +34,19 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<CommentRow>;
+        Relationships: [];
       };
       post_claps: {
         Row: PostClapRow;
         Insert: { post_slug: string; count?: number };
         Update: { count?: number };
+        Relationships: [];
       };
       clap_votes: {
         Row: ClapVoteRow;
         Insert: { post_slug: string; ip_hash: string; created_at?: string };
         Update: never;
+        Relationships: [];
       };
       subscribers: {
         Row: SubscriberRow;
@@ -52,7 +55,12 @@ export interface Database {
           subscribed_at?: string;
         };
         Update: Partial<SubscriberRow>;
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 }

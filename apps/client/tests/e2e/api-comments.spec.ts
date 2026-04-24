@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-test.describe("comments API", () => {
-  const testSlug = `test-post-${Date.now()}`;
+// Serial: each test builds on state created by previous tests
+test.describe.serial("comments API", () => {
+  const testSlug = `test-post-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
   test("GET returns empty array for unknown slug", async ({ request }) => {
     const res = await request.get(`/api/comments/${testSlug}-unknown`);
@@ -25,6 +26,7 @@ test.describe("comments API", () => {
     const parentRes = await request.post(`/api/comments/${testSlug}`, {
       data: { body: "Parent comment" },
     });
+    expect(parentRes.status()).toBe(201);
     const parent = await parentRes.json();
 
     const replyRes = await request.post(`/api/comments/${testSlug}`, {
@@ -37,6 +39,7 @@ test.describe("comments API", () => {
 
   test("GET returns the tree with nested replies", async ({ request }) => {
     const res = await request.get(`/api/comments/${testSlug}`);
+    expect(res.status()).toBe(200);
     const tree = await res.json();
     const withReplies = tree.find(
       (c: { body: string; replies: unknown[] }) => c.body === "Parent comment"

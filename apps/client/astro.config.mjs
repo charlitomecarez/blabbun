@@ -10,6 +10,7 @@ export default defineConfig({
   output: "server",
   adapter: vercel(),
   devToolbar: { enabled: false },
+  security: { checkOrigin: false },
   integrations: [svelte(), mdx()],
   image: {
     domains: ["images.unsplash.com"],

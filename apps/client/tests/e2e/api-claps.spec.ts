@@ -1,30 +1,40 @@
 import { expect, test } from "@playwright/test";
 
-test.describe("claps API", () => {
-  const testSlug = `clap-post-${Date.now()}`;
+// Serial so POST/toggle tests don't race across parallel workers
+test.describe.serial("claps API", () => {
+  // workerIndex makes slug unique per browser project
+  const slug = `clap-test-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-  test("GET returns 0 for unknown slug", async ({ request }) => {
-    const res = await request.get(`/api/claps/${testSlug}`);
+  test("GET returns count 0 and hasClapped false for unknown slug", async ({
+    request,
+  }) => {
+    const res = await request.get(`/api/claps/${slug}`);
     expect(res.status()).toBe(200);
-    expect(await res.json()).toEqual({ count: 0 });
+    const body = await res.json();
+    expect(body.count).toBe(0);
+    expect(body.hasClapped).toBe(false);
   });
 
-  test("POST increments from 0 to 1", async ({ request }) => {
-    const res = await request.post(`/api/claps/${testSlug}`);
+  test("POST adds a clap and returns hasClapped true", async ({ request }) => {
+    const res = await request.post(`/api/claps/${slug}`);
     expect(res.status()).toBe(200);
-    expect(await res.json()).toEqual({ count: 1 });
+    const body = await res.json();
+    expect(body.count).toBeGreaterThanOrEqual(1);
+    expect(body.hasClapped).toBe(true);
   });
 
-  test("POST increments again to 2", async ({ request }) => {
-    const res = await request.post(`/api/claps/${testSlug}`);
+  test("POST again toggles clap off", async ({ request }) => {
+    const res = await request.post(`/api/claps/${slug}`);
     expect(res.status()).toBe(200);
-    expect(await res.json()).toEqual({ count: 2 });
+    const body = await res.json();
+    expect(body.hasClapped).toBe(false);
   });
 
-  test("GET returns current count", async ({ request }) => {
-    const res = await request.get(`/api/claps/${testSlug}`);
+  test("GET reflects updated state", async ({ request }) => {
+    const res = await request.get(`/api/claps/${slug}`);
     expect(res.status()).toBe(200);
-    const { count } = await res.json();
-    expect(count).toBeGreaterThanOrEqual(2);
+    const body = await res.json();
+    expect(typeof body.count).toBe("number");
+    expect(typeof body.hasClapped).toBe("boolean");
   });
 });

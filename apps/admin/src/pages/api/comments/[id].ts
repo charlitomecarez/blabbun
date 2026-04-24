@@ -3,7 +3,8 @@ import type { APIRoute } from "astro";
 
 export const prerender = false;
 
-function getClient() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getClient(): any {
   return createSupabaseClient(
     import.meta.env.SUPABASE_URL,
     import.meta.env.SUPABASE_SERVICE_ROLE_KEY
@@ -24,8 +25,8 @@ export const PATCH: APIRoute = async ({ params, request }) => {
   if (!body) return json({ error: "body is required" }, 400);
 
   const supabase = getClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.from("comments") as any)
+  const { data, error } = await supabase
+    .from("comments")
     .update({ body })
     .eq("id", id!)
     .select()

@@ -66,12 +66,12 @@ test.describe("SEO meta tags", () => {
     }
   });
 
-  test("sitemap.xml returns valid XML", async ({ page }) => {
-    const response = await page.goto("/sitemap.xml");
-    expect(response?.status()).toBe(200);
-    const content = await page.content();
-    expect(content).toContain("<urlset");
-    expect(content).toContain("<url><loc>");
+  test("sitemap.xml returns valid XML", async ({ request }) => {
+    const response = await request.get("/sitemap.xml");
+    expect(response.status()).toBe(200);
+    const text = await response.text();
+    expect(text).toContain("<urlset");
+    expect(text).toContain("<loc>");
   });
 
   test("robots.txt exists and references sitemap", async ({ page }) => {

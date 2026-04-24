@@ -3,7 +3,8 @@ import type { APIRoute } from "astro";
 
 export const prerender = false;
 
-function getClient() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getClient(): any {
   return createSupabaseClient(
     import.meta.env.SUPABASE_URL,
     import.meta.env.SUPABASE_SERVICE_ROLE_KEY
