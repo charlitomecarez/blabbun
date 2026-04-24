@@ -2,6 +2,7 @@
   interface Props {
     slug: string;
   }
+
   const { slug }: Props = $props();
 
   let saved = $state(false);
@@ -15,9 +16,12 @@
   function toggle() {
     if (!mounted) return;
     saved = !saved;
-    if (saved) localStorage.setItem(`bb-bookmark-${slug}`, "1");
-    else localStorage.removeItem(`bb-bookmark-${slug}`);
-    // Notify navbar badge
+    if (saved) {
+      localStorage.setItem(`bb-bookmark-${slug}`, "1");
+    } else {
+      localStorage.removeItem(`bb-bookmark-${slug}`);
+    }
+    // Notify the Navbar bookmark badge to update its count.
     window.dispatchEvent(new Event("storage"));
   }
 </script>
@@ -25,16 +29,24 @@
 {#if mounted}
   <button
     type="button"
+    class="bookmark-btn"
     onclick={toggle}
     aria-label={saved ? "Remove bookmark" : "Bookmark this post"}
-    style="
-      background:none;border:none;cursor:pointer;padding:0;
-      font-family:inherit;font-size:1.1rem;
-      color:{saved ? 'var(--accent)' : 'var(--muted)'};
-      transition:color 0.15s;
-    "
     title={saved ? "Bookmarked" : "Bookmark"}
+    style="color: {saved ? 'var(--accent)' : 'var(--muted)'}"
   >
     🔖
   </button>
 {/if}
+
+<style>
+  .bookmark-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    font-size: 1.1rem;
+    transition: color 0.15s;
+  }
+</style>
