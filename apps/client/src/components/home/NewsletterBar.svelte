@@ -1,6 +1,7 @@
 <script lang="ts">
   let email = $state("");
   let done = $state(
+    // Guard for SSR — localStorage is unavailable on the server.
     typeof localStorage !== "undefined"
       ? localStorage.getItem("bb-subscribed") === "1"
       : false
@@ -36,62 +37,98 @@
   }
 </script>
 
-<div
-  style="
-    background:var(--bg2);border:1px solid var(--border);border-radius:4px;
-    padding:26px 28px;margin:40px 0;
-  "
->
+<div class="newsletter-card">
   {#if done}
-    <div
-      style="font-size:0.85rem;font-weight:500;margin-bottom:5px;color:var(--text)"
-    >
-      you're in.
-    </div>
-    <div style="font-size:0.76rem;color:var(--muted);line-height:1.6">
+    <div class="newsletter-title">you're in.</div>
+    <div class="newsletter-sub">
       i'll send the next one when i have something worth saying. could be
       tomorrow. could be never.
     </div>
   {:else}
-    <div
-      style="font-size:0.85rem;font-weight:500;margin-bottom:4px;color:var(--text)"
-    >
-      get new posts in your inbox
-    </div>
-    <div
-      style="font-size:0.74rem;color:var(--muted);margin-bottom:16px;line-height:1.6"
-    >
+    <div class="newsletter-title">get new posts in your inbox</div>
+    <div class="newsletter-sub">
       no schedule. no issues. just an email when something new drops.
     </div>
     {#if err}
-      <div style="font-size:0.7rem;color:var(--accent);margin-bottom:8px">
-        ! {err}
-      </div>
+      <div class="form-error">! {err}</div>
     {/if}
-    <form onsubmit={submit} style="display:flex;gap:10px;flex-wrap:wrap">
+    <form class="newsletter-form" onsubmit={submit}>
       <input
         bind:value={email}
+        class="email-input"
         placeholder="your@email.com"
         type="email"
-        style="
-          flex:1;min-width:200px;background:var(--bg);
-          border:1px solid var(--border);border-radius:3px;
-          padding:9px 14px;font-size:0.78rem;
-          font-family:inherit;color:var(--text);outline:none;
-        "
       />
       <button
         type="submit"
+        class="subscribe-btn"
         disabled={submitting}
-        style="
-          background:var(--accent);border:none;border-radius:3px;
-          padding:9px 20px;font-size:0.74rem;font-family:inherit;
-          color:#fff;cursor:pointer;white-space:nowrap;
-          opacity:{submitting ? '0.6' : '1'};
-        "
+        style="opacity: {submitting ? '0.6' : '1'}"
       >
         {submitting ? "…" : "subscribe"}
       </button>
     </form>
   {/if}
 </div>
+
+<style>
+  .newsletter-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 26px 28px;
+    margin: 40px 0;
+  }
+
+  .newsletter-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+
+  .newsletter-sub {
+    font-size: 0.74rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .form-error {
+    font-size: 0.7rem;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .newsletter-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .email-input {
+    flex: 1;
+    min-width: 200px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 9px 14px;
+    font-size: 0.78rem;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+  }
+
+  .subscribe-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 3px;
+    padding: 9px 20px;
+    font-size: 0.74rem;
+    font-family: inherit;
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+</style>
