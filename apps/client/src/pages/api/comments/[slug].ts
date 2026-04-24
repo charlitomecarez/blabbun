@@ -1,26 +1,13 @@
 import type { CommentRow } from "@blabbun/db";
-import { createSupabaseClient } from "@blabbun/db";
 import type { APIRoute } from "astro";
+
+import { getSupabaseClient, jsonResponse } from "@/lib/api";
 
 export const prerender = false;
 
-function getClient() {
-  return createSupabaseClient(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
-  );
-}
-
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
 export const GET: APIRoute = async ({ params }) => {
   const { slug } = params;
-  const supabase = getClient();
+  const supabase = getSupabaseClient();
 
   const { data, error } = await supabase
     .from("comments")
@@ -28,8 +15,9 @@ export const GET: APIRoute = async ({ params }) => {
     .eq("post_slug", slug!)
     .order("created_at", { ascending: true });
 
-  if (error) return json({ error: error.message }, 500);
+  if (error) return jsonResponse({ error: error.message }, 500);
 
+  // Nest replies under their parent comments in a single pass.
   const rows = data ?? [];
   const topLevel = rows.filter((r) => r.parent_id === null);
   const nested = topLevel.map((comment) => ({
@@ -37,12 +25,12 @@ export const GET: APIRoute = async ({ params }) => {
     replies: rows.filter((r) => r.parent_id === comment.id),
   }));
 
-  return json(nested);
+  return jsonResponse(nested);
 };
 
 export const POST: APIRoute = async ({ params, request }) => {
   const { slug } = params;
-  const supabase = getClient();
+  const supabase = getSupabaseClient();
 
   let body: { body?: string; parent_id?: string; anon_name?: string };
   try {
@@ -52,11 +40,11 @@ export const POST: APIRoute = async ({ params, request }) => {
       anon_name?: string;
     };
   } catch {
-    return json({ error: "Invalid JSON" }, 400);
+    return jsonResponse({ error: "Invalid JSON" }, 400);
   }
 
   if (!body.body?.trim()) {
-    return json({ error: "Comment body is required" }, 400);
+    return jsonResponse({ error: "Comment body is required" }, 400);
   }
 
   const insert: Partial<CommentRow> = {
@@ -72,7 +60,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     .select()
     .single();
 
-  if (error) return json({ error: error.message }, 500);
+  if (error) return jsonResponse({ error: error.message }, 500);
 
-  return json(data, 201);
+  return jsonResponse(data, 201);
 };

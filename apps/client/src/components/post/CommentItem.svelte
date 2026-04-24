@@ -1,12 +1,13 @@
 <script lang="ts">
   import { relativeTime } from "@blabbun/utils";
+
   import type { Comment } from "./types";
 
   interface Props {
     comment: Comment;
     activeReplyId: string | null;
     onReplyToggle: (id: string | null) => void;
-    onReplySubmit: (commentId: string, body: string) => void;
+    onReplySubmit: (commentId: string, body: string) => Promise<void>;
   }
 
   const { comment, activeReplyId, onReplyToggle, onReplySubmit }: Props =
@@ -20,89 +21,192 @@
     onReplySubmit(comment.id, replyBody.trim());
     replyBody = "";
   }
-
-  const inputStyle =
-    "background:var(--input-bg);border:1px solid var(--border);border-radius:3px;padding:8px 10px;font-size:0.78rem;color:var(--text);width:100%;outline:none;resize:none;font-family:inherit;line-height:1.6";
 </script>
 
-<div style="padding:14px 0;border-bottom:1px solid var(--divider)">
-  <!-- Header -->
-  <div
-    style="font-size:0.7rem;font-weight:500;color:var(--accent);margin-bottom:6px"
-  >
-    {comment.anon_name ?? "anonymous"}
-    <span style="color:var(--muted2);font-weight:400;margin-left:8px"
-      >{relativeTime(comment.created_at)}</span
-    >
+<div class="comment-item">
+  <!-- Author + timestamp -->
+  <div class="comment-header">
+    <span class="comment-author">{comment.anon_name ?? "anonymous"}</span>
+    <span class="comment-time">{relativeTime(comment.created_at)}</span>
   </div>
 
   <!-- Body -->
-  <p
-    style="font-size:0.84rem;line-height:1.65;color:var(--text);margin-bottom:8px"
-  >
-    {comment.body}
-  </p>
+  <p class="comment-body">{comment.body}</p>
 
   <!-- Reply toggle -->
   <button
     type="button"
+    class="reply-toggle"
     onclick={() => onReplyToggle(isReplying ? null : comment.id)}
-    style="background:none;border:none;font-family:inherit;font-size:0.7rem;color:var(--muted);cursor:pointer;padding:0;letter-spacing:0.02em"
   >
     {isReplying ? "↩ cancel" : "↩ reply"}
   </button>
 
-  <!-- Replies -->
+  <!-- Nested replies + inline reply form -->
   {#if comment.replies.length > 0 || isReplying}
-    <div
-      style="margin-top:10px;margin-left:14px;padding-left:12px;border-left:2px solid var(--accent-soft)"
-    >
+    <div class="replies-thread">
       {#each comment.replies as reply (reply.id)}
-        <div style="padding:8px 0;border-bottom:1px solid var(--divider)">
-          <div
-            style="font-size:0.68rem;font-weight:500;color:var(--accent);margin-bottom:4px"
-          >
-            {reply.anon_name ?? "anonymous"}
-            <span style="color:var(--muted2);font-weight:400;margin-left:6px"
-              >{relativeTime(reply.created_at)}</span
-            >
+        <div class="reply-item">
+          <div class="comment-header">
+            <span class="comment-author">{reply.anon_name ?? "anonymous"}</span>
+            <span class="comment-time">{relativeTime(reply.created_at)}</span>
           </div>
-          <p style="font-size:0.8rem;line-height:1.6;color:var(--text)">
-            {reply.body}
-          </p>
+          <p class="comment-body reply-body">{reply.body}</p>
         </div>
       {/each}
 
       {#if isReplying}
-        <div style="padding-top:10px">
+        <div class="reply-form">
           <textarea
             bind:value={replyBody}
+            class="reply-textarea"
             placeholder="write a reply…"
             rows={2}
             aria-label="Reply text"
-            style={inputStyle}
           ></textarea>
-          <div style="margin-top:6px;display:flex;gap:8px">
+          <div class="reply-actions">
             <button
               type="button"
+              class="reply-submit"
               onclick={handleReplySubmit}
               disabled={!replyBody.trim()}
-              style="background:var(--accent);border:none;border-radius:3px;padding:7px 16px;font-size:0.72rem;font-family:inherit;color:#fff;cursor:pointer;opacity:{replyBody.trim()
-                ? '1'
-                : '0.4'}">post</button
             >
+              post
+            </button>
             <button
               type="button"
+              class="reply-cancel"
               onclick={() => {
                 replyBody = "";
                 onReplyToggle(null);
               }}
-              style="background:none;border:none;font-family:inherit;font-size:0.72rem;color:var(--muted);cursor:pointer"
-              >cancel</button
             >
+              cancel
+            </button>
           </div>
         </div>
       {/if}
     </div>
   {/if}
 </div>
+
+<style>
+  .comment-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--divider);
+  }
+
+  /* ─── Header ──────────────────────────────────────────────── */
+  .comment-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .comment-author {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .comment-time {
+    font-size: 0.65rem;
+    color: var(--muted2);
+    font-weight: 400;
+  }
+
+  /* ─── Body ────────────────────────────────────────────────── */
+  .comment-body {
+    font-size: 0.84rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .reply-body {
+    font-size: 0.8rem;
+  }
+
+  /* ─── Reply toggle ────────────────────────────────────────── */
+  .reply-toggle {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 0.7rem;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0;
+    letter-spacing: 0.02em;
+    transition: color 0.12s;
+  }
+  .reply-toggle:hover {
+    color: var(--accent);
+  }
+
+  /* ─── Nested thread ───────────────────────────────────────── */
+  .replies-thread {
+    margin-top: 10px;
+    margin-left: 14px;
+    padding-left: 12px;
+    border-left: 2px solid var(--accent-soft);
+  }
+
+  .reply-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--divider);
+  }
+
+  /* ─── Inline reply form ───────────────────────────────────── */
+  .reply-form {
+    padding-top: 10px;
+  }
+
+  .reply-textarea {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 10px;
+    font-size: 0.78rem;
+    color: var(--text);
+    width: 100%;
+    outline: none;
+    resize: none;
+    font-family: inherit;
+    line-height: 1.6;
+    display: block;
+  }
+
+  .reply-actions {
+    margin-top: 6px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .reply-submit {
+    background: var(--accent);
+    border: none;
+    border-radius: 3px;
+    padding: 7px 16px;
+    font-size: 0.72rem;
+    font-family: inherit;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .reply-submit:disabled {
+    opacity: 0.4;
+  }
+
+  .reply-cancel {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 0.72rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .reply-cancel:hover {
+    color: var(--accent);
+  }
+</style>

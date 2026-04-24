@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { tagClass } from "@blabbun/utils";
+
   interface Props {
     title: string;
     description?: string;
@@ -22,19 +24,6 @@
     day: "numeric",
     year: "numeric",
   });
-
-  function tagClass(t: string): string {
-    const map: Record<string, string> = {
-      RANTS: "tag-rants",
-      TAKES: "tag-takes",
-      "HALF-BAKED IDEAS": "tag-halfbaked",
-      "LIFE STUFF": "tag-lifestuff",
-      CULTURE: "tag-culture",
-      EDITORIAL: "tag-editorial",
-      TECHNICAL: "tag-technical",
-    };
-    return map[t.toUpperCase()] ?? "tag-default";
-  }
 </script>
 
 <!-- PostDetailView header — exact design match -->
@@ -84,71 +73,5 @@
     letter-spacing: 0.04em;
     font-weight: 500;
     white-space: nowrap;
-  }
-
-  .tag-rants {
-    background: #fce8e8;
-    color: #9b2121;
-  }
-  .tag-takes {
-    background: #e8f0fc;
-    color: #1a3a8c;
-  }
-  .tag-halfbaked {
-    background: #fef3e2;
-    color: #8a5a00;
-  }
-  .tag-lifestuff {
-    background: #e8f8ee;
-    color: #1a6b3a;
-  }
-  .tag-culture {
-    background: #f3e8fc;
-    color: #6a1a8c;
-  }
-  .tag-editorial {
-    background: #faebd7;
-    color: #8a5a00;
-  }
-  .tag-technical {
-    background: #e8f0fc;
-    color: #1a3a8c;
-  }
-  .tag-default {
-    background: #f0ede8;
-    color: #6b5e4e;
-  }
-
-  :global(body.dark) .tag-rants {
-    background: #2a1414;
-    color: #d47070;
-  }
-  :global(body.dark) .tag-takes {
-    background: #111a2a;
-    color: #6a96d4;
-  }
-  :global(body.dark) .tag-halfbaked {
-    background: #241a08;
-    color: #c49040;
-  }
-  :global(body.dark) .tag-lifestuff {
-    background: #0e2218;
-    color: #5aab78;
-  }
-  :global(body.dark) .tag-culture {
-    background: #1e1228;
-    color: #a870d4;
-  }
-  :global(body.dark) .tag-editorial {
-    background: #241a08;
-    color: #c49040;
-  }
-  :global(body.dark) .tag-technical {
-    background: #111a2a;
-    color: #6a96d4;
-  }
-  :global(body.dark) .tag-default {
-    background: #1e1a14;
-    color: #a09080;
   }
 </style>

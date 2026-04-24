@@ -21,6 +21,14 @@ export default defineConfig({
     build: {
       cssMinify: true,
     },
+    ssr: {
+      noExternal: [
+        "@blabbun/utils",
+        "@blabbun/db",
+        "@blabbun/types",
+        "@blabbun/ui",
+      ],
+    },
   },
   compressHTML: true,
 });
