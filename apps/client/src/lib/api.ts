@@ -27,7 +27,7 @@ export function jsonResponse(data: unknown, status = 200): Response {
 
 /**
  * Returns a SHA-256 hex digest of the client's IP address.
- * Reads the first entry in x-forwarded-for (set by Vercel's proxy).
+ * Reads the first entry in x-forwarded-for (set by the upstream proxy; Vercel in production).
  * Falls back to "unknown" when the header is absent — prevents server errors
  * while still allowing dedup logic to function (all unknown IPs share one hash).
  */
