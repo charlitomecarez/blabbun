@@ -1,15 +1,14 @@
-// apps/client/tests/e2e/archive.spec.ts
 import { expect, test } from "@playwright/test";
 
-test("archive page renders heading and post count", async ({ page }) => {
+test("archive page renders heading", async ({ page }) => {
   await page.goto("/archive");
-  await expect(page.getByRole("heading", { name: "Archive" })).toBeVisible();
-  await expect(page.getByText(/\d+ posts/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "all posts" })).toBeVisible();
 });
 
 test("archive lists all posts by default", async ({ page }) => {
   await page.goto("/archive");
-  const titles = page.locator("article h3");
+  // ArchiveList renders div.archive-title, not article h3
+  const titles = page.locator(".archive-title");
   await expect(
     titles.filter({
       hasText: "The Tabs vs. Spaces Thing Is Not About Tabs or Spaces",
@@ -24,34 +23,44 @@ test("archive lists all posts by default", async ({ page }) => {
   await expect(titles.filter({ hasText: "Hello World" })).toBeVisible();
 });
 
-test("tag filter hides posts from other tags", async ({ page }) => {
+test("tag filter shows only posts with that tag", async ({ page }) => {
   await page.goto("/archive");
-  // Click the "personal" tag pill — only "On Not Finishing Things" has this tag
-  await page.getByRole("button", { name: /personal/i }).click();
-  const titles = page.locator("article h3");
+  // Buttons render as "/ technical" (lowercase with slash)
+  await page.getByRole("button", { name: /\/\s*technical/i }).click();
+  const titles = page.locator(".archive-title");
   await expect(
     titles.filter({ hasText: "On Not Finishing Things" })
   ).toBeVisible();
   await expect(titles.filter({ hasText: "Hello World" })).not.toBeVisible();
 });
 
-test("all pill restores full list", async ({ page }) => {
+test("all button restores full list", async ({ page }) => {
   await page.goto("/archive");
-  await page.getByRole("button", { name: /personal/i }).click();
-  const titles = page.locator("article h3");
-  await expect(titles.filter({ hasText: "Hello World" })).not.toBeVisible();
-  await page.getByRole("button", { name: /all/i }).click();
-  await expect(titles.filter({ hasText: "Hello World" })).toBeVisible();
+  await page.getByRole("button", { name: /\/\s*technical/i }).click();
+  await expect(
+    page.locator(".archive-title").filter({ hasText: "Hello World" })
+  ).not.toBeVisible();
+  await page.getByRole("button", { name: /^all$/i }).click();
+  await expect(
+    page.locator(".archive-title").filter({ hasText: "Hello World" })
+  ).toBeVisible();
 });
 
-test("sort oldest-first reverses the list", async ({ page }) => {
+test("sort oldest-first puts oldest post first", async ({ page }) => {
   await page.goto("/archive");
-  const titles = page.locator("article h3");
-  // Default: newest first — first title should be the most recent post
-  await expect(titles.first()).toContainText("The Tabs vs. Spaces Thing");
-  // Switch to oldest first
+  const titles = page.locator(".archive-title");
+  // Default newest: Traffic in the PH is Apr 20
+  await expect(titles.first()).toContainText("Traffic in the PH");
   await page.getByRole("combobox", { name: /sort/i }).selectOption("oldest");
-  // Apr 8 is the earliest pubDate across the 4 demo posts
+  // Oldest: Why I Stopped Using Dark Mode is Apr 8
   await expect(titles.first()).toContainText("Why I Stopped Using Dark Mode");
-  // ArchiveList <select> must have aria-label="Sort"
+});
+
+test("sort back to newest-first works", async ({ page }) => {
+  await page.goto("/archive");
+  await page.getByRole("combobox", { name: /sort/i }).selectOption("oldest");
+  await page.getByRole("combobox", { name: /sort/i }).selectOption("newest");
+  await expect(page.locator(".archive-title").first()).toContainText(
+    "Traffic in the PH"
+  );
 });

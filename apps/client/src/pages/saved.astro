@@ -55,7 +55,7 @@ import Layout from "@/layouts/Layout.astro";
     if (slugs.length === 0) return;
 
     // Fetch titles from the search index
-    let titleMap: Record<string, string> = {};
+    const titleMap: Record<string, string> = {};
     try {
       const res = await fetch("/search.json");
       if (res.ok) {

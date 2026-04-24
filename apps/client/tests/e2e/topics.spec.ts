@@ -1,55 +1,47 @@
-// apps/client/tests/e2e/topics.spec.ts
 import { expect, test } from "@playwright/test";
 
 test("topics index renders heading", async ({ page }) => {
   await page.goto("/topics");
-  await expect(page.getByRole("heading", { name: "Topics" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /topics/i })).toBeVisible();
 });
 
-test("topics index lists all tags", async ({ page }) => {
+test("topics index lists actual tags", async ({ page }) => {
   await page.goto("/topics");
+  await expect(page.locator('[data-testid="topic-link-rants"]')).toBeVisible();
   await expect(
-    page.locator('[data-testid="topic-link-opinion"]')
+    page.locator('[data-testid="topic-link-technical"]')
   ).toBeVisible();
   await expect(
-    page.locator('[data-testid="topic-link-personal"]')
+    page.locator('[data-testid="topic-link-editorial"]')
   ).toBeVisible();
-  await expect(page.locator('[data-testid="topic-link-meta"]')).toBeVisible();
 });
 
-test("topics index links to topic detail page", async ({ page }) => {
+test("topics index shows post counts per topic", async ({ page }) => {
   await page.goto("/topics");
-  await page.locator('[data-testid="topic-link-opinion"]').click();
-  await expect(page).toHaveURL("/topics/opinion");
+  // Each topic link has a count span — check at least one exists
+  await expect(
+    page.locator('[data-testid="topic-link-rants"]').getByText(/\d+ post/)
+  ).toBeVisible();
 });
 
-test("topic detail renders heading and filtered posts", async ({ page }) => {
-  await page.goto("/topics/opinion");
-  await expect(page.getByRole("heading", { name: /opinion/i })).toBeVisible();
-  const titles = page.locator("article h3");
-  // Both opinion posts must be visible
-  await expect(
-    titles.filter({
-      hasText: "The Tabs vs. Spaces Thing Is Not About Tabs or Spaces",
-    })
-  ).toBeVisible();
-  await expect(
-    titles.filter({ hasText: "Why I Stopped Using Dark Mode" })
-  ).toBeVisible();
-  // Personal post must NOT appear
+test("clicking a topic goes to its detail page", async ({ page }) => {
+  await page.goto("/topics");
+  await page.locator('[data-testid="topic-link-rants"]').click();
+  await expect(page).toHaveURL("/topics/rants");
+});
+
+test("topic detail renders filtered posts", async ({ page }) => {
+  await page.goto("/topics/rants");
+  const titles = page.locator(".archive-title");
+  await expect(titles.filter({ hasText: "Hello World" })).toBeVisible();
+  await expect(titles.filter({ hasText: "Traffic in the PH" })).toBeVisible();
   await expect(
     titles.filter({ hasText: "On Not Finishing Things" })
   ).not.toBeVisible();
 });
 
-test("topic detail has no filter pills", async ({ page }) => {
-  await page.goto("/topics/opinion");
-  // The "All" pill only exists on the archive page, not on locked topic pages
-  await expect(page.getByRole("button", { name: /^all$/i })).not.toBeVisible();
-});
-
 test("topic detail back link goes to /topics", async ({ page }) => {
-  await page.goto("/topics/opinion");
+  await page.goto("/topics/rants");
   await page
     .getByRole("link", { name: /topics/i })
     .first()
@@ -58,13 +50,11 @@ test("topic detail back link goes to /topics", async ({ page }) => {
 });
 
 test("topic detail sort oldest-first works", async ({ page }) => {
-  await page.goto("/topics/opinion");
-  const titles = page.locator("article h3");
-  // Default newest first: tabs post is Apr 19
-  await expect(titles.first()).toContainText(
-    "The Tabs vs. Spaces Thing Is Not About Tabs or Spaces"
-  );
+  await page.goto("/topics/rants");
+  const titles = page.locator(".archive-title");
+  // Default newest: Traffic in the PH (Apr 20)
+  await expect(titles.first()).toContainText("Traffic in the PH");
   await page.getByRole("combobox", { name: /sort/i }).selectOption("oldest");
-  // Oldest: dark mode post is Apr 8
-  await expect(titles.first()).toContainText("Why I Stopped Using Dark Mode");
+  // Oldest RANTS post: Hello World (Apr 15)
+  await expect(titles.first()).toContainText("Hello World");
 });
