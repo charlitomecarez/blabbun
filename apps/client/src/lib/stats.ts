@@ -1,4 +1,3 @@
-import type { CommentRow, PostClapRow } from "@blabbun/db";
 import { createSupabaseClient } from "@blabbun/db";
 
 export interface PostStats {
@@ -6,6 +5,11 @@ export interface PostStats {
   commentCount: number;
 }
 
+/**
+ * Fetches clap counts and top-level comment counts for a list of post slugs.
+ * Runs both queries in parallel. Returns a map keyed by slug — unknown slugs
+ * get zeroed stats so callers never need to null-check individual entries.
+ */
 export async function fetchPostStats(
   slugs: string[]
 ): Promise<Record<string, PostStats>> {
@@ -21,6 +25,7 @@ export async function fetchPostStats(
       .from("post_claps")
       .select("post_slug, count")
       .in("post_slug", slugs),
+    // Only count top-level comments (parent_id IS NULL) — replies are nested under parents.
     supabase
       .from("comments")
       .select("post_slug")
@@ -28,20 +33,15 @@ export async function fetchPostStats(
       .is("parent_id", null),
   ]);
 
-  const stats: Record<string, PostStats> = {};
-  for (const slug of slugs) {
-    stats[slug] = { claps: 0, commentCount: 0 };
-  }
-  for (const row of (clapsResult.data ?? []) as Pick<
-    PostClapRow,
-    "post_slug" | "count"
-  >[]) {
+  const stats: Record<string, PostStats> = Object.fromEntries(
+    slugs.map((slug) => [slug, { claps: 0, commentCount: 0 }])
+  );
+
+  for (const row of clapsResult.data ?? []) {
     if (stats[row.post_slug]) stats[row.post_slug].claps = row.count;
   }
-  for (const row of (commentsResult.data ?? []) as Pick<
-    CommentRow,
-    "post_slug"
-  >[]) {
+
+  for (const row of commentsResult.data ?? []) {
     if (stats[row.post_slug]) stats[row.post_slug].commentCount++;
   }
 

@@ -5,7 +5,7 @@ import {
   ReactionBar,
   ReadingProgress,
 } from "@blabbun/ui/components/post";
-import { tagClass } from "@blabbun/utils";
+import { readTime, tagClass } from "@blabbun/utils";
 import { getCollection, render } from "astro:content";
 import { shuffle } from "lodash-es";
 
@@ -22,8 +22,7 @@ if (!post) return new Response(null, { status: 404 });
 
 const { Content } = await render(post);
 
-const wordCount = post.body?.trim().split(/\s+/).length ?? 0;
-const readTime = `${Math.max(1, Math.round(wordCount / 200))} min read`;
+const postReadTime = readTime(post.body ?? "");
 const tag = (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase();
 const postUrl = `${Astro.site ?? "https://blabbun.com"}/${post.id}`;
 const hasImage = !!post.data.image;
@@ -81,7 +80,7 @@ const jsonLd = {
     <PostHero
       title={post.data.title}
       tag={tag}
-      readTime={readTime}
+      readTime={postReadTime}
       pubDate={post.data.pubDate}
       backHref="/"
     />
