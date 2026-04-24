@@ -57,7 +57,7 @@ export const POST: APIRoute = async ({ request }) => {
       // Fire-and-forget — don't block the response on email delivery
       resend.emails
         .send({
-          from: "Blab Bun <newsletter@blabbun.com>",
+          from: "onboarding@resend.dev",
           to: email,
           subject: "you're in.",
           html: welcomeEmailHtml(),
