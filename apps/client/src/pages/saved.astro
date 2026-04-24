@@ -51,11 +51,27 @@ import Layout from "@/layouts/Layout.astro";
 
   countEl.textContent = `${slugs.length} post${slugs.length !== 1 ? "s" : ""} bookmarked`;
 
-  if (slugs.length > 0) {
+  async function render() {
+    if (slugs.length === 0) return;
+
+    // Fetch titles from the search index
+    let titleMap: Record<string, string> = {};
+    try {
+      const res = await fetch("/search.json");
+      if (res.ok) {
+        const posts: { href: string; title: string }[] = await res.json();
+        for (const p of posts) {
+          const slug = p.href.replace(/^\//, "");
+          titleMap[slug] = p.title;
+        }
+      }
+    } catch {}
+
     emptyEl.style.display = "none";
     listEl.style.display = "block";
 
     slugs.forEach((slug) => {
+      const title = titleMap[slug] ?? slug;
       const item = document.createElement("div");
       item.style.cssText =
         "padding:14px 0;border-bottom:1px solid var(--divider);cursor:pointer;position:relative";
@@ -64,7 +80,7 @@ import Layout from "@/layouts/Layout.astro";
           style="display:block;font-size:0.93rem;font-weight:500;line-height:1.5;color:var(--text);text-decoration:none;text-wrap:pretty;transition:color 0.15s"
           onmouseenter="this.style.color='var(--accent)'"
           onmouseleave="this.style.color='var(--text)'"
-        >/${slug}</a>
+        >${title}</a>
         <button onclick="event.stopPropagation();localStorage.removeItem('bb-bookmark-${slug}');this.closest('div').remove();updateCount()"
           style="background:none;border:none;cursor:pointer;font-size:0.68rem;color:var(--muted2);padding:0;margin-top:4px;font-family:inherit"
         >remove</button>
@@ -72,6 +88,8 @@ import Layout from "@/layouts/Layout.astro";
       listEl.appendChild(item);
     });
   }
+
+  render();
 
   function updateCount() {
     const remaining = Object.keys(localStorage).filter(
