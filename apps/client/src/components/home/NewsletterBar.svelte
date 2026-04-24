@@ -1,34 +1,91 @@
 <script lang="ts">
+  const RATE_LIMIT_MS = 10 * 60 * 1000;
+  const STORAGE_KEY = "bb-newsletter-last";
+
   let email = $state("");
-  let done = $state(
-    // Guard for SSR — localStorage is unavailable on the server.
-    typeof localStorage !== "undefined"
-      ? localStorage.getItem("bb-subscribed") === "1"
-      : false
-  );
   let err = $state("");
+  let info = $state("");
   let submitting = $state(false);
+  let cooldownMs = $state(0);
+
+  $effect(() => {
+    tick();
+  });
+
+  function tick() {
+    const last = Number(localStorage.getItem(STORAGE_KEY) ?? 0);
+    const remaining = Math.max(0, RATE_LIMIT_MS - (Date.now() - last));
+    cooldownMs = remaining;
+    if (remaining > 0) setTimeout(tick, 10_000);
+  }
+
+  function cooldownLabel(ms: number): string {
+    const mins = Math.ceil(ms / 60_000);
+    return `try again in ${mins}m`;
+  }
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function parseEmails(raw: string): string[] {
+    return raw
+      .split(/[,\s]+/)
+      .map((e) => e.trim())
+      .filter(Boolean);
+  }
 
   async function submit(e: Event) {
     e.preventDefault();
-    if (!email.includes("@")) {
-      err = "that doesn't look like an email";
+    if (cooldownMs > 0) return;
+
+    const emails = parseEmails(email);
+    if (!emails.length || emails.some((e) => !EMAIL_RE.test(e))) {
+      err = "enter valid email(s), comma-separated";
       return;
     }
+
     err = "";
+    info = "";
     submitting = true;
+
     try {
       const res = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email: emails }),
       });
-      if (!res.ok) {
-        const data = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(data.error || "Failed to subscribe");
+
+      const data = (await res.json().catch(() => ({}))) as {
+        results?: Array<{ email: string; status: string }>;
+        error?: string;
+      };
+
+      if (!res.ok && !data.results) {
+        throw new Error(data.error ?? "something went wrong");
       }
-      done = true;
-      localStorage.setItem("bb-subscribed", "1");
+
+      const results = data.results ?? [];
+      const subscribed = results.filter(
+        (r) => r.status === "subscribed"
+      ).length;
+      const already = results.filter(
+        (r) => r.status === "already_subscribed"
+      ).length;
+
+      if (subscribed > 0) {
+        info =
+          subscribed === 1
+            ? "you're in. check your inbox."
+            : `${subscribed} addresses added.`;
+        if (already > 0) info += ` (${already} already subscribed)`;
+        email = "";
+        localStorage.setItem(STORAGE_KEY, String(Date.now()));
+        tick();
+      } else if (already > 0) {
+        info =
+          already === 1 ? "already subscribed." : "all already subscribed.";
+      } else {
+        throw new Error("something went wrong");
+      }
     } catch (ex) {
       err = ex instanceof Error ? ex.message : "something went wrong";
     } finally {
@@ -38,32 +95,39 @@
 </script>
 
 <div class="newsletter-card">
-  {#if done}
-    <div class="newsletter-title">you're in.</div>
-    <div class="newsletter-sub">
-      i'll send the next one when i have something worth saying. could be
-      tomorrow. could be never.
-    </div>
-  {:else}
-    <div class="newsletter-title">get new posts in your inbox</div>
-    <div class="newsletter-sub">
-      no schedule. no issues. just an email when something new drops.
-    </div>
-    {#if err}
-      <div class="form-error">! {err}</div>
-    {/if}
-    <form class="newsletter-form" onsubmit={submit}>
-      <input
-        bind:value={email}
-        class="email-input"
-        placeholder="your@email.com"
-        type="email"
-      />
-      <button type="submit" class="subscribe-btn" disabled={submitting}>
-        {submitting ? "…" : "subscribe"}
-      </button>
-    </form>
+  <div class="newsletter-title">get new posts in your inbox</div>
+  <div class="newsletter-sub">
+    no schedule. no issues. just an email when something new drops. separate
+    multiple addresses with a comma.
+  </div>
+  {#if err}
+    <div class="form-error">! {err}</div>
   {/if}
+  {#if info}
+    <div class="form-info">{info}</div>
+  {/if}
+  <form class="newsletter-form" onsubmit={submit}>
+    <input
+      bind:value={email}
+      class="email-input"
+      placeholder="your@email.com, friend@email.com"
+      type="text"
+      autocomplete="email"
+    />
+    <button
+      type="submit"
+      class="subscribe-btn"
+      disabled={submitting || cooldownMs > 0}
+    >
+      {#if submitting}
+        …
+      {:else if cooldownMs > 0}
+        {cooldownLabel(cooldownMs)}
+      {:else}
+        subscribe
+      {/if}
+    </button>
+  </form>
 </div>
 
 <style>
@@ -92,6 +156,12 @@
   .form-error {
     font-size: 0.7rem;
     color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .form-info {
+    font-size: 0.7rem;
+    color: var(--muted);
     margin-bottom: 8px;
   }
 
@@ -126,7 +196,9 @@
     white-space: nowrap;
     transition: opacity 0.15s;
   }
+
   .subscribe-btn:disabled {
     opacity: 0.6;
+    cursor: default;
   }
 </style>
