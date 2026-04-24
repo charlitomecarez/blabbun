@@ -69,11 +69,7 @@
         class="reaction-pill"
         onclick={() => react(r.label)}
         aria-label={`React with ${r.label}`}
-        style="
-          background: {active ? 'var(--accent-soft)' : 'var(--bg2)'};
-          border-color: {active ? 'var(--accent)' : 'var(--border)'};
-          color: {active ? 'var(--accent)' : 'var(--muted)'};
-        "
+        class:active
       >
         <span>{r.emoji}</span>
         {#if counts[r.label] > 0}
@@ -111,5 +107,11 @@
 
   .reaction-count {
     font-size: 0.7rem;
+  }
+
+  .reaction-pill.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
   }
 </style>

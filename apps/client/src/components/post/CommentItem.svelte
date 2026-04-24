@@ -70,7 +70,6 @@
               class="reply-submit"
               onclick={handleReplySubmit}
               disabled={!replyBody.trim()}
-              style="opacity: {replyBody.trim() ? '1' : '0.4'}"
             >
               post
             </button>
@@ -194,6 +193,9 @@
     color: #fff;
     cursor: pointer;
     transition: opacity 0.15s;
+  }
+  .reply-submit:disabled {
+    opacity: 0.4;
   }
 
   .reply-cancel {

@@ -55,12 +55,7 @@
     aria-label="Comment text"
   ></textarea>
 
-  <button
-    type="submit"
-    class="submit-btn"
-    disabled={submitting}
-    style="opacity: {submitting ? '0.6' : '1'}"
-  >
+  <button type="submit" class="submit-btn" disabled={submitting}>
     {submitting ? "posting…" : "post anonymously"}
   </button>
 </form>
@@ -122,5 +117,8 @@
     cursor: pointer;
     letter-spacing: 0.04em;
     transition: opacity 0.15s;
+  }
+  .submit-btn:disabled {
+    opacity: 0.6;
   }
 </style>

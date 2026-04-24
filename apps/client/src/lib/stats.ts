@@ -1,4 +1,4 @@
-import { createSupabaseClient } from "@blabbun/db";
+import { getSupabaseClient } from "@/lib/api";
 
 export interface PostStats {
   claps: number;
@@ -15,10 +15,7 @@ export async function fetchPostStats(
 ): Promise<Record<string, PostStats>> {
   if (slugs.length === 0) return {};
 
-  const supabase = createSupabaseClient(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+  const supabase = getSupabaseClient();
 
   const [clapsResult, commentsResult] = await Promise.all([
     supabase

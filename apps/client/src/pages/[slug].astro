@@ -142,11 +142,9 @@ const jsonLd = {
         postUrl={postUrl}
         postTitle={post.data.title}
       >
-        <BookmarkButton
-          client:visible
-          slug={post.id}
-          style="margin-left:auto;font-size:1.1rem"
-        />
+        <div style="margin-left: auto">
+          <BookmarkButton client:visible slug={post.id} />
+        </div>
       </ClapShare>
     </div>
 

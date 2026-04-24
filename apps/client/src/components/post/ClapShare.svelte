@@ -84,12 +84,9 @@
       onclick={clap}
       disabled={loading}
       title={mine >= MAX_CLAPS ? "max claps reached" : "clap for this post"}
-      style="
-        border-color: {mine > 0 ? 'var(--accent)' : 'var(--border)'};
-        color: {mine > 0 ? 'var(--accent)' : 'var(--muted)'};
-        transform: {burst ? 'scale(1.35)' : 'scale(1)'};
-        cursor: {mine >= MAX_CLAPS ? 'not-allowed' : 'pointer'};
-      "
+      class:active={mine > 0}
+      class:burst
+      class:maxed={mine >= MAX_CLAPS}
     >
       👏
     </button>
@@ -107,10 +104,7 @@
       type="button"
       class="share-btn"
       onclick={() => (shareOpen = !shareOpen)}
-      style="
-        border-color: {shareOpen ? 'var(--accent)' : 'var(--border)'};
-        color: {shareOpen ? 'var(--accent)' : 'var(--muted)'};
-      "
+      class:open={shareOpen}
     >
       ↗ share
     </button>
@@ -121,10 +115,7 @@
           type="button"
           class="share-link"
           onclick={copyLink}
-          style="
-            color: {copied ? 'var(--accent)' : 'var(--muted)'};
-            border-color: {copied ? 'var(--accent)' : 'var(--border)'};
-          "
+          class:copied
         >
           {copied ? "✓ copied!" : "🔗 copy link"}
         </button>
@@ -263,6 +254,26 @@
     border-color: var(--border);
   }
   .share-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Dynamic state modifiers */
+  .clap-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .clap-btn.burst {
+    transform: scale(1.35);
+  }
+  .clap-btn.maxed {
+    cursor: not-allowed;
+  }
+  .share-btn.open {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .share-link.copied {
     color: var(--accent);
     border-color: var(--accent);
   }

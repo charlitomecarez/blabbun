@@ -59,12 +59,7 @@
         placeholder="your@email.com"
         type="email"
       />
-      <button
-        type="submit"
-        class="subscribe-btn"
-        disabled={submitting}
-        style="opacity: {submitting ? '0.6' : '1'}"
-      >
+      <button type="submit" class="subscribe-btn" disabled={submitting}>
         {submitting ? "…" : "subscribe"}
       </button>
     </form>
@@ -130,5 +125,8 @@
     cursor: pointer;
     white-space: nowrap;
     transition: opacity 0.15s;
+  }
+  .subscribe-btn:disabled {
+    opacity: 0.6;
   }
 </style>

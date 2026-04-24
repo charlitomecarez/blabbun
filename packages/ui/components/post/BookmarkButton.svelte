@@ -33,7 +33,7 @@
     onclick={toggle}
     aria-label={saved ? "Remove bookmark" : "Bookmark this post"}
     title={saved ? "Bookmarked" : "Bookmark"}
-    style="color: {saved ? 'var(--accent)' : 'var(--muted)'}"
+    class:saved
   >
     🔖
   </button>
@@ -48,5 +48,9 @@
     font-family: inherit;
     font-size: 1.1rem;
     transition: color 0.15s;
+    color: var(--muted);
+  }
+  .bookmark-btn.saved {
+    color: var(--accent);
   }
 </style>
