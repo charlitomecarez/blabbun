@@ -18,7 +18,9 @@
   let copied = $state(false);
   let clapTimer: ReturnType<typeof setTimeout> | undefined;
   let copyTimer: ReturnType<typeof setTimeout> | undefined;
-  const maxClaps = 50;
+
+  /** Maximum claps a single visitor can give per post. */
+  const MAX_CLAPS = 50;
 
   onMount(async () => {
     try {
@@ -28,10 +30,11 @@
       count = data.count ?? 0;
       mine = data.hasClapped ? 1 : 0;
     } catch {
-      /* silent */
+      /* silent — clap count failing shouldn't block page render */
     } finally {
       loading = false;
     }
+
     return () => {
       clearTimeout(clapTimer);
       clearTimeout(copyTimer);
@@ -39,7 +42,8 @@
   });
 
   async function clap() {
-    if (mine >= maxClaps || loading) return;
+    if (mine >= MAX_CLAPS || loading) return;
+    // Optimistic update — revert on error.
     count += 1;
     mine += 1;
     burst = true;
@@ -63,109 +67,203 @@
       clearTimeout(copyTimer);
       copyTimer = setTimeout(() => (copied = false), 2000);
     } catch {
-      /* */
+      /* clipboard API not available in all contexts */
     }
   }
 
   const encodedUrl = $derived(encodeURIComponent(postUrl));
   const encodedTitle = $derived(encodeURIComponent(postTitle));
-
-  const btnStyle =
-    "background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:7px 13px;font-size:0.72rem;font-family:inherit;cursor:pointer;color:var(--muted);letter-spacing:0.03em;transition:color 0.15s,border-color 0.15s;display:flex;align-items:center;gap:6px;text-decoration:none;width:100%;text-align:left";
 </script>
 
-<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-  <!-- ClapButton — exact design: round 44px circle -->
-  <div style="display:flex;align-items:center;gap:10px">
+<div class="clap-wrap">
+  <!-- Clap button + count -->
+  <div class="clap-group">
     <button
       type="button"
+      class="clap-btn"
       onclick={clap}
       disabled={loading}
-      title={mine >= maxClaps ? "max claps reached" : "clap for this post"}
+      title={mine >= MAX_CLAPS ? "max claps reached" : "clap for this post"}
       style="
-        background:none;border:1px solid {mine > 0
-        ? 'var(--accent)'
-        : 'var(--border)'};
-        border-radius:50%;width:44px;height:44px;
-        cursor:{mine >= maxClaps ? 'not-allowed' : 'pointer'};
-        font-size:1.2rem;display:flex;align-items:center;justify-content:center;
-        color:{mine > 0 ? 'var(--accent)' : 'var(--muted)'};
-        transform:{burst ? 'scale(1.35)' : 'scale(1)'};
-        transition:transform 0.25s cubic-bezier(.34,1.56,.64,1);
-      ">👏</button
+        border-color: {mine > 0 ? 'var(--accent)' : 'var(--border)'};
+        color: {mine > 0 ? 'var(--accent)' : 'var(--muted)'};
+        transform: {burst ? 'scale(1.35)' : 'scale(1)'};
+        cursor: {mine >= MAX_CLAPS ? 'not-allowed' : 'pointer'};
+      "
     >
+      👏
+    </button>
     <div>
-      <div style="font-size:0.88rem;font-weight:500;color:var(--text)">
-        {count}
-      </div>
-      <div style="font-size:0.62rem;color:var(--muted)">
+      <div class="clap-count-num">{count}</div>
+      <div class="clap-count-label">
         {mine > 0 ? `you clapped ${mine}x` : "clap if you liked it"}
       </div>
     </div>
   </div>
 
-  <!-- SharePanel — popup on click, exact design -->
-  <div style="position:relative">
+  <!-- Share panel -->
+  <div class="share-wrapper">
     <button
       type="button"
+      class="share-btn"
       onclick={() => (shareOpen = !shareOpen)}
       style="
-        background:var(--bg2);border:1px solid {shareOpen
-        ? 'var(--accent)'
-        : 'var(--border)'};
-        border-radius:3px;padding:7px 13px;font-size:0.72rem;font-family:inherit;cursor:pointer;
-        color:{shareOpen ? 'var(--accent)' : 'var(--muted)'};
-        letter-spacing:0.03em;transition:color 0.15s,border-color 0.15s;
-        display:flex;align-items:center;gap:6px;
+        border-color: {shareOpen ? 'var(--accent)' : 'var(--border)'};
+        color: {shareOpen ? 'var(--accent)' : 'var(--muted)'};
       "
     >
       ↗ share
     </button>
 
     {#if shareOpen}
-      <div
-        style="
-          position:absolute;bottom:calc(100% + 8px);left:0;
-          background:var(--bg2);border:1px solid var(--border);
-          border-radius:4px;padding:8px;
-          display:flex;flex-direction:column;gap:4px;
-          min-width:180px;box-shadow:0 4px 20px rgba(0,0,0,0.12);
-          z-index:50;
-        "
-      >
+      <div class="share-panel">
         <button
           type="button"
+          class="share-link"
           onclick={copyLink}
           style="
-            {btnStyle};
-            color:{copied ? 'var(--accent)' : 'var(--muted)'};
-            border-color:{copied ? 'var(--accent)' : 'var(--border)'};
+            color: {copied ? 'var(--accent)' : 'var(--muted)'};
+            border-color: {copied ? 'var(--accent)' : 'var(--border)'};
           "
         >
           {copied ? "✓ copied!" : "🔗 copy link"}
         </button>
         <a
+          class="share-link"
           href="https://twitter.com/intent/tweet?text={encodedTitle}&url={encodedUrl}"
           target="_blank"
           rel="noopener noreferrer"
-          style={btnStyle}>𝕏 share on X</a
         >
+          𝕏 share on X
+        </a>
         <a
+          class="share-link"
           href="https://www.facebook.com/sharer/sharer.php?u={encodedUrl}"
           target="_blank"
           rel="noopener noreferrer"
-          style={btnStyle}>f share on Facebook</a
         >
+          f share on Facebook
+        </a>
         <a
+          class="share-link"
           href="https://reddit.com/submit?url={encodedUrl}&title={encodedTitle}"
           target="_blank"
           rel="noopener noreferrer"
-          style={btnStyle}>↑ share on Reddit</a
         >
+          ↑ share on Reddit
+        </a>
       </div>
     {/if}
   </div>
 
-  <!-- Bookmark pushed to right -->
+  <!-- Bookmark slot — pushed right by the parent's flex layout -->
   <slot />
 </div>
+
+<style>
+  .clap-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  /* ─── Clap button ─────────────────────────────────────────── */
+  .clap-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .clap-btn {
+    background: none;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .clap-count-num {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .clap-count-label {
+    font-size: 0.62rem;
+    color: var(--muted);
+  }
+
+  /* ─── Share button ────────────────────────────────────────── */
+  .share-wrapper {
+    position: relative;
+  }
+
+  .share-btn {
+    background: var(--bg2);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    padding: 7px 13px;
+    font-size: 0.72rem;
+    font-family: inherit;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition:
+      color 0.15s,
+      border-color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ─── Share panel popup ───────────────────────────────────── */
+  .share-panel {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 180px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    z-index: 50;
+  }
+
+  .share-link {
+    background: var(--bg2);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    padding: 7px 13px;
+    font-size: 0.72rem;
+    font-family: inherit;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition:
+      color 0.15s,
+      border-color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    width: 100%;
+    text-align: left;
+    color: var(--muted);
+    border-color: var(--border);
+  }
+  .share-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+</style>
