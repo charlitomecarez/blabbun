@@ -17,32 +17,29 @@ function json(data: unknown, status = 200) {
   });
 }
 
+export const PATCH: APIRoute = async ({ params, request }) => {
+  const { id } = params;
+  const payload = (await request.json()) as { body?: string };
+  const body = payload.body?.trim();
+  if (!body) return json({ error: "body is required" }, 400);
+
+  const supabase = getClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.from("comments") as any)
+    .update({ body })
+    .eq("id", id!)
+    .select()
+    .single();
+
+  if (error) return json({ error: error.message }, 500);
+  return json(data);
+};
+
 export const DELETE: APIRoute = async ({ params }) => {
   const { id } = params;
   const supabase = getClient();
 
-  const { data: comment, error: fetchError } = await supabase
-    .from("comments")
-    .select("*")
-    .eq("id", id!)
-    .single();
-
-  if (fetchError) {
-    return json({ error: "Comment not found" }, 404);
-  }
-
-  if (!comment) {
-    return json({ error: "Comment not found" }, 404);
-  }
-
-  const { error: deleteError } = await supabase
-    .from("comments")
-    .delete()
-    .eq("id", id!);
-
-  if (deleteError) {
-    return json({ error: deleteError.message }, 500);
-  }
-
-  return json({ success: true, message: "Comment deleted" });
+  const { error } = await supabase.from("comments").delete().eq("id", id!);
+  if (error) return json({ error: error.message }, 500);
+  return json({ success: true });
 };

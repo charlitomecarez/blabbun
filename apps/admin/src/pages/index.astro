@@ -1,8 +1,89 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import { createSupabaseClient } from "@blabbun/db";
+import Layout from "../layouts/Layout.astro";
+
+const supabase = createSupabaseClient(
+  import.meta.env.SUPABASE_URL,
+  import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+const [comments, subscribers, claps] = await Promise.all([
+  supabase.from("comments").select("id", { count: "exact", head: true }),
+  supabase.from("subscribers").select("id", { count: "exact", head: true }),
+  supabase.from("post_claps").select("count"),
+]);
+
+const totalClaps = ((claps.data ?? []) as { count: number }[]).reduce(
+  (s, r) => s + (r.count ?? 0),
+  0
+);
+
+const stats = [
+  { label: "comments", value: comments.count ?? 0, href: "/comments" },
+  { label: "subscribers", value: subscribers.count ?? 0, href: "/subscribers" },
+  { label: "total claps", value: totalClaps, href: "/claps" },
+];
 ---
 
-<Layout title="Dashboard">
-  <h1 class="mb-2 text-2xl font-bold">Dashboard</h1>
-  <p class="text-gray-400">Admin panel coming soon.</p>
+<Layout title="dashboard">
+  <!-- Stat cards -->
+  <div
+    style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:40px"
+  >
+    {
+      stats.map((s) => (
+        <a
+          href={s.href}
+          style="
+          display:block;padding:20px;
+          border:1px solid var(--border);border-radius:4px;
+          background:var(--bg2);text-decoration:none;
+          transition:border-color 0.15s;
+        "
+          onmouseenter="this.style.borderColor='var(--accent)'"
+          onmouseleave="this.style.borderColor='var(--border)'"
+        >
+          <div style="font-size:1.4rem;font-weight:600;color:var(--text);margin-bottom:4px">
+            {s.value.toLocaleString()}
+          </div>
+          <div style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase">
+            {s.label}
+          </div>
+        </a>
+      ))
+    }
+  </div>
+
+  <!-- Quick links -->
+  <div
+    style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px"
+  >
+    manage
+  </div>
+  <div
+    style="display:flex;flex-direction:column;gap:1px;border:1px solid var(--border);border-radius:4px;overflow:hidden"
+  >
+    {
+      [
+        { label: "view & delete comments", href: "/comments" },
+        { label: "view & delete subscribers", href: "/subscribers" },
+        { label: "view & reset post claps", href: "/claps" },
+      ].map((l) => (
+        <a
+          href={l.href}
+          style="
+          display:flex;align-items:center;justify-content:space-between;
+          padding:12px 16px;text-decoration:none;background:var(--bg);
+          font-size:0.8rem;color:var(--text);border-bottom:1px solid var(--divider);
+          transition:background 0.1s;
+        "
+          onmouseenter="this.style.background='var(--bg2)'"
+          onmouseleave="this.style.background='var(--bg)'"
+        >
+          {l.label}
+          <span style="color:var(--muted)">→</span>
+        </a>
+      ))
+    }
+  </div>
 </Layout>
