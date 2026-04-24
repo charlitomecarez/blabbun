@@ -166,6 +166,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@blabbun/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@tailwindcss/typography':
         specifier: ^0.5.19
         version: 0.5.19(tailwindcss@4.2.2)

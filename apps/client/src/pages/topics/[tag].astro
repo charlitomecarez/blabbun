@@ -1,9 +1,9 @@
 ---
+import { tagToLabel } from "@blabbun/utils";
 import { getCollection } from "astro:content";
 
 import ArchiveList from "@/components/archive/ArchiveList.svelte";
 import Layout from "@/layouts/Layout.astro";
-import { tagToLabel } from "@/utils/tags";
 
 const { tag: rawTag } = Astro.params;
 const tag = rawTag.toUpperCase();
