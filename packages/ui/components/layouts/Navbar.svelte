@@ -138,7 +138,13 @@
         text-decoration:none;
       "
     >
-      <span style="font-size:1.35rem;line-height:1">🍞</span>
+      <img
+        src="/blabbun.png"
+        alt="blab bun"
+        width="28"
+        height="28"
+        style="width:28px;height:28px;object-fit:contain;flex-shrink:0"
+      />
       <span
         style="font-size:0.95rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)"
       >
