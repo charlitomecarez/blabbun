@@ -6,7 +6,7 @@
     comment: Comment;
     activeReplyId: string | null;
     onReplyToggle: (id: string | null) => void;
-    onReplySubmit: (commentId: string, body: string) => void;
+    onReplySubmit: (commentId: string, body: string) => Promise<void>;
   }
 
   const { comment, activeReplyId, onReplyToggle, onReplySubmit }: Props =
