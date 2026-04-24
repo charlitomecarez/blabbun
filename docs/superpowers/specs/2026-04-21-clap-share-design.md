@@ -59,7 +59,7 @@ Insert between `</article>` and the Related Posts `<section>`:
 <ClapShare
   client:load
   postSlug={post.id}
-  postUrl={`https://thelunan.com/${post.id}`}
+  postUrl={`https://blabbun.com/${post.id}`}
   postTitle={post.data.title}
 />
 ```

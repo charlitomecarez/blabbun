@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a "More from The Lunan" section below each blog post showing 3 randomly-selected posts (excluding the current one) as cards with image, tag, title, and excerpt.
+**Goal:** Add a "More from Blab Bun" section below each blog post showing 3 randomly-selected posts (excluding the current one) as cards with image, tag, title, and excerpt.
 
 **Architecture:** All logic is inline in the existing `[slug].astro` page — no new components or files. Post selection is Fisher-Yates shuffled at build time in the frontmatter. Card markup is plain Astro/HTML with Tailwind.
 
@@ -63,7 +63,7 @@ with:
     <section class="mx-auto max-w-[1200px] px-4 pb-20 md:px-8">
       <div class="mb-6 border-t-2 border-[#c5f7d0] pt-8">
         <span class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase">
-          More from The Lunan
+          More from Blab Bun
         </span>
       </div>
 
@@ -103,7 +103,7 @@ with:
 
 - [ ] **Step 3: Verify the build passes**
 
-Run: `pnpm --filter @thelunan/client build`
+Run: `pnpm --filter @blabbun/client build`
 
 Expected: Build completes with no errors. The `[slug]` pages are generated with the related posts section.
 

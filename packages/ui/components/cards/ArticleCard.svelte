@@ -39,7 +39,7 @@
   <div class="mb-[14px] flex w-full items-center justify-between">
     <span
       class="font-space-grotesk text-[9px] font-bold
-             tracking-[0.1em] text-[#2d5a3d] uppercase"
+             tracking-[0.1em] text-[#C4832A] uppercase"
     >
       {tag}
     </span>
@@ -83,7 +83,7 @@
       viewBox="0 0 14 14"
       fill="none"
       aria-hidden="true"
-      class="text-[#2d3435] transition-colors group-hover:text-[#2d5a3d]"
+      class="text-[#2d3435] transition-colors group-hover:text-[#C4832A]"
     >
       <path
         d="M1 7h12M7 1l6 6-6 6"

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { relativeTime } from "@thelunan/utils";
+  import { relativeTime } from "@blabbun/utils";
   import type { Comment } from "./types";
 
   interface Props {
@@ -13,7 +13,6 @@
     $props();
 
   let replyBody = $state("");
-
   const isReplying = $derived(activeReplyId === comment.id);
 
   function handleReplySubmit() {
@@ -22,86 +21,85 @@
     replyBody = "";
   }
 
-  function handleCancel() {
-    replyBody = "";
-    onReplyToggle(null);
-  }
+  const inputStyle =
+    "background:var(--input-bg);border:1px solid var(--border);border-radius:3px;padding:8px 10px;font-size:0.78rem;color:var(--text);width:100%;outline:none;resize:none;font-family:inherit;line-height:1.6";
 </script>
 
-<div>
-  <!-- Comment header -->
-  <div class="mb-1.5 flex items-baseline gap-2">
-    <span class="font-manrope text-[13px] font-bold text-[#29302d]"
-      >Anonymous</span
-    >
-    <span class="font-manrope text-[11px] text-[rgba(41,48,45,0.4)]"
+<div style="padding:14px 0;border-bottom:1px solid var(--divider)">
+  <!-- Header -->
+  <div
+    style="font-size:0.7rem;font-weight:500;color:var(--accent);margin-bottom:6px"
+  >
+    {comment.anon_name ?? "anonymous"}
+    <span style="color:var(--muted2);font-weight:400;margin-left:8px"
       >{relativeTime(comment.created_at)}</span
     >
   </div>
 
-  <!-- Comment body -->
+  <!-- Body -->
   <p
-    class="font-manrope mb-2 text-[15px] leading-[1.65] text-[rgba(41,48,45,0.8)]"
+    style="font-size:0.84rem;line-height:1.65;color:var(--text);margin-bottom:8px"
   >
     {comment.body}
   </p>
 
-  <!-- Reply toggle button -->
+  <!-- Reply toggle -->
   <button
     type="button"
-    aria-expanded={isReplying}
     onclick={() => onReplyToggle(isReplying ? null : comment.id)}
-    class="font-manrope cursor-pointer border-none bg-transparent p-0 text-[12px] font-bold tracking-[0.04em] text-[#386547]"
+    style="background:none;border:none;font-family:inherit;font-size:0.7rem;color:var(--muted);cursor:pointer;padding:0;letter-spacing:0.02em"
   >
-    {isReplying ? "↩ Cancel reply" : "↩ Reply"}
+    {isReplying ? "↩ cancel" : "↩ reply"}
   </button>
 
-  <!-- Replies + inline reply form -->
+  <!-- Replies -->
   {#if comment.replies.length > 0 || isReplying}
-    <div class="mt-3 ml-5 space-y-3 border-l-2 border-[#c5f7d0] pl-4">
+    <div
+      style="margin-top:10px;margin-left:14px;padding-left:12px;border-left:2px solid var(--accent-soft)"
+    >
       {#each comment.replies as reply (reply.id)}
-        <div>
-          <div class="mb-1 flex items-baseline gap-2">
-            <span class="font-manrope text-[13px] font-bold text-[#29302d]"
-              >Anonymous</span
-            >
-            <span class="font-manrope text-[11px] text-[rgba(41,48,45,0.4)]"
+        <div style="padding:8px 0;border-bottom:1px solid var(--divider)">
+          <div
+            style="font-size:0.68rem;font-weight:500;color:var(--accent);margin-bottom:4px"
+          >
+            {reply.anon_name ?? "anonymous"}
+            <span style="color:var(--muted2);font-weight:400;margin-left:6px"
               >{relativeTime(reply.created_at)}</span
             >
           </div>
-          <p
-            class="font-manrope text-[14px] leading-[1.65] text-[rgba(41,48,45,0.75)]"
-          >
+          <p style="font-size:0.8rem;line-height:1.6;color:var(--text)">
             {reply.body}
           </p>
         </div>
       {/each}
 
       {#if isReplying}
-        <div>
+        <div style="padding-top:10px">
           <textarea
             bind:value={replyBody}
-            placeholder="Write a reply…"
+            placeholder="write a reply…"
+            rows={2}
             aria-label="Reply text"
-            rows="3"
-            class="font-manrope w-full resize-none rounded-[8px] border-[1.5px] border-[rgba(197,247,208,0.8)] bg-white px-3 py-2.5 text-[14px] text-[#29302d] placeholder-[rgba(41,48,45,0.35)] outline-none focus:border-[#386547]"
+            style={inputStyle}
           ></textarea>
-          <div class="mt-2 flex gap-2">
+          <div style="margin-top:6px;display:flex;gap:8px">
             <button
               type="button"
               onclick={handleReplySubmit}
               disabled={!replyBody.trim()}
-              class="font-manrope cursor-pointer rounded-full bg-[#386547] px-4 py-1.5 text-[13px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+              style="background:var(--accent);border:none;border-radius:3px;padding:7px 16px;font-size:0.72rem;font-family:inherit;color:#fff;cursor:pointer;opacity:{replyBody.trim()
+                ? '1'
+                : '0.4'}">post</button
             >
-              Post reply
-            </button>
             <button
               type="button"
-              onclick={handleCancel}
-              class="font-manrope cursor-pointer border-none bg-transparent text-[13px] font-bold text-[rgba(41,48,45,0.4)] hover:text-[rgba(41,48,45,0.7)]"
+              onclick={() => {
+                replyBody = "";
+                onReplyToggle(null);
+              }}
+              style="background:none;border:none;font-family:inherit;font-size:0.72rem;color:var(--muted);cursor:pointer"
+              >cancel</button
             >
-              Cancel
-            </button>
           </div>
         </div>
       {/if}

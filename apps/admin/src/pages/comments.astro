@@ -1,6 +1,6 @@
 ---
-import type { CommentRow } from "@thelunan/db";
-import { createSupabaseClient } from "@thelunan/db";
+import type { CommentRow } from "@blabbun/db";
+import { createSupabaseClient } from "@blabbun/db";
 
 import Layout from "../layouts/Layout.astro";
 
@@ -15,90 +15,229 @@ const { data: comments } = await supabase
   .order("created_at", { ascending: false });
 ---
 
-<Layout title="Comments">
-  <div class="min-h-screen bg-gradient-to-br from-[#ebf3ed] to-white px-4 py-8">
-    <div class="mx-auto max-w-4xl">
-      <h1 class="font-manrope mb-8 text-4xl font-bold text-[#29302d]">
-        Comments Management
-      </h1>
-
-      {
-        comments && comments.length > 0 ? (
-          <div class="space-y-4">
-            {comments.map((comment: CommentRow) => (
-              <div
-                key={comment.id}
-                data-comment-id={comment.id}
-                class="rounded-lg border border-[#c5f7d0] bg-white p-6 shadow-sm"
-              >
-                <div class="mb-3 flex items-start justify-between">
-                  <div>
-                    <p class="font-manrope text-sm font-bold text-[#29302d]">
-                      Post: {comment.post_slug}
-                    </p>
-                    <p class="font-manrope text-xs text-[rgba(41,48,45,0.6)]">
-                      {new Date(comment.created_at).toLocaleString()}
-                    </p>
-                    {comment.parent_id && (
-                      <p class="font-manrope mt-1 text-xs text-[#386547]">
-                        ↳ Reply to {comment.parent_id}
-                      </p>
-                    )}
-                  </div>
-                  <button
-                    onclick={`deleteComment('${comment.id}')`}
-                    class="font-manrope rounded bg-red-500 px-4 py-2 text-sm font-bold text-white hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                </div>
-                <p class="font-manrope text-[15px] leading-relaxed text-[rgba(41,48,45,0.8)]">
-                  {comment.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p class="font-manrope text-center text-[rgba(41,48,45,0.6)]">
-            No comments yet.
-          </p>
-        )
-      }
+<Layout title="comments">
+  <!-- Create form -->
+  <div
+    style="border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:24px;background:var(--bg2)"
+  >
+    <div
+      style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px"
+    >
+      new comment
     </div>
+    <form id="create-form" style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input
+          name="post_slug"
+          placeholder="post-slug"
+          required
+          style="flex:1;min-width:120px;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+        />
+        <input
+          name="anon_name"
+          placeholder="name (optional)"
+          style="flex:1;min-width:120px;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+        />
+      </div>
+      <textarea
+        name="body"
+        placeholder="comment body"
+        required
+        rows="2"
+        style="padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;resize:vertical"
+      ></textarea>
+      <div style="display:flex;justify-content:flex-end">
+        <button
+          type="submit"
+          style="padding:6px 14px;font-size:0.75rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer"
+          >add comment</button
+        >
+      </div>
+    </form>
   </div>
 
-  <script>
-    async function deleteComment(commentId: string) {
-      if (!confirm("Are you sure you want to delete this comment?")) {
-        return;
-      }
+  <div style="font-size:0.72rem;color:var(--muted);margin-bottom:12px">
+    {comments?.length ?? 0} total
+  </div>
 
-      try {
-        const res = await fetch(`/api/comments/${commentId}`, {
-          method: "DELETE",
-        });
+  {
+    !comments?.length ? (
+      <p style="font-size:0.8rem;color:var(--muted);padding:32px 0;border-top:1px solid var(--divider)">
+        no comments yet.
+      </p>
+    ) : (
+      <div
+        id="comment-list"
+        style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:4px;overflow:hidden"
+      >
+        {(comments as CommentRow[]).map((c) => (
+          <div
+            data-id={c.id}
+            style="padding:14px 16px;border-bottom:1px solid var(--divider);background:var(--bg)"
+          >
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+              <div style="min-width:0;flex:1">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+                  <span style="font-size:0.7rem;font-weight:500;color:var(--accent)">
+                    {c.anon_name ?? "anonymous"}
+                  </span>
+                  <span style="font-size:0.65rem;color:var(--muted2)">on</span>
+                  <a
+                    href={`https://blabbun.com/${c.post_slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style="font-size:0.7rem;color:var(--muted);text-decoration:none"
+                    onmouseenter="this.style.color='var(--accent)'"
+                    onmouseleave="this.style.color='var(--muted)'"
+                  >
+                    /{c.post_slug}
+                  </a>
+                  {c.parent_id && (
+                    <span style="font-size:0.65rem;color:var(--muted2)">
+                      ↳ reply
+                    </span>
+                  )}
+                  <span style="font-size:0.65rem;color:var(--muted2)">
+                    {new Date(c.created_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </span>
+                </div>
 
-        if (!res.ok) {
-          const data = await res.json();
-          alert(`Error: ${data.error}`);
-          return;
-        }
+                <p
+                  class="body-text"
+                  style="font-size:0.8rem;color:var(--muted);line-height:1.6;text-wrap:pretty"
+                >
+                  {c.body}
+                </p>
 
-        const element = document.querySelector(
-          `[data-comment-id="${commentId}"]`
-        );
-        if (element) {
-          element.remove();
-        } else {
-          location.reload();
-        }
-      } catch (error) {
-        alert("Failed to delete comment");
-        console.error(error);
-      }
-    }
-
-    (window as Window & { deleteComment: typeof deleteComment }).deleteComment =
-      deleteComment;
-  </script>
+                <div class="edit-mode" style="display:none">
+                  <textarea
+                    class="edit-input"
+                    rows="2"
+                    style="width:100%;padding:6px 8px;font-size:0.78rem;font-family:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;resize:vertical"
+                  >
+                    {c.body}
+                  </textarea>
+                  <div style="display:flex;gap:6px;margin-top:6px">
+                    <button
+                      class="save-btn"
+                      onclick={`saveComment('${c.id}',this)`}
+                      style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer"
+                    >
+                      save
+                    </button>
+                    <button
+                      class="cancel-btn"
+                      onclick={`cancelEdit('${c.id}')`}
+                      style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer"
+                    >
+                      cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;flex-shrink:0">
+                <button
+                  onclick={`startEdit('${c.id}')`}
+                  style="background:none;border:1px solid var(--border);border-radius:3px;padding:4px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;transition:border-color 0.1s,color 0.1s"
+                  onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+                  onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                >
+                  edit
+                </button>
+                <button
+                  onclick={`deleteComment('${c.id}')`}
+                  style="background:none;border:1px solid var(--border);border-radius:3px;padding:4px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;transition:border-color 0.1s,color 0.1s"
+                  onmouseenter="this.style.borderColor='#e05c5c';this.style.color='#e05c5c'"
+                  onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                >
+                  delete
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
 </Layout>
+
+<script>
+  function getRow(id: string) {
+    return document.querySelector(`[data-id="${id}"]`);
+  }
+
+  function startEdit(id: string) {
+    const row = getRow(id);
+    row?.querySelector(".body-text")?.setAttribute("style", "display:none");
+    const em = row?.querySelector(".edit-mode") as HTMLElement | null;
+    if (em) em.style.display = "block";
+  }
+
+  function cancelEdit(id: string) {
+    const row = getRow(id);
+    row
+      ?.querySelector(".body-text")
+      ?.setAttribute(
+        "style",
+        "font-size:0.8rem;color:var(--muted);line-height:1.6;text-wrap:pretty"
+      );
+    const em = row?.querySelector(".edit-mode") as HTMLElement | null;
+    if (em) em.style.display = "none";
+  }
+
+  async function saveComment(id: string, btn: HTMLButtonElement) {
+    const row = getRow(id);
+    const input = row?.querySelector(
+      ".edit-input"
+    ) as HTMLTextAreaElement | null;
+    const body = input?.value.trim();
+    if (!body) return;
+    btn.textContent = "saving…";
+    const res = await fetch(`/api/comments/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body }),
+    });
+    if (res.ok) {
+      const p = row?.querySelector(".body-text");
+      if (p) p.textContent = body;
+      cancelEdit(id);
+    } else {
+      alert("failed to save");
+      btn.textContent = "save";
+    }
+  }
+
+  async function deleteComment(id: string) {
+    if (!confirm("delete this comment?")) return;
+    const res = await fetch(`/api/comments/${id}`, { method: "DELETE" });
+    if (res.ok) getRow(id)?.remove();
+    else alert("failed to delete");
+  }
+
+  document
+    .getElementById("create-form")
+    ?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const data = Object.fromEntries(new FormData(form));
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        form.reset();
+        location.reload();
+      } else {
+        const j = await res.json();
+        alert(j.error ?? "failed");
+      }
+    });
+
+  Object.assign(window, { startEdit, cancelEdit, saveComment, deleteComment });
+</script>

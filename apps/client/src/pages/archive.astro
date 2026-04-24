@@ -40,20 +40,16 @@ const allTags = [
 
 <Layout
   title="Archive"
-  description={`All ${allPosts.length} posts from The Lunan, sorted by date.`}
+  description={`All ${allPosts.length} posts from Blab Bun.`}
 >
-  <main class="mx-auto max-w-[1200px] px-4 pt-[64px] pb-20 md:px-8">
-    <!-- Page header -->
-    <div class="mb-10 pt-12 md:pt-16">
-      <h1
-        class="font-space-grotesk text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-[#2d5a3d] sm:text-[46px]"
-      >
-        Archive<span class="text-[#ccf05f]">.</span>
-      </h1>
-      <p class="font-manrope mt-2 text-[14px] text-[rgba(41,48,45,0.5)]">
-        {allPosts.length} posts
-      </p>
-    </div>
+  <main
+    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
+  >
+    <h1
+      style="font-size:1.05rem;font-weight:600;margin-bottom:22px;animation:fadeIn 0.2s ease"
+    >
+      all posts
+    </h1>
 
     <ArchiveList posts={postItems} tags={allTags} client:load />
   </main>

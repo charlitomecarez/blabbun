@@ -1,5 +1,4 @@
 ---
-// apps/client/src/pages/topics/[tag].astro
 import { getCollection } from "astro:content";
 
 import ArchiveList from "@/components/archive/ArchiveList.svelte";
@@ -32,95 +31,67 @@ const postItems = tagPosts.map((post) => ({
   }),
   tag: (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
   href: `/${post.id}`,
+  imageUrl: post.data.image,
 }));
 
 const label = tagToLabel(tag);
 ---
 
-<Layout title={label} description={`All posts about ${label} on The Lunan.`}>
-  <main class="pt-[64px]">
-    <!-- Page hero -->
-    <section
-      class="relative overflow-hidden border-b border-[rgba(197,247,208,0.25)] px-4 pt-14 pb-12 md:px-8 md:pt-20 md:pb-16"
-    >
-      <div
-        class="pointer-events-none absolute inset-0"
-        style="background-image: linear-gradient(rgba(197,247,208,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(197,247,208,0.07) 1px, transparent 1px); background-size: 40px 40px;"
+<Layout title={label} description={`All posts about ${label} on Blab Bun.`}>
+  <main
+    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
+  >
+    <div style="padding-top:48px;padding-bottom:24px">
+      <a
+        href="/topics"
+        style="
+          display:inline-flex;align-items:center;gap:5px;
+          font-size:0.68rem;font-weight:600;color:var(--muted2);
+          text-decoration:none;transition:color 0.15s;margin-bottom:20px;
+        "
+        onmouseenter="this.style.color='var(--accent)'"
+        onmouseleave="this.style.color='var(--muted2)'"
       >
-      </div>
-      <div
-        class="pointer-events-none absolute inset-0"
-        style="background: radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, white 100%);"
-      >
-      </div>
-      <div
-        class="relative mx-auto flex max-w-[1200px] items-end justify-between gap-6"
-      >
-        <div>
-          <a
-            href="/topics"
-            class="font-manrope group mb-5 inline-flex items-center gap-1.5 text-[13px] font-bold text-[rgba(41,48,45,0.4)] transition-colors hover:text-[#386547]"
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 14 14"
-              fill="none"
-              aria-hidden="true"
-              class="transition-transform group-hover:-translate-x-0.5"
-            >
-              <path
-                d="M13 7H1M6 2L1 7l5 5"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"></path>
-            </svg>
-            Topics
-          </a>
-          <div class="mb-3">
-            <span
-              class="font-manrope rounded-full bg-[#ccf05f] px-3 py-1 text-[11px] font-bold tracking-[0.06em] text-[#29302d] uppercase"
-            >
-              {tag}
-            </span>
-          </div>
-          <h1
-            class="font-space-grotesk text-[48px] leading-[0.97] font-bold tracking-[-0.05em] text-[#1a2e22] sm:text-[64px] md:text-[80px]"
-          >
-            {label}<span class="text-[#ccf05f]">.</span>
-          </h1>
-          <p class="font-manrope mt-3 text-[14px] text-[rgba(41,48,45,0.45)]">
-            {postItems.length}
-            {postItems.length === 1 ? "post" : "posts"}
-          </p>
-        </div>
-        <a
-          href="/archive"
-          class="font-manrope group mb-1 hidden items-center gap-1.5 text-[13px] font-bold text-[rgba(41,48,45,0.4)] transition-colors hover:text-[#386547] md:inline-flex"
+        <svg
+          width="11"
+          height="11"
+          viewBox="0 0 14 14"
+          fill="none"
+          aria-hidden="true"
         >
-          All posts
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 14 14"
-            fill="none"
-            aria-hidden="true"
-            class="transition-transform group-hover:translate-x-0.5"
-          >
-            <path
-              d="M1 7h12M8 2l5 5-5 5"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"></path>
-          </svg>
-        </a>
-      </div>
-    </section>
+          <path
+            d="M13 7H1M6 2L1 7l5 5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+        topics
+      </a>
 
-    <div class="mx-auto max-w-[1200px] px-4 py-12 md:px-8 md:py-16">
-      <ArchiveList posts={postItems} tags={[]} lockedTag={tag} client:load />
+      <div style="margin-bottom:10px">
+        <span
+          style="
+            font-size:0.65rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+            background:var(--accent);color:#fff;
+            border-radius:3px;padding:3px 8px;
+          "
+        >
+          {tag}
+        </span>
+      </div>
+
+      <h1
+        style="font-size:1.6rem;font-weight:700;letter-spacing:-0.03em;color:var(--text);margin-bottom:6px"
+      >
+        {label}<span style="color:var(--accent)">.</span>
+      </h1>
+      <p style="font-size:0.72rem;color:var(--muted2)">
+        {postItems.length}
+        {postItems.length === 1 ? "post" : "posts"}
+      </p>
     </div>
+
+    <ArchiveList posts={postItems} tags={[]} lockedTag={tag} client:load />
   </main>
 </Layout>

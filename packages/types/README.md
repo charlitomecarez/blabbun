@@ -1,11 +1,11 @@
-# @thelunan/types
+# @blabbun/types
 
-Shared TypeScript types used across all thelunan apps and packages.
+Shared TypeScript types used across all blabbun apps and packages.
 
 ## Usage
 
 ```ts
-import type { Post } from "@thelunan/types";
+import type { Post } from "@blabbun/types";
 ```
 
 ## Navigation

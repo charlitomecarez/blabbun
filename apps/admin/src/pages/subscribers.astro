@@ -1,6 +1,6 @@
 ---
-import type { SubscriberRow } from "@thelunan/db";
-import { createSupabaseClient } from "@thelunan/db";
+import type { SubscriberRow } from "@blabbun/db";
+import { createSupabaseClient } from "@blabbun/db";
 
 import Layout from "../layouts/Layout.astro";
 
@@ -15,55 +15,196 @@ const { data: subscribers } = await supabase
   .order("subscribed_at", { ascending: false });
 ---
 
-<Layout title="Subscribers">
-  <div class="min-h-screen bg-gradient-to-br from-[#ebf3ed] to-white px-4 py-8">
-    <div class="mx-auto max-w-4xl">
-      <h1 class="font-manrope mb-8 text-4xl font-bold text-[#29302d]">
-        Newsletter Subscribers
-      </h1>
-
-      {
-        subscribers && subscribers.length > 0 ? (
-          <div>
-            <p class="font-manrope mb-4 text-sm text-[rgba(41,48,45,0.6)]">
-              Total subscribers:{" "}
-              <span class="font-bold">{subscribers.length}</span>
-            </p>
-            <div class="overflow-x-auto rounded-lg border border-[#c5f7d0]">
-              <table class="w-full">
-                <thead class="bg-[#ebf3ed]">
-                  <tr>
-                    <th class="font-manrope px-6 py-4 text-left text-sm font-bold text-[#29302d]">
-                      Email
-                    </th>
-                    <th class="font-manrope px-6 py-4 text-left text-sm font-bold text-[#29302d]">
-                      Subscribed At
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {subscribers.map(
-                    (subscriber: SubscriberRow, index: number) => (
-                      <tr class={index % 2 === 0 ? "bg-white" : "bg-[#f7fbf8]"}>
-                        <td class="font-manrope border-t border-[rgba(197,247,208,0.4)] px-6 py-4 text-[14px] text-[#29302d]">
-                          {subscriber.email}
-                        </td>
-                        <td class="font-manrope border-t border-[rgba(197,247,208,0.4)] px-6 py-4 text-[14px] text-[rgba(41,48,45,0.6)]">
-                          {new Date(subscriber.subscribed_at).toLocaleString()}
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : (
-          <p class="font-manrope text-center text-[rgba(41,48,45,0.6)]">
-            No subscribers yet.
-          </p>
-        )
-      }
+<Layout title="subscribers">
+  <!-- Create form -->
+  <div
+    style="border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:24px;background:var(--bg2)"
+  >
+    <div
+      style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px"
+    >
+      add subscriber
     </div>
+    <form id="create-form" style="display:flex;gap:8px;flex-wrap:wrap">
+      <input
+        name="email"
+        type="email"
+        placeholder="email@example.com"
+        required
+        style="flex:1;min-width:200px;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+      />
+      <button
+        type="submit"
+        style="padding:7px 14px;font-size:0.75rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer;white-space:nowrap"
+        >add</button
+      >
+    </form>
   </div>
+
+  <div style="font-size:0.72rem;color:var(--muted);margin-bottom:12px">
+    {subscribers?.length ?? 0} total
+  </div>
+
+  {
+    !subscribers?.length ? (
+      <p style="font-size:0.8rem;color:var(--muted);padding:32px 0;border-top:1px solid var(--divider)">
+        no subscribers yet.
+      </p>
+    ) : (
+      <div style="border:1px solid var(--border);border-radius:4px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:var(--bg2)">
+              <th style="text-align:left;padding:10px 16px;font-size:0.68rem;font-weight:500;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase">
+                email
+              </th>
+              <th style="text-align:left;padding:10px 16px;font-size:0.68rem;font-weight:500;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase">
+                subscribed
+              </th>
+              <th style="padding:10px 16px;width:120px" />
+            </tr>
+          </thead>
+          <tbody>
+            {(subscribers as SubscriberRow[]).map((s) => (
+              <tr
+                data-id={s.id}
+                style="border-top:1px solid var(--divider);background:var(--bg)"
+              >
+                <td style="padding:12px 16px;font-size:0.8rem;color:var(--text)">
+                  <span class="email-text">{s.email}</span>
+                  <div class="edit-mode" style="display:none">
+                    <input
+                      type="email"
+                      class="edit-input"
+                      value={s.email}
+                      style="width:100%;padding:5px 8px;font-size:0.78rem;font-family:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+                    />
+                    <div style="display:flex;gap:6px;margin-top:6px">
+                      <button
+                        class="save-btn"
+                        onclick={`saveSubscriber('${s.id}',this)`}
+                        style="padding:3px 10px;font-size:0.72rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer"
+                      >
+                        save
+                      </button>
+                      <button
+                        onclick={`cancelEdit('${s.id}')`}
+                        style="padding:3px 10px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer"
+                      >
+                        cancel
+                      </button>
+                    </div>
+                  </div>
+                </td>
+                <td style="padding:12px 16px;font-size:0.75rem;color:var(--muted)">
+                  {new Date(s.subscribed_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </td>
+                <td style="padding:12px 16px;text-align:right">
+                  <div style="display:flex;gap:6px;justify-content:flex-end">
+                    <button
+                      onclick={`startEdit('${s.id}')`}
+                      style="background:none;border:1px solid var(--border);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit"
+                      onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+                      onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                    >
+                      edit
+                    </button>
+                    <button
+                      onclick={`deleteSubscriber('${s.id}')`}
+                      style="background:none;border:1px solid var(--border);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit"
+                      onmouseenter="this.style.borderColor='#e05c5c';this.style.color='#e05c5c'"
+                      onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                    >
+                      delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
 </Layout>
+
+<script>
+  function getRow(id: string) {
+    return document.querySelector(`[data-id="${id}"]`);
+  }
+
+  function startEdit(id: string) {
+    const row = getRow(id);
+    const txt = row?.querySelector(".email-text") as HTMLElement | null;
+    if (txt) txt.style.display = "none";
+    const em = row?.querySelector(".edit-mode") as HTMLElement | null;
+    if (em) em.style.display = "block";
+  }
+
+  function cancelEdit(id: string) {
+    const row = getRow(id);
+    const txt = row?.querySelector(".email-text") as HTMLElement | null;
+    if (txt) txt.style.display = "";
+    const em = row?.querySelector(".edit-mode") as HTMLElement | null;
+    if (em) em.style.display = "none";
+  }
+
+  async function saveSubscriber(id: string, btn: HTMLButtonElement) {
+    const row = getRow(id);
+    const input = row?.querySelector(".edit-input") as HTMLInputElement | null;
+    const email = input?.value.trim();
+    if (!email) return;
+    btn.textContent = "saving…";
+    const res = await fetch(`/api/subscribers/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    if (res.ok) {
+      const txt = row?.querySelector(".email-text");
+      if (txt) txt.textContent = email;
+      cancelEdit(id);
+    } else {
+      alert("failed to save");
+      btn.textContent = "save";
+    }
+  }
+
+  async function deleteSubscriber(id: string) {
+    if (!confirm("delete this subscriber?")) return;
+    const res = await fetch(`/api/subscribers/${id}`, { method: "DELETE" });
+    if (res.ok) getRow(id)?.remove();
+    else alert("failed to delete");
+  }
+
+  document
+    .getElementById("create-form")
+    ?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const { email } = Object.fromEntries(new FormData(form));
+      const res = await fetch("/api/subscribers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        form.reset();
+        location.reload();
+      } else {
+        const j = await res.json();
+        alert(j.error ?? "failed");
+      }
+    });
+
+  Object.assign(window, {
+    startEdit,
+    cancelEdit,
+    saveSubscriber,
+    deleteSubscriber,
+  });
+</script>

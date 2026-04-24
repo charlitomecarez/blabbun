@@ -1,5 +1,5 @@
 {
-  "name": "@thelunan/client",
+  "name": "@blabbun/client",
   "private": true,
   "type": "module",
   "version": "0.0.1",
@@ -23,10 +23,10 @@
     "@astrojs/svelte": "^8.0.5",
     "@astrojs/vercel": "^10.0.4",
     "@tailwindcss/vite": "^4.2.2",
-    "@thelunan/db": "workspace:*",
-    "@thelunan/types": "workspace:*",
-    "@thelunan/ui": "workspace:*",
-    "@thelunan/utils": "workspace:*",
+    "@blabbun/db": "workspace:*",
+    "@blabbun/types": "workspace:*",
+    "@blabbun/ui": "workspace:*",
+    "@blabbun/utils": "workspace:*",
     "astro": "^6.1.6",
     "svelte": "^5.55.4",
     "tailwindcss": "^4.2.2"

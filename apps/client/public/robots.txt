@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://thelunan.com/sitemap.xml
+Sitemap: https://blabbun.com/sitemap.xml

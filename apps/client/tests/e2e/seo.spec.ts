@@ -3,22 +3,22 @@ import { expect, test } from "@playwright/test";
 test.describe("SEO meta tags", () => {
   test("homepage has correct title", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle("The Lunan");
+    await expect(page).toHaveTitle("Blab Bun");
   });
 
   test("archive page has correct title", async ({ page }) => {
     await page.goto("/archive");
-    await expect(page).toHaveTitle(/Archive · The Lunan/);
+    await expect(page).toHaveTitle(/Archive · Blab Bun/);
   });
 
   test("topics page has correct title", async ({ page }) => {
     await page.goto("/topics");
-    await expect(page).toHaveTitle(/Topics · The Lunan/);
+    await expect(page).toHaveTitle(/Topics · Blab Bun/);
   });
 
   test("about page has correct title", async ({ page }) => {
     await page.goto("/about");
-    await expect(page).toHaveTitle(/About · The Lunan/);
+    await expect(page).toHaveTitle(/About · Blab Bun/);
   });
 
   test("every page has a meta description", async ({ page }) => {
@@ -66,12 +66,12 @@ test.describe("SEO meta tags", () => {
     }
   });
 
-  test("sitemap.xml returns valid XML", async ({ page }) => {
-    const response = await page.goto("/sitemap.xml");
-    expect(response?.status()).toBe(200);
-    const content = await page.content();
-    expect(content).toContain("<urlset");
-    expect(content).toContain("<url><loc>");
+  test("sitemap.xml returns valid XML", async ({ request }) => {
+    const response = await request.get("/sitemap.xml");
+    expect(response.status()).toBe(200);
+    const text = await response.text();
+    expect(text).toContain("<urlset");
+    expect(text).toContain("<loc>");
   });
 
   test("robots.txt exists and references sitemap", async ({ page }) => {

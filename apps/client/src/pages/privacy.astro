@@ -2,151 +2,38 @@
 import Layout from "@/layouts/Layout.astro";
 ---
 
-<Layout
-  title="Privacy Policy"
-  description="Privacy policy for The Lunan — how data is handled and what is collected."
->
-  <main class="pt-[64px]">
-    <!-- Page hero -->
-    <section
-      class="relative overflow-hidden border-b border-[rgba(197,247,208,0.25)] px-4 pt-14 pb-12 md:px-8 md:pt-20 md:pb-16"
-    >
-      <div
-        class="pointer-events-none absolute inset-0"
-        style="background-image: linear-gradient(rgba(197,247,208,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(197,247,208,0.07) 1px, transparent 1px); background-size: 40px 40px;"
+<Layout title="privacy" description="Privacy policy for Blab Bun.">
+  <main
+    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
+  >
+    <div style="animation:fadeIn 0.2s ease">
+      <a
+        href="/"
+        style="background:none;border:none;color:var(--accent);font-size:0.76rem;cursor:pointer;font-family:inherit;padding:0;margin-bottom:28px;display:inline-block;text-decoration:none"
       >
-      </div>
-      <div
-        class="pointer-events-none absolute inset-0"
-        style="background: radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, white 100%);"
+        ← back
+      </a>
+      <h1
+        style="font-size:1.05rem;font-weight:600;margin-bottom:24px;margin-top:20px"
       >
-      </div>
-      <div class="relative mx-auto max-w-[760px] text-center">
-        <span
-          class="font-manrope mb-4 inline-block rounded-full bg-[#ebf3ed] px-3 py-1 text-[10px] font-bold tracking-[3px] text-[#386547] uppercase"
-        >
-          Privacy
-        </span>
-        <h1
-          class="font-space-grotesk text-[48px] leading-[0.97] font-bold tracking-[-0.05em] text-[#1a2e22] sm:text-[64px] md:text-[80px]"
-        >
-          Privacy Policy<span class="text-[#ccf05f]">.</span>
-        </h1>
-        <p class="font-manrope mt-3 text-[13px] text-[rgba(41,48,45,0.4)]">
-          Last updated: April 2026
+        privacy
+      </h1>
+      <div
+        style="font-size:0.82rem;color:var(--muted);line-height:1.9;max-width:540px"
+      >
+        <p style="margin-bottom:14px">
+          i don't collect your data. i don't have analytics. i can't see who you
+          are or where you're from.
         </p>
-      </div>
-    </section>
-
-    <div class="mx-auto max-w-[760px] px-4 py-14 md:px-8 md:py-20">
-      <div class="space-y-8">
-        <section>
-          <h2
-            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#1a2e22]"
-          >
-            The short version
-          </h2>
-          <p
-            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
-          >
-            This is a personal blog. I&apos;m not trying to harvest your data. I
-            don&apos;t run ads, I don&apos;t sell anything, and I have no
-            interest in tracking you around the internet.
-          </p>
-        </section>
-
-        <section>
-          <h2
-            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#1a2e22]"
-          >
-            What this site collects
-          </h2>
-          <p
-            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
-          >
-            The Lunan is a static site. It does not use cookies, does not
-            require an account, and does not collect personally identifiable
-            information by default. Comments on posts are anonymous &mdash; no
-            name, no email, nothing tied to you.
-          </p>
-          <p
-            class="font-manrope mt-4 text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
-          >
-            Basic server logs (IP address, browser, page visited) may be
-            retained by the hosting provider for operational purposes. I
-            don&apos;t access these unless something breaks.
-          </p>
-        </section>
-
-        <section>
-          <h2
-            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#1a2e22]"
-          >
-            Third-party services
-          </h2>
-          <p
-            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
-          >
-            This site loads fonts from Google Fonts. Google may log that
-            request. If that concerns you, most browsers let you block external
-            font loading. Share buttons (Facebook, X) open external sites in a
-            new tab &mdash; those sites have their own privacy policies.
-          </p>
-        </section>
-
-        <section>
-          <h2
-            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#1a2e22]"
-          >
-            Local storage
-          </h2>
-          <p
-            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
-          >
-            The clap feature saves your interaction (clapped or not, local
-            count) to your browser&apos;s local storage. This data stays on your
-            device and is never sent anywhere.
-          </p>
-        </section>
-
-        <section>
-          <h2
-            class="font-space-grotesk mt-4 mb-3 text-[20px] font-bold tracking-[-0.02em] text-[#1a2e22]"
-          >
-            Questions
-          </h2>
-          <p
-            class="font-manrope text-[17px] leading-[1.75] text-[rgba(41,48,45,0.65)]"
-          >
-            If you have questions about any of this, leave a comment on any post
-            or reach out through the links in the about page. I&apos;ll do my
-            best to respond.
-          </p>
-        </section>
-      </div>
-
-      <div class="mt-14 border-t border-[rgba(197,247,208,0.4)] pt-8">
-        <a
-          href="/"
-          class="font-manrope group inline-flex items-center gap-2 text-[13px] font-bold text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547]"
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-            aria-hidden="true"
-            class="transition-transform group-hover:-translate-x-0.5"
-          >
-            <path
-              d="M13 7H1M6 2L1 7l5 5"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"></path>
-          </svg>
-          Back home
-        </a>
+        <p style="margin-bottom:14px">
+          if you subscribe to the newsletter, i get your email address and
+          nothing else. i won't sell it, share it, or use it for anything other
+          than sending you the occasional post.
+        </p>
+        <p>
+          comments are anonymous and stored locally in your browser. they're
+          yours.
+        </p>
       </div>
     </div>
   </main>

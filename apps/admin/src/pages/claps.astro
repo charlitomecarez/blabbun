@@ -1,0 +1,231 @@
+---
+import type { PostClapRow } from "@blabbun/db";
+import { createSupabaseClient } from "@blabbun/db";
+
+import Layout from "../layouts/Layout.astro";
+
+const supabase = createSupabaseClient(
+  import.meta.env.SUPABASE_URL,
+  import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+const { data: claps } = await supabase
+  .from("post_claps")
+  .select("*")
+  .order("count", { ascending: false });
+
+const total = ((claps ?? []) as PostClapRow[]).reduce(
+  (s, r) => s + (r.count ?? 0),
+  0
+);
+---
+
+<Layout title="post claps">
+  <!-- Create form -->
+  <div
+    style="border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:24px;background:var(--bg2)"
+  >
+    <div
+      style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px"
+    >
+      add entry
+    </div>
+    <form id="create-form" style="display:flex;gap:8px;flex-wrap:wrap">
+      <input
+        name="post_slug"
+        placeholder="post-slug"
+        required
+        style="flex:1;min-width:160px;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+      />
+      <input
+        name="count"
+        type="number"
+        min="0"
+        placeholder="count (default 0)"
+        style="width:160px;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+      />
+      <button
+        type="submit"
+        style="padding:7px 14px;font-size:0.75rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer;white-space:nowrap"
+        >add</button
+      >
+    </form>
+  </div>
+
+  <div style="font-size:0.72rem;color:var(--muted);margin-bottom:12px">
+    {claps?.length ?? 0} posts · {total.toLocaleString()} total claps
+  </div>
+
+  {
+    !claps?.length ? (
+      <p style="font-size:0.8rem;color:var(--muted);padding:32px 0;border-top:1px solid var(--divider)">
+        no claps yet.
+      </p>
+    ) : (
+      <div style="border:1px solid var(--border);border-radius:4px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:var(--bg2)">
+              <th style="text-align:left;padding:10px 16px;font-size:0.68rem;font-weight:500;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase">
+                post
+              </th>
+              <th style="text-align:right;padding:10px 16px;font-size:0.68rem;font-weight:500;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase">
+                claps
+              </th>
+              <th style="padding:10px 16px;width:160px" />
+            </tr>
+          </thead>
+          <tbody>
+            {(claps as PostClapRow[]).map((c) => (
+              <tr
+                data-slug={c.post_slug}
+                style="border-top:1px solid var(--divider);background:var(--bg)"
+              >
+                <td style="padding:12px 16px;font-size:0.8rem;color:var(--text)">
+                  <a
+                    href={`https://blabbun.com/${c.post_slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style="color:var(--text);text-decoration:none"
+                    onmouseenter="this.style.color='var(--accent)'"
+                    onmouseleave="this.style.color='var(--text)'"
+                  >
+                    /{c.post_slug}
+                  </a>
+                </td>
+                <td style="padding:12px 16px;font-size:0.8rem;color:var(--text);text-align:right;font-weight:500">
+                  <span class="count-text">{c.count.toLocaleString()}</span>
+                  <div class="edit-mode" style="display:none">
+                    <input
+                      type="number"
+                      min="0"
+                      class="edit-input"
+                      value={c.count}
+                      style="width:80px;padding:4px 6px;font-size:0.78rem;font-family:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;text-align:right"
+                    />
+                  </div>
+                </td>
+                <td style="padding:12px 16px;text-align:right">
+                  <div
+                    class="action-btns"
+                    style="display:flex;gap:6px;justify-content:flex-end"
+                  >
+                    <button
+                      onclick={`startEdit('${c.post_slug}')`}
+                      style="background:none;border:1px solid var(--border);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit"
+                      onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+                      onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                    >
+                      edit
+                    </button>
+                    <button
+                      onclick={`deleteEntry('${c.post_slug}')`}
+                      style="background:none;border:1px solid var(--border);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit"
+                      onmouseenter="this.style.borderColor='#e05c5c';this.style.color='#e05c5c'"
+                      onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                    >
+                      delete
+                    </button>
+                  </div>
+                  <div
+                    class="edit-btns"
+                    style="display:none;gap:6px;justify-content:flex-end"
+                  >
+                    <button
+                      onclick={`saveClaps('${c.post_slug}',this)`}
+                      style="background:none;border:1px solid var(--accent);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--accent);cursor:pointer;font-family:inherit"
+                    >
+                      save
+                    </button>
+                    <button
+                      onclick={`cancelEdit('${c.post_slug}')`}
+                      style="background:none;border:1px solid var(--border);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit"
+                    >
+                      cancel
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+</Layout>
+
+<script>
+  function getRow(slug: string) {
+    return document.querySelector(`[data-slug="${slug}"]`);
+  }
+
+  function startEdit(slug: string) {
+    const row = getRow(slug);
+    (row?.querySelector(".count-text") as HTMLElement).style.display = "none";
+    (row?.querySelector(".edit-mode") as HTMLElement).style.display = "block";
+    (row?.querySelector(".action-btns") as HTMLElement).style.display = "none";
+    (row?.querySelector(".edit-btns") as HTMLElement).style.display = "flex";
+  }
+
+  function cancelEdit(slug: string) {
+    const row = getRow(slug);
+    (row?.querySelector(".count-text") as HTMLElement).style.display = "";
+    (row?.querySelector(".edit-mode") as HTMLElement).style.display = "none";
+    (row?.querySelector(".action-btns") as HTMLElement).style.display = "flex";
+    (row?.querySelector(".edit-btns") as HTMLElement).style.display = "none";
+  }
+
+  async function saveClaps(slug: string, btn: HTMLButtonElement) {
+    const row = getRow(slug);
+    const input = row?.querySelector(".edit-input") as HTMLInputElement | null;
+    const count = parseInt(input?.value ?? "0", 10);
+    btn.textContent = "saving…";
+    const res = await fetch(`/api/claps/${encodeURIComponent(slug)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ count }),
+    });
+    if (res.ok) {
+      const txt = row?.querySelector(".count-text");
+      if (txt) txt.textContent = count.toLocaleString();
+      cancelEdit(slug);
+    } else {
+      alert("failed to save");
+      btn.textContent = "save";
+    }
+  }
+
+  async function deleteEntry(slug: string) {
+    if (!confirm(`delete clap entry for "${slug}"?`)) return;
+    const res = await fetch(`/api/claps/${encodeURIComponent(slug)}`, {
+      method: "DELETE",
+    });
+    if (res.ok) getRow(slug)?.remove();
+    else alert("failed to delete");
+  }
+
+  document
+    .getElementById("create-form")
+    ?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const data = Object.fromEntries(new FormData(form));
+      const res = await fetch("/api/claps", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          post_slug: data.post_slug,
+          count: Number(data.count) || 0,
+        }),
+      });
+      if (res.ok) {
+        form.reset();
+        location.reload();
+      } else {
+        const j = await res.json();
+        alert(j.error ?? "failed");
+      }
+    });
+
+  Object.assign(window, { startEdit, cancelEdit, saveClaps, deleteEntry });
+</script>

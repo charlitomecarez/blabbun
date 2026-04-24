@@ -6,50 +6,66 @@
   interface Props {
     postSlug: string;
   }
-
   const { postSlug }: Props = $props();
 
   let comments = $state<Comment[]>([]);
   let loading = $state(true);
-  let error = $state<string | null>(null);
+  let text = $state("");
+  let err = $state("");
+  let posted = $state(false);
+  let submitting = $state(false);
+  let activeReplyId = $state<string | null>(null);
 
-  const COMMENTS_PER_PAGE = 5;
+  const COMMENTS_PER_PAGE = 10;
   let visibleCount = $state(COMMENTS_PER_PAGE);
-
   const visibleComments = $derived(comments.slice(0, visibleCount));
   const hasMore = $derived(visibleCount < comments.length);
-
-  let activeReplyId = $state<string | null>(null);
-  let newCommentBody = $state("");
-  let submitting = $state(false);
+  const total = $derived(
+    comments.reduce((a, c) => a + 1 + (c.replies?.length ?? 0), 0)
+  );
 
   onMount(async () => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      yourName = saved;
+    } else {
+      yourName = anonName(((Date.now() / 10000) | 0) % 120);
+      localStorage.setItem(STORAGE_KEY, yourName);
+    }
+
     try {
       const res = await fetch(`/api/comments/${postSlug}`);
-      if (!res.ok) throw new Error("Failed to load comments");
+      if (!res.ok) throw new Error();
       comments = await res.json();
-    } catch (e) {
-      error = e instanceof Error ? e.message : "Unknown error";
+    } catch {
+      /* silent */
     } finally {
       loading = false;
     }
   });
 
-  async function addComment() {
-    if (!newCommentBody.trim() || submitting) return;
+  async function submitComment(e: Event) {
+    e.preventDefault();
+    if (!text.trim()) {
+      err = "say something first";
+      return;
+    }
     submitting = true;
+    err = "";
     try {
       const res = await fetch(`/api/comments/${postSlug}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: newCommentBody.trim() }),
+        body: JSON.stringify({ body: text.trim(), anon_name: yourName }),
       });
-      if (!res.ok) throw new Error("Failed to post comment");
+      if (!res.ok) throw new Error();
       const created = await res.json();
       comments = [{ ...created, replies: [] }, ...comments];
-      newCommentBody = "";
-    } catch (e) {
-      error = e instanceof Error ? e.message : "Unknown error";
+      text = "";
+      posted = true;
+      setTimeout(() => (posted = false), 2000);
+    } catch {
+      err = "couldn't post, try again";
     } finally {
       submitting = false;
     }
@@ -60,116 +76,157 @@
       const res = await fetch(`/api/comments/${postSlug}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body, parent_id: commentId }),
+        body: JSON.stringify({
+          body,
+          parent_id: commentId,
+          anon_name: yourName,
+        }),
       });
-      if (!res.ok) throw new Error("Failed to post reply");
+      if (!res.ok) throw new Error();
       const created = await res.json();
       comments = comments.map((c) =>
         c.id === commentId ? { ...c, replies: [...c.replies, created] } : c
       );
-    } catch (e) {
-      error = e instanceof Error ? e.message : "Unknown error";
+    } catch {
+      /* silent */
     }
     activeReplyId = null;
   }
 
-  function handleReplyToggle(id: string | null) {
-    activeReplyId = id;
+  const BUN_ADJS = [
+    "sleepy",
+    "cozy",
+    "golden",
+    "toasty",
+    "fluffy",
+    "crusty",
+    "warm",
+    "soft",
+    "crispy",
+    "doughy",
+    "puffy",
+    "sesame",
+  ];
+  const BUN_NOUNS = [
+    "loaf",
+    "bun",
+    "roll",
+    "crumb",
+    "muffin",
+    "scone",
+    "pretzel",
+    "bagel",
+    "biscuit",
+    "brioche",
+  ];
+  function anonName(seed: number) {
+    return (
+      BUN_ADJS[seed % BUN_ADJS.length] +
+      "-" +
+      BUN_NOUNS[Math.floor(seed / BUN_ADJS.length) % BUN_NOUNS.length]
+    );
   }
+  const STORAGE_KEY = "blabbun-anon-name";
+  let yourName = $state("");
 
-  function loadMore() {
-    visibleCount += COMMENTS_PER_PAGE;
-  }
+  const inputStyle =
+    "background:var(--input-bg);border:1px solid var(--border);border-radius:3px;padding:10px 12px;font-size:0.8rem;color:var(--text);width:100%;outline:none;resize:vertical;font-family:inherit;line-height:1.6";
 </script>
 
 <div
-  class="mx-auto max-w-[760px] border-t-2 border-[#c5f7d0] px-4 pt-10 pb-12 md:px-8"
+  style="margin-top:48px;padding-top:32px;border-top:1px solid var(--divider)"
 >
-  <p
-    class="font-manrope mb-6 text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase"
+  <!-- Comment count -->
+  <div
+    style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:24px;text-transform:uppercase"
   >
     {#if !loading}
-      {comments.length} Comment{comments.length === 1 ? "" : "s"}
+      {total} comment{total !== 1 ? "s" : ""}
     {/if}
-  </p>
+  </div>
 
-  {#if error}
-    <div class="mb-6 rounded-[8px] border border-red-100 bg-red-50 px-4 py-3">
-      <p class="font-manrope text-[13px] text-red-500">
-        Could not load comments. Try refreshing the page.
-      </p>
-    </div>
-  {:else if loading}
-    <div class="mb-6 space-y-4">
+  <!-- Loading skeleton -->
+  {#if loading}
+    <div style="display:flex;flex-direction:column;gap:12px">
       {#each [1, 2] as n (n)}
-        <div class="animate-pulse">
-          <div class="mb-2 h-3 w-24 rounded bg-[rgba(197,247,208,0.6)]"></div>
-          <div class="h-4 w-full rounded bg-[rgba(197,247,208,0.4)]"></div>
+        <div style="animation:fadeIn 0.5s ease">
           <div
-            class="mt-1.5 h-4 w-3/4 rounded bg-[rgba(197,247,208,0.4)]"
+            style="height:9px;width:60px;border-radius:2px;background:var(--bg3);margin-bottom:7px"
+          ></div>
+          <div
+            style="height:11px;width:90%;border-radius:2px;background:var(--bg3)"
+          ></div>
+          <div
+            style="height:11px;width:70%;border-radius:2px;background:var(--bg3);margin-top:5px"
           ></div>
         </div>
       {/each}
     </div>
   {:else if comments.length === 0}
-    <div class="mb-6 rounded-[8px] bg-[#f7fbf8] px-5 py-6 text-center">
-      <p class="font-manrope text-[15px] text-[rgba(41,48,45,0.5)]">
-        No comments yet — be the first.
-      </p>
-    </div>
+    <!-- Empty state — don't show anything prominent, just subtle -->
   {:else}
-    <div class="space-y-6">
-      {#each visibleComments as comment, i (comment.id)}
-        <div>
-          <CommentItem
-            {comment}
-            {activeReplyId}
-            onReplyToggle={handleReplyToggle}
-            onReplySubmit={addReply}
-          />
-          {#if i < visibleComments.length - 1}
-            <div class="mt-6 border-t border-[rgba(197,247,208,0.4)]"></div>
-          {/if}
-        </div>
+    <div style="display:flex;flex-direction:column;gap:0">
+      {#each visibleComments as comment (comment.id)}
+        <CommentItem
+          {comment}
+          {activeReplyId}
+          onReplyToggle={(id) => (activeReplyId = id)}
+          onReplySubmit={addReply}
+        />
       {/each}
     </div>
   {/if}
 
   {#if hasMore}
-    <div class="mt-6 flex justify-center">
-      <button
-        type="button"
-        onclick={loadMore}
-        class="font-manrope cursor-pointer rounded-full border border-[#c5f7d0] bg-transparent px-5 py-2 text-[13px] font-bold text-[#386547] transition-colors hover:bg-[#ebf3ed]"
-      >
-        Load more ({comments.length - visibleCount} remaining)
-      </button>
-    </div>
+    <button
+      type="button"
+      onclick={() => (visibleCount += COMMENTS_PER_PAGE)}
+      style="background:none;border:none;font-family:inherit;font-size:0.74rem;color:var(--accent);cursor:pointer;margin-top:12px;padding:0"
+    >
+      load more ({comments.length - visibleCount} remaining)
+    </button>
   {/if}
 
-  <!-- Leave a comment form -->
-  <div class="mt-8 border-t border-[rgba(197,247,208,0.4)] pt-6">
-    <p
-      class="font-manrope mb-3 text-[11px] font-bold tracking-[0.12em] text-[rgba(41,48,45,0.5)] uppercase"
+  <!-- New comment form -->
+  <form
+    onsubmit={submitComment}
+    style="margin-top:28px;padding-top:20px;border-top:1px solid var(--divider)"
+  >
+    <div
+      style="font-size:0.7rem;color:var(--muted);margin-bottom:12px;letter-spacing:0.04em"
     >
-      Leave a comment
-    </p>
-    <textarea
-      bind:value={newCommentBody}
-      placeholder="What's on your mind?"
-      aria-label="Comment text"
-      rows="4"
-      class="font-manrope w-full resize-none rounded-[8px] border-[1.5px] border-[rgba(197,247,208,0.8)] bg-white px-3.5 py-3 text-[15px] text-[#29302d] placeholder-[rgba(41,48,45,0.35)] outline-none focus:border-[#386547]"
-    ></textarea>
-    <div class="mt-2.5">
-      <button
-        type="button"
-        onclick={addComment}
-        disabled={!newCommentBody.trim() || submitting}
-        class="font-manrope cursor-pointer rounded-full bg-[#386547] px-5 py-2 text-[14px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+      leave a comment — you'll be anonymous <span style="color:var(--accent)"
+        >({yourName})</span
       >
-        {submitting ? "Posting…" : "Post comment"}
-      </button>
     </div>
-  </div>
+    {#if err}
+      <div style="font-size:0.7rem;color:var(--accent);margin-bottom:8px">
+        ! {err}
+      </div>
+    {/if}
+    {#if posted}
+      <div style="font-size:0.7rem;color:#3a8c5a;margin-bottom:8px">
+        posted!
+      </div>
+    {/if}
+    <textarea
+      bind:value={text}
+      placeholder="what do you think..."
+      rows={3}
+      aria-label="Comment text"
+      style="{inputStyle};margin-bottom:10px;"
+    ></textarea>
+    <button
+      type="submit"
+      disabled={submitting}
+      style="
+        background:var(--accent);border:none;border-radius:3px;
+        padding:9px 20px;font-size:0.74rem;font-family:inherit;
+        color:#fff;cursor:pointer;letter-spacing:0.04em;
+        opacity:{submitting ? '0.6' : '1'};
+      "
+    >
+      {submitting ? "posting…" : "post anonymously"}
+    </button>
+  </form>
 </div>

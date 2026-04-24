@@ -1,9 +1,9 @@
-import type { Post } from "@thelunan/types";
+import type { Post } from "@blabbun/types";
 import { glob } from "astro/loaders";
 import { defineCollection, z } from "astro:content";
 
 // Post is the canonical type for blog post frontmatter, shared across apps.
-// The Zod schema below must stay in sync with the Post interface in @thelunan/types.
+// The Zod schema below must stay in sync with the Post interface in @blabbun/types.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type _PostCheck = Post;
 

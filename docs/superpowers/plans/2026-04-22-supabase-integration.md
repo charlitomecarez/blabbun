@@ -4,7 +4,7 @@
 
 **Goal:** Replace all mock/localStorage data in Comments, Claps, and Newsletter with real Supabase persistence; add server-side API routes; add admin views for comments and subscribers.
 
-**Architecture:** A new `@thelunan/db` package provides the typed Supabase client. Both apps switch to `@astrojs/vercel` for SSR/hybrid rendering so the service role key never reaches the browser. Svelte components call Astro API routes; the API routes call Supabase with the service role key.
+**Architecture:** A new `@blabbun/db` package provides the typed Supabase client. Both apps switch to `@astrojs/vercel` for SSR/hybrid rendering so the service role key never reaches the browser. Svelte components call Astro API routes; the API routes call Supabase with the service role key.
 
 **Tech Stack:** Astro 6, Svelte 5, `@supabase/supabase-js` v2, `@astrojs/vercel`, pnpm workspaces, Playwright (e2e tests)
 
@@ -26,7 +26,7 @@
 
 ```json
 {
-  "name": "@thelunan/db",
+  "name": "@blabbun/db",
   "private": true,
   "type": "module",
   "version": "0.0.1",
@@ -130,20 +130,20 @@ export type {
 } from "./types.js";
 ```
 
-- [ ] **Step 6: Add `@thelunan/db` to `apps/client/package.json`**
+- [ ] **Step 6: Add `@blabbun/db` to `apps/client/package.json`**
 
 In the `"dependencies"` object, add:
 
 ```json
-"@thelunan/db": "workspace:*"
+"@blabbun/db": "workspace:*"
 ```
 
-- [ ] **Step 7: Add `@thelunan/db` to `apps/admin/package.json`**
+- [ ] **Step 7: Add `@blabbun/db` to `apps/admin/package.json`**
 
 In the `"dependencies"` object, add:
 
 ```json
-"@thelunan/db": "workspace:*"
+"@blabbun/db": "workspace:*"
 ```
 
 - [ ] **Step 8: Install the workspace**
@@ -154,13 +154,13 @@ Run from repo root:
 pnpm install
 ```
 
-Expected: no errors; `@thelunan/db` appears in lockfile.
+Expected: no errors; `@blabbun/db` appears in lockfile.
 
 - [ ] **Step 9: Commit**
 
 ```bash
 git add packages/db apps/client/package.json apps/admin/package.json pnpm-lock.yaml
-git commit -m "feat: add @thelunan/db package with typed Supabase client"
+git commit -m "feat: add @blabbun/db package with typed Supabase client"
 ```
 
 ---
@@ -176,7 +176,7 @@ git commit -m "feat: add @thelunan/db package with typed Supabase client"
 - [ ] **Step 1: Install `@astrojs/vercel` in client**
 
 ```bash
-pnpm --filter @thelunan/client add @astrojs/vercel
+pnpm --filter @blabbun/client add @astrojs/vercel
 ```
 
 Expected: `@astrojs/vercel` appears in `apps/client/package.json` dependencies.
@@ -194,7 +194,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://thelunan.com",
+  site: "https://blabbun.com",
   output: "hybrid",
   adapter: vercel(),
   integrations: [svelte(), mdx()],
@@ -224,7 +224,7 @@ If missing, add `.env` to the root `.gitignore`.
 - [ ] **Step 5: Verify build still passes**
 
 ```bash
-pnpm --filter @thelunan/client build
+pnpm --filter @blabbun/client build
 ```
 
 Expected: build completes with no TypeScript errors. (Without real env vars, API routes won't work at runtime, but the build itself should succeed.)
@@ -249,7 +249,7 @@ git commit -m "feat: enable hybrid rendering in client app via @astrojs/vercel"
 - [ ] **Step 1: Install `@astrojs/vercel` in admin**
 
 ```bash
-pnpm --filter @thelunan/admin add @astrojs/vercel
+pnpm --filter @blabbun/admin add @astrojs/vercel
 ```
 
 - [ ] **Step 2: Update `apps/admin/astro.config.mjs`**
@@ -283,7 +283,7 @@ SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 - [ ] **Step 4: Verify admin build passes**
 
 ```bash
-pnpm --filter @thelunan/admin build
+pnpm --filter @blabbun/admin build
 ```
 
 Expected: build completes; `apps/admin/dist/` is generated.
@@ -433,8 +433,8 @@ Expected: all 5 tests fail — endpoint does not exist yet.
 
 ```typescript
 import type { APIRoute } from "astro";
-import { createSupabaseClient } from "@thelunan/db";
-import type { CommentRow } from "@thelunan/db";
+import { createSupabaseClient } from "@blabbun/db";
+import type { CommentRow } from "@blabbun/db";
 
 export const prerender = false;
 
@@ -757,7 +757,7 @@ Replace `apps/client/src/components/post/Comments.svelte` with:
 - [ ] **Step 4: Run TypeScript check**
 
 ```bash
-pnpm --filter @thelunan/client exec astro check
+pnpm --filter @blabbun/client exec astro check
 ```
 
 Expected: 0 errors.
@@ -827,7 +827,7 @@ Expected: all 4 tests fail.
 
 ```typescript
 import type { APIRoute } from "astro";
-import { createSupabaseClient } from "@thelunan/db";
+import { createSupabaseClient } from "@blabbun/db";
 
 export const prerender = false;
 
@@ -1121,7 +1121,7 @@ Replace `apps/client/src/components/post/ClapShare.svelte` with:
 - [ ] **Step 2: Run TypeScript check**
 
 ```bash
-pnpm --filter @thelunan/client exec astro check
+pnpm --filter @blabbun/client exec astro check
 ```
 
 Expected: 0 errors.
@@ -1199,7 +1199,7 @@ Expected: all 4 tests fail.
 
 ```typescript
 import type { APIRoute } from "astro";
-import { createSupabaseClient } from "@thelunan/db";
+import { createSupabaseClient } from "@blabbun/db";
 
 export const prerender = false;
 
@@ -1264,7 +1264,7 @@ Replace `apps/client/src/components/home/NewsletterBar.svelte` with:
 
 ```svelte
 <script lang="ts">
-  import { EmailInput } from "@thelunan/ui/components/inputs";
+  import { EmailInput } from "@blabbun/ui/components/inputs";
 
   let email = $state("");
   let submitted = $state(false);
@@ -1413,7 +1413,7 @@ Replace `apps/client/src/components/home/NewsletterBar.svelte` with:
 - [ ] **Step 2: Run TypeScript check**
 
 ```bash
-pnpm --filter @thelunan/client exec astro check
+pnpm --filter @blabbun/client exec astro check
 ```
 
 Expected: 0 errors.
@@ -1437,7 +1437,7 @@ git commit -m "feat: connect NewsletterBar to Supabase via API route"
 
 ```typescript
 import type { APIRoute } from "astro";
-import { createSupabaseClient } from "@thelunan/db";
+import { createSupabaseClient } from "@blabbun/db";
 
 export const POST: APIRoute = async ({ request, redirect }) => {
   const form = await request.formData();
@@ -1501,8 +1501,8 @@ import Layout from "@/layouts/Layout.astro";
 
 ```astro
 ---
-import { createSupabaseClient } from "@thelunan/db";
-import type { CommentRow } from "@thelunan/db";
+import { createSupabaseClient } from "@blabbun/db";
+import type { CommentRow } from "@blabbun/db";
 import Layout from "@/layouts/Layout.astro";
 
 const supabase = createSupabaseClient(
@@ -1587,7 +1587,7 @@ const urlError = Astro.url.searchParams.get("error");
 - [ ] **Step 3: Run TypeScript check for admin**
 
 ```bash
-pnpm --filter @thelunan/admin exec astro check
+pnpm --filter @blabbun/admin exec astro check
 ```
 
 Expected: 0 errors.
@@ -1611,8 +1611,8 @@ git commit -m "feat: add admin comments page with delete action"
 
 ```astro
 ---
-import { createSupabaseClient } from "@thelunan/db";
-import type { SubscriberRow } from "@thelunan/db";
+import { createSupabaseClient } from "@blabbun/db";
+import type { SubscriberRow } from "@blabbun/db";
 import Layout from "@/layouts/Layout.astro";
 
 const supabase = createSupabaseClient(
@@ -1678,7 +1678,7 @@ const subscribers: SubscriberRow[] = data ?? [];
 - [ ] **Step 2: Run TypeScript check for admin**
 
 ```bash
-pnpm --filter @thelunan/admin exec astro check
+pnpm --filter @blabbun/admin exec astro check
 ```
 
 Expected: 0 errors.
@@ -1706,7 +1706,7 @@ git commit -m "feat: add admin subscribers page"
 
 | Spec requirement                                                 | Implemented in |
 | ---------------------------------------------------------------- | -------------- |
-| `@thelunan/db` package with typed Supabase client                | Task 1         |
+| `@blabbun/db` package with typed Supabase client                 | Task 1         |
 | Hybrid rendering via `@astrojs/vercel` in client                 | Task 2         |
 | SSR via `@astrojs/vercel` in admin                               | Task 3         |
 | Database schema (comments, post_claps, subscribers)              | Task 4         |

@@ -5,57 +5,54 @@
     postSlug: string;
     postUrl: string;
     postTitle: string;
+    inline?: boolean;
   }
 
-  const { postSlug, postUrl, postTitle }: Props = $props();
+  const { postSlug, postUrl, postTitle, inline = false }: Props = $props();
 
   let count = $state(0);
-  let clapped = $state(false);
+  let mine = $state(0);
   let loading = $state(true);
-  let animating = $state(false);
+  let burst = $state(false);
+  let shareOpen = $state(false);
   let copied = $state(false);
-  let error = $state<string | null>(null);
   let clapTimer: ReturnType<typeof setTimeout> | undefined;
   let copyTimer: ReturnType<typeof setTimeout> | undefined;
+  const maxClaps = 50;
 
   onMount(async () => {
     try {
       const res = await fetch(`/api/claps/${postSlug}`);
-      if (!res.ok) throw new Error("Failed to load clap count");
+      if (!res.ok) throw new Error();
       const data = (await res.json()) as { count: number; hasClapped: boolean };
       count = data.count ?? 0;
-      clapped = data.hasClapped ?? false;
-    } catch (e) {
-      error = e instanceof Error ? e.message : "Unknown error";
+      mine = data.hasClapped ? 1 : 0;
+    } catch {
+      /* silent */
     } finally {
       loading = false;
     }
-
     return () => {
       clearTimeout(clapTimer);
       clearTimeout(copyTimer);
     };
   });
 
-  async function handleClap() {
-    const optimistic = !clapped;
-    clapped = optimistic;
-    count = optimistic ? count + 1 : Math.max(0, count - 1);
-    animating = true;
+  async function clap() {
+    if (mine >= maxClaps || loading) return;
+    count += 1;
+    mine += 1;
+    burst = true;
     clearTimeout(clapTimer);
-    clapTimer = setTimeout(() => (animating = false), 200);
-
+    clapTimer = setTimeout(() => (burst = false), 350);
     try {
       const res = await fetch(`/api/claps/${postSlug}`, { method: "POST" });
-      if (!res.ok) throw new Error("Failed to clap");
+      if (!res.ok) throw new Error();
       const data = (await res.json()) as { count: number; hasClapped: boolean };
       count = data.count;
-      clapped = data.hasClapped;
-    } catch (e) {
-      // Revert optimistic update on failure
-      clapped = !optimistic;
-      count = optimistic ? Math.max(0, count - 1) : count + 1;
-      error = e instanceof Error ? e.message : "Failed to clap";
+    } catch {
+      count -= 1;
+      mine -= 1;
     }
   }
 
@@ -66,128 +63,109 @@
       clearTimeout(copyTimer);
       copyTimer = setTimeout(() => (copied = false), 2000);
     } catch {
-      // clipboard not available
+      /* */
     }
   }
 
-  const fbUrl = $derived(
-    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`
-  );
-  const xUrl = $derived(
-    `https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(postTitle)}`
-  );
+  const encodedUrl = $derived(encodeURIComponent(postUrl));
+  const encodedTitle = $derived(encodeURIComponent(postTitle));
+
+  const btnStyle =
+    "background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:7px 13px;font-size:0.72rem;font-family:inherit;cursor:pointer;color:var(--muted);letter-spacing:0.03em;transition:color 0.15s,border-color 0.15s;display:flex;align-items:center;gap:6px;text-decoration:none;width:100%;text-align:left";
 </script>
 
-<div
-  class="mx-auto max-w-[760px] border-t-2 border-[#c5f7d0] px-4 pt-10 pb-12 text-center md:px-8"
->
-  {#if error}
-    <p class="font-manrope mb-6 text-[14px] text-red-500">{error}</p>
-  {/if}
-
-  <!-- Clap button -->
-  <button
-    type="button"
-    onclick={handleClap}
-    disabled={loading}
-    aria-pressed={clapped}
-    aria-label={clapped ? "Remove clap" : "Clap for this post"}
-    class="font-manrope mb-6 inline-flex cursor-pointer items-center gap-2 rounded-full border-none px-6 py-3 text-[15px] font-bold text-[#386547] transition-transform duration-150 disabled:cursor-not-allowed disabled:opacity-50"
-    class:bg-[#c5f7d0]={clapped}
-    class:bg-[#ebf3ed]={!clapped}
-    class:scale-[1.15]={animating}
-    class:scale-100={!animating}
-  >
-    <span style="font-size:20px;" aria-hidden="true">👏</span>
-    <span>{loading ? "Loading…" : `Clap · ${count}`}</span>
-  </button>
-
-  <!-- Share label -->
-  <p
-    class="font-manrope mb-3 text-[11px] font-bold tracking-[0.12em] text-[rgba(41,48,45,0.4)] uppercase"
-  >
-    Share this post
-  </p>
-
-  <!-- Share icons -->
-  <div class="flex items-center justify-center gap-3">
-    <!-- Facebook -->
-    <a
-      href={fbUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Share on Facebook"
-      class="flex h-[38px] w-[38px] items-center justify-center rounded-full bg-[#ebf3ed] text-[#386547] transition-colors hover:bg-[#c5f7d0]"
-    >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        aria-hidden="true"
-      >
-        <path
-          d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
-        />
-      </svg>
-    </a>
-
-    <!-- X / Twitter -->
-    <a
-      href={xUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Share on X"
-      class="flex h-[38px] w-[38px] items-center justify-center rounded-full bg-[#ebf3ed] text-[#386547] transition-colors hover:bg-[#c5f7d0]"
-    >
-      <svg
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        aria-hidden="true"
-      >
-        <path
-          d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-        />
-      </svg>
-    </a>
-
-    <!-- Copy Link -->
+<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+  <!-- ClapButton — exact design: round 44px circle -->
+  <div style="display:flex;align-items:center;gap:10px">
     <button
       type="button"
-      onclick={copyLink}
-      aria-label="Copy link"
-      class="font-manrope flex h-[38px] cursor-pointer items-center justify-center gap-1.5 rounded-full border-none bg-[#ebf3ed] px-4 text-[12px] font-bold text-[#386547] transition-colors hover:bg-[#c5f7d0]"
+      onclick={clap}
+      disabled={loading}
+      title={mine >= maxClaps ? "max claps reached" : "clap for this post"}
+      style="
+        background:none;border:1px solid {mine > 0
+        ? 'var(--accent)'
+        : 'var(--border)'};
+        border-radius:50%;width:44px;height:44px;
+        cursor:{mine >= maxClaps ? 'not-allowed' : 'pointer'};
+        font-size:1.2rem;display:flex;align-items:center;justify-content:center;
+        color:{mine > 0 ? 'var(--accent)' : 'var(--muted)'};
+        transform:{burst ? 'scale(1.35)' : 'scale(1)'};
+        transition:transform 0.25s cubic-bezier(.34,1.56,.64,1);
+      ">👏</button
     >
-      {#if copied}
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg
-        >
-        Copied!
-      {:else}
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          aria-hidden="true"
-          ><path
-            d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
-          /><path
-            d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
-          /></svg
-        >
-        Copy link
-      {/if}
-    </button>
+    <div>
+      <div style="font-size:0.88rem;font-weight:500;color:var(--text)">
+        {count}
+      </div>
+      <div style="font-size:0.62rem;color:var(--muted)">
+        {mine > 0 ? `you clapped ${mine}x` : "clap if you liked it"}
+      </div>
+    </div>
   </div>
+
+  <!-- SharePanel — popup on click, exact design -->
+  <div style="position:relative">
+    <button
+      type="button"
+      onclick={() => (shareOpen = !shareOpen)}
+      style="
+        background:var(--bg2);border:1px solid {shareOpen
+        ? 'var(--accent)'
+        : 'var(--border)'};
+        border-radius:3px;padding:7px 13px;font-size:0.72rem;font-family:inherit;cursor:pointer;
+        color:{shareOpen ? 'var(--accent)' : 'var(--muted)'};
+        letter-spacing:0.03em;transition:color 0.15s,border-color 0.15s;
+        display:flex;align-items:center;gap:6px;
+      "
+    >
+      ↗ share
+    </button>
+
+    {#if shareOpen}
+      <div
+        style="
+          position:absolute;bottom:calc(100% + 8px);left:0;
+          background:var(--bg2);border:1px solid var(--border);
+          border-radius:4px;padding:8px;
+          display:flex;flex-direction:column;gap:4px;
+          min-width:180px;box-shadow:0 4px 20px rgba(0,0,0,0.12);
+          z-index:50;
+        "
+      >
+        <button
+          type="button"
+          onclick={copyLink}
+          style="
+            {btnStyle};
+            color:{copied ? 'var(--accent)' : 'var(--muted)'};
+            border-color:{copied ? 'var(--accent)' : 'var(--border)'};
+          "
+        >
+          {copied ? "✓ copied!" : "🔗 copy link"}
+        </button>
+        <a
+          href="https://twitter.com/intent/tweet?text={encodedTitle}&url={encodedUrl}"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={btnStyle}>𝕏 share on X</a
+        >
+        <a
+          href="https://www.facebook.com/sharer/sharer.php?u={encodedUrl}"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={btnStyle}>f share on Facebook</a
+        >
+        <a
+          href="https://reddit.com/submit?url={encodedUrl}&title={encodedTitle}"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={btnStyle}>↑ share on Reddit</a
+        >
+      </div>
+    {/if}
+  </div>
+
+  <!-- Bookmark pushed to right -->
+  <slot />
 </div>

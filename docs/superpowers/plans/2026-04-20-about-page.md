@@ -39,7 +39,7 @@ import Layout from "@/layouts/Layout.astro";
       <h1
         class="font-space-grotesk text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-[#2d5a3d] sm:text-[46px] md:text-[52px]"
       >
-        hey, I&apos;m Lunan<span class="text-[#ccf05f]">.</span>
+        Hola, I&apos;m Charli<span class="text-[#ccf05f]">.</span>
       </h1>
 
       <!-- Divider -->
@@ -96,13 +96,13 @@ import Layout from "@/layouts/Layout.astro";
 - [ ] **Step 2: Verify the dev server renders it**
 
 ```bash
-pnpm --filter @thelunan/client dev
+pnpm --filter @blabbun/client dev
 ```
 
 Open `http://localhost:4321/about` and confirm:
 
 - Pill badge shows `ABOUT` in yellow
-- Heading reads "hey, I'm Lunan." with yellow period
+- Heading reads "hey, I'm Charli." with yellow period
 - Two paragraphs render in muted green-grey
 - "Back to archive" link appears at the bottom
 - Navbar "About" link highlights correctly on this route

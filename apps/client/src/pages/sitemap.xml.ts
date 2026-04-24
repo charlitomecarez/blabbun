@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 
 export const GET: APIRoute = async ({ site }) => {
-  const siteUrl = site?.toString().replace(/\/$/, "") ?? "https://thelunan.com";
+  const siteUrl = site?.toString().replace(/\/$/, "") ?? "https://blabbun.com";
 
   const posts = await getCollection("posts", ({ data }) => !data.draft);
 
@@ -11,19 +11,30 @@ export const GET: APIRoute = async ({ site }) => {
     "/archive",
     "/topics",
     "/about",
+    "/now",
     "/help",
     "/terms",
     "/privacy",
   ];
 
-  const allUrls = [
-    ...staticPaths.map((path) => `${siteUrl}${path}`),
-    ...posts.map((post) => `${siteUrl}/${post.id}`),
+  const today = new Date().toISOString().split("T")[0];
+
+  const entries = [
+    ...staticPaths.map(
+      (path) =>
+        `  <url><loc>${siteUrl}${path}</loc><lastmod>${today}</lastmod></url>`
+    ),
+    ...posts.map((post) => {
+      const lastmod = (post.data.updatedDate ?? post.data.pubDate)
+        .toISOString()
+        .split("T")[0];
+      return `  <url><loc>${siteUrl}/${post.id}</loc><lastmod>${lastmod}</lastmod></url>`;
+    }),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${allUrls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}
+${entries.join("\n")}
 </urlset>`;
 
   return new Response(xml, {

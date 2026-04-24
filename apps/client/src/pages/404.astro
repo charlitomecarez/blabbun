@@ -1,0 +1,46 @@
+---
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout title="404 — not found" description="This page doesn't exist.">
+  <main
+    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh;display:flex;flex-direction:column;justify-content:center"
+  >
+    <div style="animation:fadeIn 0.2s ease">
+      <div
+        style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px"
+      >
+        404
+      </div>
+      <h1
+        style="font-size:1.2rem;font-weight:600;color:var(--text);margin-bottom:12px;line-height:1.4"
+      >
+        this page doesn't exist.
+      </h1>
+      <p
+        style="font-size:0.84rem;color:var(--muted);line-height:1.8;margin-bottom:32px;max-width:420px;text-wrap:pretty"
+      >
+        it might've been moved, deleted, or never existed in the first place.
+        either way, it's not here now.
+      </p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a
+          href="/"
+          style="font-size:0.78rem;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:3px;padding:7px 14px;transition:background 0.15s"
+          onmouseenter="this.style.background='var(--accent-soft)'"
+          onmouseleave="this.style.background='transparent'"
+        >
+          ← go home
+        </a>
+        <a
+          href="/archive"
+          style="font-size:0.78rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:3px;padding:7px 14px;transition:background 0.15s"
+          onmouseenter="this.style.background='var(--bg2)'"
+          onmouseleave="this.style.background='transparent'"
+        >
+          browse all posts
+        </a>
+      </div>
+    </div>
+  </main>
+</Layout>

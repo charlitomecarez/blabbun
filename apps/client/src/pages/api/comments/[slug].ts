@@ -1,5 +1,5 @@
-import type { CommentRow } from "@thelunan/db";
-import { createSupabaseClient } from "@thelunan/db";
+import type { CommentRow } from "@blabbun/db";
+import { createSupabaseClient } from "@blabbun/db";
 import type { APIRoute } from "astro";
 
 export const prerender = false;
@@ -44,9 +44,13 @@ export const POST: APIRoute = async ({ params, request }) => {
   const { slug } = params;
   const supabase = getClient();
 
-  let body: { body?: string; parent_id?: string };
+  let body: { body?: string; parent_id?: string; anon_name?: string };
   try {
-    body = (await request.json()) as { body?: string; parent_id?: string };
+    body = (await request.json()) as {
+      body?: string;
+      parent_id?: string;
+      anon_name?: string;
+    };
   } catch {
     return json({ error: "Invalid JSON" }, 400);
   }
@@ -59,6 +63,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     post_slug: slug!,
     body: body.body.trim(),
     parent_id: body.parent_id ?? null,
+    anon_name: body.anon_name ?? null,
   };
 
   const { data, error } = await supabase

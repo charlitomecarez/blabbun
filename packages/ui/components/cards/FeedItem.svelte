@@ -6,7 +6,6 @@
     excerpt?: string;
     tag?: string;
     readTime?: string;
-    /** 192×128 thumbnail */
     imageUrl?: string;
     href?: string;
     claps?: number;
@@ -14,11 +13,10 @@
   }
 
   const {
-    author = "The Lunan",
     date = "",
     title,
     excerpt = "",
-    tag = "TECHNICAL",
+    tag = "EDITORIAL",
     readTime = "5 min read",
     imageUrl = "",
     href = "#",
@@ -26,210 +24,257 @@
     commentCount,
   }: Props = $props();
 
-  function initials(name: string): string {
-    return name
-      .split(" ")
-      .map((w) => w[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  }
-
-  let copied = $state(false);
-  let copyTimer: ReturnType<typeof setTimeout> | undefined;
-
-  async function share() {
-    const url = new URL(href, window.location.origin).href;
-    if (navigator.share) {
-      await navigator.share({ title, url }).catch(() => {});
-      return;
-    }
-    await navigator.clipboard.writeText(url).catch(() => {});
-    copied = true;
-    clearTimeout(copyTimer);
-    copyTimer = setTimeout(() => (copied = false), 2000);
+  // Map tag → CSS class for color theming (light + dark handled entirely in CSS)
+  function tagClass(t: string): string {
+    const map: Record<string, string> = {
+      RANTS: "tag-rants",
+      TAKES: "tag-takes",
+      "HALF-BAKED IDEAS": "tag-halfbaked",
+      "LIFE STUFF": "tag-lifestuff",
+      CULTURE: "tag-culture",
+      EDITORIAL: "tag-editorial",
+      TECHNICAL: "tag-technical",
+    };
+    return map[t.toUpperCase()] ?? "tag-default";
   }
 </script>
 
 <!--
-  Stretched-link pattern: the title <a> gets after:absolute after:inset-0
-  so the entire card is clickable. Bookmark/share buttons sit above via
-  relative z-10 so they remain individually interactive.
+  Pure-CSS hover — no client: directive needed.
+  The parent list has padding-left:20px; the › sits in that gutter via left:-20px.
 -->
-<article
-  class="group relative -mx-2 flex items-start gap-4
-         rounded-lg border-b border-[rgba(197,247,208,0.4)]
-         px-2 py-6 transition-colors hover:bg-[rgba(197,247,208,0.06)] md:gap-6"
->
-  <!-- Left: content -->
-  <div class="flex min-w-0 flex-1 flex-col gap-3">
-    <!-- Author row -->
-    <div class="flex items-center gap-2">
-      <div
-        class="flex h-8 w-8 shrink-0 items-center justify-center
-               rounded-full bg-[#c5f7d0] text-[11px] font-bold
-               tracking-wider text-[#386547]"
-      >
-        {initials(author)}
-      </div>
-      <span
-        class="font-manrope text-[13px] font-medium text-[rgba(41,48,45,0.7)]"
-      >
-        {author}
-      </span>
-      {#if date}
-        <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.55)]"
-          >·</span
-        >
-        <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.55)]"
-          >{date}</span
-        >
-      {/if}
-    </div>
+<article class="feed-card">
+  <!-- › gutter arrow — CSS opacity transition -->
+  <div class="feed-arrow" aria-hidden="true">›</div>
 
-    <!-- Title — stretched link covers the whole card -->
-    <a
-      {href}
-      class="block after:absolute after:inset-0 after:z-0 after:rounded-lg"
-      aria-label={title}
-    >
-      <h3
-        class="font-space-grotesk text-[22px] leading-[1.2] font-bold
-               tracking-[-0.03em] text-[#29302d]
-               transition-colors group-hover:text-[#386547]"
-      >
-        {title}
-      </h3>
-    </a>
-
-    {#if excerpt}
-      <p
-        class="font-manrope line-clamp-2 text-[15px] leading-[1.6] text-[rgba(41,48,45,0.6)]"
-      >
-        {excerpt}
-      </p>
-    {/if}
-
-    <!-- Meta row — buttons are relative z-10 to sit above the stretched link -->
-    <div class="relative z-10 flex items-center gap-3 pt-1">
-      <span
-        class="font-manrope rounded-full bg-[#ebf3ed] px-3 py-1 text-[11px]
-               font-bold tracking-[0.06em] text-[#386547] uppercase"
-      >
-        {tag}
-      </span>
-      <span class="font-manrope text-[12px] text-[rgba(41,48,45,0.55)]"
-        >{readTime}</span
-      >
-
-      {#if claps !== undefined && claps > 0}
-        <span
-          class="font-manrope flex items-center gap-1 text-[12px] text-[rgba(41,48,45,0.45)]"
-        >
-          <span aria-hidden="true">👏</span>
-          {claps}
-        </span>
-      {/if}
-
-      {#if commentCount !== undefined && commentCount > 0}
-        <span
-          class="font-manrope flex items-center gap-1 text-[12px] text-[rgba(41,48,45,0.45)]"
-        >
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M14 2H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3l3 3 3-3h3a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z"
-              stroke="currentColor"
-              stroke-width="1.3"
-              stroke-linejoin="round"
-            />
-          </svg>
-          {commentCount}
-        </span>
-      {/if}
-
-      <div class="flex-1"></div>
-
-      <button
-        type="button"
-        onclick={share}
-        aria-label={copied ? "Copied!" : "Share"}
-        class="cursor-pointer border-none bg-transparent transition-colors
-               {copied
-          ? 'text-[#386547]'
-          : 'text-[rgba(41,48,45,0.35)] hover:text-[#386547]'}"
-      >
-        {#if copied}
-          <svg
-            width="15"
-            height="15"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            aria-hidden="true"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        {:else}
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden="true"
-          >
-            <circle
-              cx="12"
-              cy="3"
-              r="1.5"
-              stroke="currentColor"
-              stroke-width="1.3"
-            />
-            <circle
-              cx="4"
-              cy="8"
-              r="1.5"
-              stroke="currentColor"
-              stroke-width="1.3"
-            />
-            <circle
-              cx="12"
-              cy="13"
-              r="1.5"
-              stroke="currentColor"
-              stroke-width="1.3"
-            />
-            <path
-              d="M5.5 7l5-3M5.5 9l5 3"
-              stroke="currentColor"
-              stroke-width="1.3"
-              stroke-linecap="round"
-            />
-          </svg>
-        {/if}
-      </button>
-    </div>
-  </div>
-
-  <!-- Right: thumbnail — decorative, covered by stretched link -->
+  <!-- Image -->
   {#if imageUrl}
-    <div class="hidden shrink-0 sm:block" aria-hidden="true">
+    <div class="feed-img-wrap">
       <img
         src={imageUrl}
         alt=""
-        width="192"
-        height="128"
+        width="616"
+        height="140"
         loading="lazy"
         decoding="async"
-        class="h-[96px] w-[140px] rounded-[8px] object-cover
-               transition-opacity group-hover:opacity-80 md:h-[128px] md:w-[192px]"
+        class="feed-img"
       />
     </div>
   {/if}
+
+  <!-- Date + tag badge -->
+  <div class="feed-meta-top">
+    {#if date}
+      <span class="feed-date">{date}</span>
+    {/if}
+    <span class="feed-badge {tagClass(tag)}">{tag}</span>
+  </div>
+
+  <!-- Title (stretched link) -->
+  <a {href} class="feed-title-link" aria-label={title}>
+    <h3 class="feed-title">{title}</h3>
+  </a>
+
+  <!-- Excerpt -->
+  {#if excerpt}
+    <p class="feed-excerpt">{excerpt}</p>
+  {/if}
+
+  <!-- Meta row -->
+  <div class="feed-meta-bottom">
+    <span class="feed-stat">{readTime}</span>
+    {#if claps !== undefined && claps > 0}
+      <span class="feed-stat">👏 {claps}</span>
+    {/if}
+    {#if commentCount !== undefined}
+      <span class="feed-stat">💬 {commentCount}</span>
+    {/if}
+  </div>
 </article>
+
+<style>
+  /* ─── Card shell ───────────────────────────────────────────── */
+  .feed-card {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--divider);
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+  }
+
+  /* ─── › arrow — lives in the 20px left gutter ─────────────── */
+  .feed-arrow {
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 0.9rem;
+    line-height: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+  }
+  .feed-card:hover .feed-arrow {
+    opacity: 1;
+  }
+
+  /* ─── Image ───────────────────────────────────────────────── */
+  .feed-img-wrap {
+    width: 100%;
+    height: 140px;
+    border-radius: 3px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    position: relative;
+  }
+  .feed-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .feed-card:hover .feed-img {
+    transform: scale(1.02);
+  }
+
+  /* ─── Date + badge row ────────────────────────────────────── */
+  .feed-meta-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .feed-date {
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+
+  /* ─── Tag badge base ──────────────────────────────────────── */
+  .feed-badge {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Light mode tag colors */
+  .tag-rants {
+    background: #fce8e8;
+    color: #9b2121;
+  }
+  .tag-takes {
+    background: #e8f0fc;
+    color: #1a3a8c;
+  }
+  .tag-halfbaked {
+    background: #fef3e2;
+    color: #8a5a00;
+  }
+  .tag-lifestuff {
+    background: #e8f8ee;
+    color: #1a6b3a;
+  }
+  .tag-culture {
+    background: #f3e8fc;
+    color: #6a1a8c;
+  }
+  .tag-editorial {
+    background: #faebd7;
+    color: #8a5a00;
+  }
+  .tag-technical {
+    background: #e8f0fc;
+    color: #1a3a8c;
+  }
+  .tag-default {
+    background: #f0ede8;
+    color: #6b5e4e;
+  }
+
+  /* Dark mode tag colors — scoped via :global(body.dark) */
+  :global(body.dark) .tag-rants {
+    background: #2a1414;
+    color: #d47070;
+  }
+  :global(body.dark) .tag-takes {
+    background: #111a2a;
+    color: #6a96d4;
+  }
+  :global(body.dark) .tag-halfbaked {
+    background: #241a08;
+    color: #c49040;
+  }
+  :global(body.dark) .tag-lifestuff {
+    background: #0e2218;
+    color: #5aab78;
+  }
+  :global(body.dark) .tag-culture {
+    background: #1e1228;
+    color: #a870d4;
+  }
+  :global(body.dark) .tag-editorial {
+    background: #241a08;
+    color: #c49040;
+  }
+  :global(body.dark) .tag-technical {
+    background: #111a2a;
+    color: #6a96d4;
+  }
+  :global(body.dark) .tag-default {
+    background: #1e1a14;
+    color: #a09080;
+  }
+
+  /* ─── Title ───────────────────────────────────────────────── */
+  .feed-title-link {
+    display: block;
+    text-decoration: none;
+  }
+  /* stretched link: covers whole card */
+  .feed-title-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 3px;
+  }
+  .feed-title {
+    font-size: 0.93rem;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    text-wrap: pretty;
+    color: var(--text);
+    transition: color 0.15s;
+  }
+  .feed-card:hover .feed-title {
+    color: var(--accent);
+  }
+
+  /* ─── Excerpt ─────────────────────────────────────────────── */
+  .feed-excerpt {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.65;
+    text-wrap: pretty;
+    margin-bottom: 10px;
+  }
+
+  /* ─── Bottom meta ─────────────────────────────────────────── */
+  .feed-meta-bottom {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+  }
+  .feed-stat {
+    font-size: 0.65rem;
+    color: var(--muted2);
+  }
+</style>

@@ -11,11 +11,9 @@
 
   const {
     title,
-    description = "",
     tag = "EDITORIAL",
     readTime = "5 min read",
     pubDate,
-    author = "The Lunan",
     backHref = "/",
   }: Props = $props();
 
@@ -25,104 +23,132 @@
     year: "numeric",
   });
 
-  function initials(name: string): string {
-    return name
-      .split(" ")
-      .map((w) => w[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
+  function tagClass(t: string): string {
+    const map: Record<string, string> = {
+      RANTS: "tag-rants",
+      TAKES: "tag-takes",
+      "HALF-BAKED IDEAS": "tag-halfbaked",
+      "LIFE STUFF": "tag-lifestuff",
+      CULTURE: "tag-culture",
+      EDITORIAL: "tag-editorial",
+      TECHNICAL: "tag-technical",
+    };
+    return map[t.toUpperCase()] ?? "tag-default";
   }
 </script>
 
-<!--
-  Post detail hero — sits at the top of every article page.
-  Contains back link, tag/read-time bar, title, description, and author row.
--->
-<header
-  class="border-b border-[rgba(197,247,208,0.3)] bg-[#f1f8f3] px-4 pt-14 pb-10 md:px-8 md:pt-20 md:pb-14"
->
-  <div class="mx-auto max-w-[760px]">
-    <!-- Back link -->
-    <a
-      href={backHref}
-      class="font-manrope group mb-8 inline-flex items-center
-             gap-1.5 text-[13px] font-medium
-             text-[rgba(41,48,45,0.5)] transition-colors hover:text-[#386547] md:mb-10"
+<!-- PostDetailView header — exact design match -->
+<div style="animation:fadeSlideIn 0.25s ease;margin-bottom:0">
+  <!-- ← back [esc] -->
+  <a
+    href={backHref}
+    style="
+      color:var(--accent);font-size:0.76rem;font-family:inherit;
+      padding:0;margin-bottom:28px;
+      display:inline-flex;align-items:center;gap:12px;
+      text-decoration:none;
+    "
+  >
+    ← back
+    <span style="font-size:0.62rem;color:var(--muted2);font-weight:400"
+      >[esc]</span
     >
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 14 14"
-        fill="none"
-        aria-hidden="true"
-        class="transition-transform group-hover:-translate-x-0.5"
-      >
-        <path
-          d="M13 7H1M6 2L1 7l5 5"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-      Archive
-    </a>
+  </a>
 
-    <!-- Tag + read time row -->
-    <div class="mb-5 flex items-center justify-between">
-      <span
-        class="font-manrope rounded-full bg-[rgba(197,247,208,0.5)] px-3 py-1
-               text-[11px] font-bold tracking-[0.08em] text-[#386547] uppercase"
-      >
-        {tag}
-      </span>
-      <span
-        class="font-manrope text-[11px] font-bold tracking-[0.12em]
-               text-[rgba(41,48,45,0.4)] uppercase"
-      >
-        {readTime}
-      </span>
-    </div>
-
-    <!-- Title -->
-    <h1
-      class="font-space-grotesk mb-5 text-[32px] leading-[1.08]
-             font-bold tracking-[-0.04em] text-[#29302d] sm:text-[42px] md:text-[52px]"
-    >
-      {title}
-    </h1>
-
-    <!-- Description -->
-    {#if description}
-      <p
-        class="font-manrope mb-8 text-[16px] leading-[1.7]
-               text-[rgba(41,48,45,0.6)] md:text-[18px]"
-      >
-        {description}
-      </p>
-    {/if}
-
-    <!-- Author row -->
-    <div class="flex items-center gap-3">
-      <div
-        class="font-space-grotesk flex h-9 w-9 shrink-0 items-center justify-center
-               rounded-full bg-[#c5f7d0] text-[12px] font-bold text-[#386547]"
-      >
-        {initials(author)}
-      </div>
-      <span
-        class="font-manrope text-[14px] font-semibold text-[rgba(41,48,45,0.8)]"
-      >
-        {author}
-      </span>
-      <span class="text-[rgba(41,48,45,0.25)]">·</span>
-      <time
-        datetime={pubDate.toISOString()}
-        class="font-manrope text-[13px] text-[rgba(41,48,45,0.45)]"
-      >
-        {formattedDate}
-      </time>
-    </div>
+  <!-- Date + tag + readtime row -->
+  <div
+    style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap"
+  >
+    <span style="font-size:0.68rem;color:var(--muted)">{formattedDate}</span>
+    <span class="post-badge {tagClass(tag)}">{tag}</span>
+    <span style="font-size:0.68rem;color:var(--muted2)">{readTime}</span>
   </div>
-</header>
+
+  <!-- Title -->
+  <h1
+    style="
+      font-size:1.28rem;font-weight:600;line-height:1.4;
+      margin-bottom:30px;text-wrap:pretty;max-width:560px;
+      color:var(--text);
+    "
+  >
+    {title}
+  </h1>
+</div>
+
+<style>
+  .post-badge {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .tag-rants {
+    background: #fce8e8;
+    color: #9b2121;
+  }
+  .tag-takes {
+    background: #e8f0fc;
+    color: #1a3a8c;
+  }
+  .tag-halfbaked {
+    background: #fef3e2;
+    color: #8a5a00;
+  }
+  .tag-lifestuff {
+    background: #e8f8ee;
+    color: #1a6b3a;
+  }
+  .tag-culture {
+    background: #f3e8fc;
+    color: #6a1a8c;
+  }
+  .tag-editorial {
+    background: #faebd7;
+    color: #8a5a00;
+  }
+  .tag-technical {
+    background: #e8f0fc;
+    color: #1a3a8c;
+  }
+  .tag-default {
+    background: #f0ede8;
+    color: #6b5e4e;
+  }
+
+  :global(body.dark) .tag-rants {
+    background: #2a1414;
+    color: #d47070;
+  }
+  :global(body.dark) .tag-takes {
+    background: #111a2a;
+    color: #6a96d4;
+  }
+  :global(body.dark) .tag-halfbaked {
+    background: #241a08;
+    color: #c49040;
+  }
+  :global(body.dark) .tag-lifestuff {
+    background: #0e2218;
+    color: #5aab78;
+  }
+  :global(body.dark) .tag-culture {
+    background: #1e1228;
+    color: #a870d4;
+  }
+  :global(body.dark) .tag-editorial {
+    background: #241a08;
+    color: #c49040;
+  }
+  :global(body.dark) .tag-technical {
+    background: #111a2a;
+    color: #6a96d4;
+  }
+  :global(body.dark) .tag-default {
+    background: #1e1a14;
+    color: #a09080;
+  }
+</style>

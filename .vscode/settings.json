@@ -4,6 +4,7 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
+  "eslint.validate": ["javascript", "typescript", "astro"],
   "prettier.requireConfig": true,
   "prettier.resolveGlobalModules": false,
   "[astro]": {

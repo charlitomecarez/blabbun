@@ -5,7 +5,7 @@
 
 ## Overview
 
-A minimal, static `/about` page for The Lunan blog. No photo. Single centered column. Tone: casual, warm — like a friend you talk to every day.
+A minimal, static `/about` page for Blab Bun blog. No photo. Single centered column. Tone: casual, warm — like a friend you talk to every day.
 
 ## Layout
 
@@ -17,7 +17,7 @@ A minimal, static `/about` page for The Lunan blog. No photo. Single centered co
 ## Sections (top to bottom)
 
 1. **Pill badge** — `ABOUT` in the site's `#ccf05f` yellow pill (matches homepage `Personal Blog` badge)
-2. **Heading** — `"hey, I'm Lunan."` in Space Grotesk, large, tracking tight, `#2d5a3d`
+2. **Heading** — `"hey, I'm Charli."` in Space Grotesk, large, tracking tight, `#2d5a3d`
 3. **Divider** — short `2px` green bar, same as homepage
 4. **Body copy** — 2 short paragraphs in Manrope, muted green-grey (`rgba(41,48,45,0.65)`):
    - _"This is my little corner of the internet. No agenda, no niche, no 'personal brand.' Just me writing about whatever's on my mind — life, opinions, the stuff I'd rant about to a friend over a late night."_

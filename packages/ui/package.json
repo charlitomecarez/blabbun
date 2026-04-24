@@ -1,5 +1,5 @@
 {
-  "name": "@thelunan/ui",
+  "name": "@blabbun/ui",
   "private": true,
   "type": "module",
   "version": "0.0.1",
@@ -23,6 +23,11 @@
       "svelte": "./components/cards/index.ts",
       "types": "./components/cards/index.ts",
       "default": "./components/cards/index.ts"
+    },
+    "./components/post": {
+      "svelte": "./components/post/index.ts",
+      "types": "./components/post/index.ts",
+      "default": "./components/post/index.ts"
     },
     "./styles/*": "./styles/*"
   },

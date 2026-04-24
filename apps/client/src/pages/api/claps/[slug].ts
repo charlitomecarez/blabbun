@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { createSupabaseClient } from "@thelunan/db";
+import { createSupabaseClient } from "@blabbun/db";
 import type { APIRoute } from "astro";
 
 export const prerender = false;

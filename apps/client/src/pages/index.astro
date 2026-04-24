@@ -1,5 +1,5 @@
 ---
-import { FeedItem } from "@thelunan/ui/components/cards";
+import { FeedItem } from "@blabbun/ui/components/cards";
 import { getCollection } from "astro:content";
 
 import NewsletterBar from "@/components/home/NewsletterBar.svelte";
@@ -10,18 +10,9 @@ const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
-const featuredPost = posts[0] ?? null;
-const feedPosts = posts.slice(1);
+const stats = await fetchPostStats(posts.slice(0, 10).map((p) => p.id));
 
-const feedSlice = feedPosts.slice(0, 3);
-const allStatSlugs = [
-  ...(featuredPost ? [featuredPost.id] : []),
-  ...feedSlice.map((p) => p.id),
-];
-const stats = await fetchPostStats(allStatSlugs);
-
-const displayFeed = feedSlice.map((post) => ({
-  author: "The Lunan",
+const feedItems = posts.map((post) => ({
   date: post.data.pubDate.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -30,390 +21,99 @@ const displayFeed = feedSlice.map((post) => ({
   title: post.data.title,
   excerpt: post.data.description,
   tag: (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
-  readTime: "5 min read",
+  readTime: `${Math.max(1, Math.round((post.body?.trim().split(/\s+/).length ?? 0) / 200))} min read`,
   imageUrl: post.data.image,
   href: `/${post.id}`,
   claps: stats[post.id]?.claps,
   commentCount: stats[post.id]?.commentCount,
 }));
 
-// Featured post
-const featuredHasImage = !!featuredPost?.data.image;
-const featuredImageUrl = featuredPost?.data.image ?? null;
-const featuredTitle =
-  featuredPost?.data.title ?? "Living Systems and the New Architecture";
-const featuredExcerpt =
-  featuredPost?.data.description ??
-  "Exploring the convergence of generative algorithms and organic structuralism.";
-const featuredHref = featuredPost ? `/${featuredPost.id}` : "#";
-const featuredDate = featuredPost
-  ? featuredPost.data.pubDate.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
-  : "Apr 15, 2026";
-const featuredTag = featuredPost
-  ? (featuredPost.data.tags?.[0] ?? "EDITORIAL").toUpperCase()
-  : "EDITORIAL";
-const featuredWordCount = featuredPost?.body?.trim().split(/\s+/).length ?? 0;
-const featuredReadTime = `${Math.max(1, Math.round(featuredWordCount / 200))} min read`;
-const featuredClaps = featuredPost ? (stats[featuredPost.id]?.claps ?? 0) : 0;
-const featuredComments = featuredPost
-  ? (stats[featuredPost.id]?.commentCount ?? 0)
-  : 0;
+const allTags = [
+  ...new Set(
+    posts.flatMap((p) => p.data.tags ?? []).map((t) => t.toUpperCase())
+  ),
+];
 ---
 
 <Layout>
-  <main class="pt-[64px]">
-    <!-- ─── Hero ───────────────────────────────────────────────── -->
-    <section
-      class="relative overflow-hidden border-b border-[rgba(197,247,208,0.25)] px-4 pt-16 pb-14 md:px-8 md:pt-24 md:pb-20"
+  <main
+    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
+  >
+    <!-- Subtitle line (exact from design) -->
+    <div
+      style="
+        margin-bottom:24px;padding-bottom:20px;
+        border-bottom:1px solid var(--divider);
+        animation:fadeIn 0.2s ease;
+      "
     >
-      <!-- subtle grid texture -->
-      <div
-        class="pointer-events-none absolute inset-0"
-        style="background-image: linear-gradient(rgba(197,247,208,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(197,247,208,0.07) 1px, transparent 1px); background-size: 40px 40px;"
+      <div style="font-size:0.72rem;color:var(--muted);line-height:1.7">
+        unfiltered takes &amp; half-baked thoughts — probably should've kept to
+        myself
+      </div>
+    </div>
+
+    <!-- Tag filter (client-side) -->
+    <div
+      id="tag-filters"
+      style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"
+    >
+      <button
+        data-tag="all"
+        style="background:none;border:none;padding:3px 0;font-size:0.7rem;font-family:inherit;cursor:pointer;letter-spacing:0.03em;color:var(--accent);font-weight:500"
+        >all</button
       >
-      </div>
-      <!-- radial fade so grid softens at edges -->
-      <div class="pointer-events-none absolute inset-0"></div>
-
-      <div class="relative mx-auto max-w-[760px] text-center">
-        <span
-          class="font-manrope mb-5 inline-flex items-center gap-2 rounded-full border border-[rgba(56,101,71,0.15)] bg-[rgba(197,247,208,0.4)] px-3.5 py-1.5 text-[11px] font-bold tracking-[0.12em] text-[#386547] uppercase"
-        >
-          <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-[#386547]"
-          ></span>
-          Personal Blog
-        </span>
-
-        <h1
-          class="font-space-grotesk text-[48px] leading-[0.97] font-bold tracking-[-0.05em] text-[#2d5a3d] sm:text-[64px] md:text-[80px] lg:text-[96px]"
-        >
-          The Lunan<span class="text-[#ccf05f]">.</span>
-        </h1>
-
-        <p
-          class="font-manrope mx-auto mt-5 max-w-[420px] text-[15px] leading-[1.7] text-[rgba(41,48,45,0.55)] md:text-[16px]"
-        >
-          A quiet corner for unfiltered reflections — half-finished ideas,
-          late-night opinions, and the kind of takes you only say when you're
-          not trying to impress anyone.
-        </p>
-
-        <div class="mt-6 flex items-center justify-center gap-3">
-          <a
-            href="/archive"
-            class="font-manrope inline-flex items-center gap-1.5 text-[13px] font-bold text-[#386547] underline decoration-[rgba(56,101,71,0.3)] underline-offset-3 transition-colors hover:decoration-[#386547]"
-          >
-            Browse all posts
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 14 14"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M1 7h12M8 2l5 5-5 5"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"></path>
-            </svg>
-          </a>
-          <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.35)]"
-            >·</span
-          >
-          <span class="font-manrope text-[13px] text-[rgba(41,48,45,0.4)]"
-            >{posts.length} entries</span
-          >
-        </div>
-      </div>
-    </section>
-
-    <!-- ─── Newsletter Bar ──────────────────────────────────────── -->
-    <NewsletterBar client:visible />
-
-    <!-- ─── Hero Featured Card ────────────────────────────────── -->
-    <section class="mx-auto max-w-[1200px] px-4 pt-8 pb-4 md:px-8 md:pt-12">
       {
-        featuredHasImage ? (
-          /* ── With image: full-bleed cover with gradient overlay ── */
-          <div class="group relative min-h-[380px] overflow-hidden rounded-[16px] md:min-h-[480px]">
-            <img
-              src={featuredImageUrl}
-              alt={featuredTitle}
-              class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-            />
-
-            {/* layered gradient: dark bottom + subtle top vignette */}
-            <div class="absolute inset-0 bg-[linear-gradient(to_top,rgba(20,32,26,0.92)_0%,rgba(20,32,26,0.4)_50%,rgba(20,32,26,0.1)_100%)]" />
-
-            {/* stretched link */}
-            <a
-              href={featuredHref}
-              class="absolute inset-0 z-0"
-              aria-label={featuredTitle}
-            />
-
-            {/* top badges */}
-            <div class="absolute top-5 left-5 z-10 flex items-center gap-2 md:top-7 md:left-7">
-              <span class="font-manrope rounded-full bg-[#ccf05f] px-3 py-1 text-[10px] font-bold tracking-[0.1em] text-[#29302d] uppercase">
-                FEATURED
-              </span>
-              <span class="font-manrope rounded-full bg-[rgba(255,255,255,0.15)] px-3 py-1 text-[10px] font-bold tracking-[0.1em] text-white uppercase backdrop-blur-sm">
-                {featuredTag}
-              </span>
-            </div>
-
-            {/* bottom content */}
-            <div class="absolute right-0 bottom-0 left-0 z-10 p-6 md:p-10">
-              <h2 class="font-space-grotesk mb-3 text-[26px] leading-[1.1] font-bold tracking-[-0.04em] text-white sm:text-[34px] md:mb-4 md:text-[44px]">
-                {featuredTitle}
-              </h2>
-
-              <p class="font-manrope mb-5 hidden max-w-[600px] text-[14px] leading-[1.65] text-[rgba(255,255,255,0.75)] md:block md:text-[15px]">
-                {featuredExcerpt}
-              </p>
-
-              <div class="flex flex-wrap items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                  <div class="font-space-grotesk flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(197,247,208,0.25)] text-[11px] font-bold text-white backdrop-blur-sm">
-                    TL
-                  </div>
-                  <span class="font-manrope text-[13px] font-medium text-[rgba(255,255,255,0.8)]">
-                    The Lunan
-                  </span>
-                  <span class="font-manrope text-[rgba(255,255,255,0.5)]">
-                    ·
-                  </span>
-                  <span class="font-manrope text-[13px] text-[rgba(255,255,255,0.6)]">
-                    {featuredDate}
-                  </span>
-                  <span class="font-manrope text-[rgba(255,255,255,0.5)]">
-                    ·
-                  </span>
-                  <span class="font-manrope text-[13px] text-[rgba(255,255,255,0.6)]">
-                    {featuredReadTime}
-                  </span>
-                  {featuredClaps > 0 && (
-                    <>
-                      <span class="font-manrope text-[rgba(255,255,255,0.5)]">
-                        ·
-                      </span>
-                      <span class="font-manrope text-[13px] text-[rgba(255,255,255,0.6)]">
-                        👏 {featuredClaps}
-                      </span>
-                    </>
-                  )}
-                  {featuredComments > 0 && (
-                    <>
-                      <span class="font-manrope text-[rgba(255,255,255,0.5)]">
-                        ·
-                      </span>
-                      <span class="font-manrope text-[13px] text-[rgba(255,255,255,0.6)]">
-                        💬 {featuredComments}
-                      </span>
-                    </>
-                  )}
-                </div>
-
-                <a
-                  href={featuredHref}
-                  class="font-manrope relative z-10 inline-flex items-center gap-2 rounded-full bg-[#ccf05f] px-5 py-2.5 text-[13px] font-bold text-[#1a2e22] transition-all hover:bg-white focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:outline-none"
-                >
-                  Read entry
-                  <svg
-                    width="13"
-                    height="13"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M1 7h12M8 2l5 5-5 5"
-                      stroke="currentColor"
-                      stroke-width="1.8"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* ── No image: editorial gradient card ── */
-          <div class="group relative overflow-hidden rounded-[16px] bg-[#1a2e22]">
-            {/* decorative background elements */}
-            <div class="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[rgba(197,247,208,0.07)]" />
-            <div class="pointer-events-none absolute -bottom-16 -left-16 h-52 w-52 rounded-full bg-[rgba(204,240,95,0.06)]" />
-            <div class="pointer-events-none absolute top-1/2 right-1/4 h-32 w-32 -translate-y-1/2 rounded-full bg-[rgba(197,247,208,0.04)]" />
-
-            {/* stretched link */}
-            <a
-              href={featuredHref}
-              class="absolute inset-0 z-0"
-              aria-label={featuredTitle}
-            />
-
-            <div class="relative z-10 p-8 md:p-12">
-              {/* top row */}
-              <div class="mb-6 flex items-center gap-2 md:mb-8">
-                <span class="font-manrope rounded-full bg-[#ccf05f] px-3 py-1 text-[10px] font-bold tracking-[0.1em] text-[#29302d] uppercase">
-                  FEATURED
-                </span>
-                <span class="font-manrope rounded-full border border-[rgba(197,247,208,0.2)] px-3 py-1 text-[10px] font-bold tracking-[0.1em] text-[rgba(197,247,208,0.6)] uppercase">
-                  {featuredTag}
-                </span>
-              </div>
-
-              {/* large decorative quotemark */}
-              <div class="font-space-grotesk pointer-events-none absolute top-6 right-8 text-[140px] leading-none font-bold text-[rgba(197,247,208,0.05)] select-none md:text-[200px]">
-                "
-              </div>
-
-              <h2 class="font-space-grotesk mb-4 max-w-[700px] text-[28px] leading-[1.08] font-bold tracking-[-0.04em] text-white transition-colors group-hover:text-[#ccf05f] sm:text-[38px] md:mb-6 md:text-[50px]">
-                {featuredTitle}
-              </h2>
-
-              <p class="font-manrope mb-8 max-w-[560px] text-[15px] leading-[1.7] text-[rgba(197,247,208,0.65)] md:mb-10 md:text-[17px]">
-                {featuredExcerpt}
-              </p>
-
-              <div class="flex flex-wrap items-center justify-between gap-4">
-                <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <div class="font-space-grotesk flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(197,247,208,0.15)] text-[11px] font-bold text-[#c5f7d0]">
-                    TL
-                  </div>
-                  <span class="font-manrope text-[13px] font-medium text-[rgba(197,247,208,0.7)]">
-                    The Lunan
-                  </span>
-                  <span class="text-[rgba(197,247,208,0.3)]">·</span>
-                  <span class="font-manrope text-[13px] text-[rgba(197,247,208,0.5)]">
-                    {featuredDate}
-                  </span>
-                  <span class="text-[rgba(197,247,208,0.3)]">·</span>
-                  <span class="font-manrope text-[13px] text-[rgba(197,247,208,0.5)]">
-                    {featuredReadTime}
-                  </span>
-                  {featuredClaps > 0 && (
-                    <>
-                      <span class="text-[rgba(197,247,208,0.3)]">·</span>
-                      <span class="font-manrope text-[13px] text-[rgba(197,247,208,0.5)]">
-                        👏 {featuredClaps}
-                      </span>
-                    </>
-                  )}
-                  {featuredComments > 0 && (
-                    <>
-                      <span class="text-[rgba(197,247,208,0.3)]">·</span>
-                      <span class="font-manrope text-[13px] text-[rgba(197,247,208,0.5)]">
-                        💬 {featuredComments}
-                      </span>
-                    </>
-                  )}
-                </div>
-
-                <a
-                  href={featuredHref}
-                  class="font-manrope relative z-10 inline-flex items-center gap-2 rounded-full bg-[#ccf05f] px-5 py-2.5 text-[13px] font-bold text-[#1a2e22] transition-all hover:bg-white focus-visible:ring-2 focus-visible:ring-[#ccf05f] focus-visible:outline-none"
-                >
-                  Read entry
-                  <svg
-                    width="13"
-                    height="13"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M1 7h12M8 2l5 5-5 5"
-                      stroke="currentColor"
-                      stroke-width="1.8"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-        )
+        allTags.map((t) => (
+          <button
+            data-tag={t}
+            style="background:none;border:none;padding:3px 0;font-size:0.7rem;font-family:inherit;cursor:pointer;letter-spacing:0.03em;color:var(--muted);font-weight:400"
+          >
+            / {t.toLowerCase()}
+          </button>
+        ))
       }
-    </section>
+    </div>
 
-    <!-- ─── Latest Entries Feed ───────────────────────────────── -->
-    <section class="mx-auto max-w-[1200px] px-4 pt-14 pb-16 md:px-8 md:pt-20">
-      <!-- Section header -->
-      <div class="mb-8 flex items-center justify-between md:mb-10">
-        <div class="flex items-center gap-3">
-          <span
-            class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.45)] uppercase"
-          >
-            Latest Entries
-          </span>
-          <span
-            class="font-manrope rounded-full bg-[#ebf3ed] px-2.5 py-0.5 text-[11px] font-bold text-[#386547]"
-          >
-            {feedPosts.length}
-          </span>
-        </div>
-        <a
-          href="/archive"
-          class="font-manrope group flex items-center gap-1.5 text-[13px] font-bold text-[rgba(41,48,45,0.4)] transition-colors hover:text-[#386547]"
-        >
-          View all
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 14 14"
-            fill="none"
-            aria-hidden="true"
-            class="transition-transform group-hover:translate-x-0.5"
-          >
-            <path
-              d="M1 7h12M8 2l5 5-5 5"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"></path>
-          </svg>
-        </a>
-      </div>
+    <!-- Post list -->
+    <div
+      id="post-list"
+      style="padding-left:20px;padding-right:20px;animation:fadeIn 0.2s ease"
+    >
+      {
+        feedItems.map((item) => (
+          <div data-tag={item.tag}>
+            <FeedItem {...item} />
+          </div>
+        ))
+      }
+    </div>
 
-      <div class="divide-y-0">
-        {displayFeed.map((item) => <FeedItem {...item} />)}
-      </div>
-
-      <!-- CTA -->
-      <div class="mt-12 flex items-center gap-4">
-        <div class="h-px flex-1 bg-[rgba(197,247,208,0.4)]"></div>
-        <a
-          href="/archive"
-          class="font-manrope group inline-flex items-center gap-2 rounded-full bg-[#1a2e22] px-6 py-3 text-[13px] font-bold text-[#ccf05f] transition-all hover:bg-[#2d5a3d] focus-visible:ring-2 focus-visible:ring-[#386547] focus-visible:outline-none"
-        >
-          Browse all {posts.length} entries
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 14 14"
-            fill="none"
-            aria-hidden="true"
-            class="transition-transform group-hover:translate-x-0.5"
-          >
-            <path
-              d="M1 7h12M8 2l5 5-5 5"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"></path>
-          </svg>
-        </a>
-        <div class="h-px flex-1 bg-[rgba(197,247,208,0.4)]"></div>
-      </div>
-    </section>
+    <!-- Newsletter (inline, matching design) -->
+    <NewsletterBar client:visible />
   </main>
 </Layout>
+
+<script>
+  // Tag filter logic
+  const filters = document.querySelectorAll<HTMLButtonElement>(
+    "#tag-filters button"
+  );
+  const items = document.querySelectorAll<HTMLElement>("#post-list [data-tag]");
+  let active = "all";
+
+  filters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      active = btn.dataset.tag ?? "all";
+      filters.forEach((b) => {
+        const isActive = b.dataset.tag === active;
+        b.style.color = isActive ? "var(--accent)" : "var(--muted)";
+        b.style.fontWeight = isActive ? "500" : "400";
+      });
+      items.forEach((item) => {
+        const match = active === "all" || item.dataset.tag === active;
+        (item as HTMLElement).style.display = match ? "" : "none";
+      });
+    });
+  });
+</script>

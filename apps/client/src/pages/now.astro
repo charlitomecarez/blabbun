@@ -1,0 +1,105 @@
+---
+import Layout from "@/layouts/Layout.astro";
+
+const items = [
+  {
+    section: "reading",
+    entries: [
+      "a book i started three months ago and keep putting down",
+      "every article about why modern software is bad, apparently",
+      "old blog posts from people who quit the internet in 2014",
+    ],
+  },
+  {
+    section: "thinking about",
+    entries: [
+      "whether having fewer opinions would make me happier or just more boring",
+      "the fact that group chats are dying and nobody is naming it",
+      "why finishing things became a moral virtue instead of just a choice",
+    ],
+  },
+  {
+    section: "current mood",
+    entries: [
+      "a bit tired but in the way that feels earned",
+      "mildly annoyed at something i can't fully articulate yet (blog post incoming)",
+    ],
+  },
+  {
+    section: "lately",
+    entries: [
+      "writing more than usual, which is either good or a sign of avoidance",
+      "drinking too much coffee and calling it a personality",
+      "resisting the urge to redesign this blog for the fourth time",
+    ],
+  },
+];
+---
+
+<Layout title="/now" description="what i'm doing right now.">
+  <main
+    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
+  >
+    <div style="animation:fadeIn 0.2s ease">
+      <a
+        href="/"
+        style="background:none;border:none;color:var(--accent);font-size:0.76rem;cursor:pointer;font-family:inherit;padding:0;margin-bottom:32px;display:inline-block;text-decoration:none"
+      >
+        ← back
+      </a>
+
+      <div style="margin-bottom:32px;margin-top:20px">
+        <h1
+          style="font-size:1.1rem;font-weight:600;margin-bottom:6px;color:var(--text)"
+        >
+          now
+        </h1>
+        <div style="font-size:0.7rem;color:var(--muted)">
+          a snapshot of what's going on — updated Apr 2026 ·{" "}
+          <a
+            href="https://nownownow.com/about"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="color:var(--accent);text-decoration:none"
+            >what is a /now page?</a
+          >
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:36px;max-width:560px">
+        {
+          items.map(({ section, entries }) => (
+            <div>
+              <div style="font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;border-bottom:1px solid var(--divider);padding-bottom:8px">
+                {section}
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                {entries.map((entry) => (
+                  <div style="display:flex;gap:12px;align-items:flex-start">
+                    <span style="color:var(--accent);font-size:0.8rem;margin-top:2px;flex-shrink:0">
+                      —
+                    </span>
+                    <p style="font-size:0.84rem;line-height:1.7;color:var(--muted)">
+                      {entry}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      <div
+        style="margin-top:48px;padding-top:24px;border-top:1px solid var(--divider);font-size:0.68rem;color:var(--muted)"
+      >
+        inspired by <a
+          href="https://nownownow.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="color:var(--accent);text-decoration:none">nownownow.com</a
+        > — the /now page movement
+      </div>
+    </div>
+  </main>
+</Layout>

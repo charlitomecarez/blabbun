@@ -1,63 +1,55 @@
 <script lang="ts">
-  interface FooterLink {
-    label: string;
-    href: string;
-  }
-
   interface Props {
-    brandName?: string;
-    copyright?: string;
-    links?: FooterLink[];
+    wordCount?: number;
   }
-
-  const {
-    brandName = "The Lunan",
-    copyright = `© ${new Date().getFullYear()} The Lunan`,
-    links = [
-      { label: "Terms", href: "/terms" },
-      { label: "Privacy", href: "/privacy" },
-      { label: "Help", href: "/help" },
-      { label: "RSS", href: "/rss.xml" },
-    ],
-  }: Props = $props();
+  const { wordCount = 0 }: Props = $props();
 </script>
 
-<!--
-  Minimal single-row footer with green tint background.
-  Brand + copyright left; utility links right.
--->
-<footer class="border-t border-[rgba(197,247,208,0.3)] bg-[#ebf3ed]">
-  <div
-    class="mx-auto flex max-w-[1200px] flex-col items-center justify-between
-           gap-4 px-4 py-5 md:flex-row md:px-8"
-  >
-    <!-- Left: brand + copyright -->
-    <div class="flex items-center gap-4">
-      <span
-        class="font-space-grotesk text-[18px] font-bold
-               tracking-[-0.03em] text-[#386547]"
-      >
-        {brandName}
-      </span>
-      <span
-        class="font-manrope text-[13px]
-               text-[rgba(41,48,45,0.5)]"
-      >
-        {copyright}
-      </span>
-    </div>
+<!-- Exact match to design Footer component -->
+<footer
+  style="
+    border-top:1px solid var(--divider);
+    padding:22px 32px;
+    max-width:680px;width:100%;margin:auto auto 0;
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:12px;
+  "
+>
+  <div>
+    <span style="font-size:0.68rem;color:var(--muted)"
+      >blab bun — writings since whenever</span
+    >
+    {#if wordCount > 0}
+      <div style="font-size:0.62rem;color:var(--muted2);margin-top:2px">
+        {wordCount.toLocaleString()} words blabbed so far
+      </div>
+    {/if}
+  </div>
 
-    <!-- Right: utility links -->
-    <nav class="flex items-center gap-6" aria-label="Footer links">
-      {#each links as link}
-        <a
-          href={link.href}
-          class="font-manrope text-[13px] text-[rgba(41,48,45,0.5)]
-                 transition-colors hover:text-[#386547]"
-        >
-          {link.label}
-        </a>
-      {/each}
-    </nav>
+  <div style="display:flex;gap:16px;align-items:center">
+    <a
+      href="/about"
+      style="background:none;border:none;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;padding:0;text-decoration:underline;text-decoration-color:var(--border)"
+    >
+      about
+    </a>
+    <a
+      href="/now"
+      style="background:none;border:none;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;padding:0;text-decoration:underline;text-decoration-color:var(--border)"
+    >
+      /now
+    </a>
+    <a
+      href="/terms"
+      style="background:none;border:none;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;padding:0;text-decoration:underline;text-decoration-color:var(--border)"
+    >
+      terms
+    </a>
+    <a
+      href="/rss.xml"
+      style="font-size:0.64rem;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:2px;padding:1px 6px;letter-spacing:0.04em"
+    >
+      RSS
+    </a>
   </div>
 </footer>

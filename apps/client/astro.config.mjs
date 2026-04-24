@@ -6,11 +6,21 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://thelunan.com",
+  site: "https://blabbun.com",
   output: "server",
   adapter: vercel(),
+  devToolbar: { enabled: false },
+  security: { checkOrigin: false },
   integrations: [svelte(), mdx()],
+  image: {
+    domains: ["images.unsplash.com"],
+    remotePatterns: [{ protocol: "https" }],
+  },
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      cssMinify: true,
+    },
   },
+  compressHTML: true,
 });

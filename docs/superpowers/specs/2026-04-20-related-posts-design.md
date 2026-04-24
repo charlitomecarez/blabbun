@@ -5,7 +5,7 @@
 
 ## Overview
 
-A "More from The Lunan" section rendered below the article footer on every blog post page. Shows 3 randomly selected posts (excluding the current one), each as a card with image, tag, title, and excerpt. Randomized at build time — static, no client-side logic.
+A "More from Blab Bun" section rendered below the article footer on every blog post page. Shows 3 randomly selected posts (excluding the current one), each as a card with image, tag, title, and excerpt. Randomized at build time — static, no client-side logic.
 
 ## Placement
 
@@ -37,7 +37,7 @@ At build time in the Astro frontmatter:
   <span
     class="font-manrope text-[11px] font-bold tracking-[0.2em] text-[rgba(41,48,45,0.5)] uppercase"
   >
-    More from The Lunan
+    More from Blab Bun
   </span>
 </div>
 ```

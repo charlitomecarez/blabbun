@@ -31,9 +31,9 @@ Replace the entire `apps/client/src/layouts/Layout.astro` with:
 
 ```astro
 ---
-import "@thelunan/ui/styles/global.css";
+import "@blabbun/ui/styles/global.css";
 
-import { Footer, Navbar } from "@thelunan/ui/components/layouts";
+import { Footer, Navbar } from "@blabbun/ui/components/layouts";
 
 import SearchDropdown from "@/components/search/SearchDropdown.svelte";
 import ScrollToTop from "@/components/layouts/ScrollToTop.svelte";
@@ -50,11 +50,11 @@ const {
   ogImage,
 } = Astro.props;
 
-const siteTitle = "The Lunan";
+const siteTitle = "Blab Bun";
 const pageTitle = rawTitle ? `${rawTitle} · ${siteTitle}` : siteTitle;
 const canonicalUrl = Astro.url.href;
 const siteUrl =
-  Astro.site?.toString().replace(/\/$/, "") ?? "https://thelunan.com";
+  Astro.site?.toString().replace(/\/$/, "") ?? "https://blabbun.com";
 
 const { pathname } = Astro.url;
 const navLinks = [
@@ -168,7 +168,7 @@ to:
 ```astro
 <Layout
   title="Archive"
-  description={`All ${allPosts.length} posts from The Lunan, sorted by date.`}
+  description={`All ${allPosts.length} posts from Blab Bun, sorted by date.`}
 />
 ```
 
@@ -185,7 +185,7 @@ to:
 ```astro
 <Layout
   title="Topics"
-  description="Browse all topics written about on The Lunan."
+  description="Browse all topics written about on Blab Bun."
 />
 ```
 
@@ -200,7 +200,7 @@ Change line 60 from:
 to:
 
 ```astro
-<Layout title={label} description={`All posts about ${label} on The Lunan.`} />
+<Layout title={label} description={`All posts about ${label} on Blab Bun.`} />
 ```
 
 - [ ] **Step 6: Update `apps/client/src/pages/about.astro` — pass about title**
@@ -227,17 +227,14 @@ In `help.astro`, change `<Layout>` to:
 ```astro
 <Layout
   title="Help"
-  description="Answers to common questions about reading, navigating, and getting the most out of The Lunan."
+  description="Answers to common questions about reading, navigating, and getting the most out of Blab Bun."
 />
 ```
 
 In `terms.astro`, change `<Layout>` to:
 
 ```astro
-<Layout
-  title="Terms of Service"
-  description="Terms of service for The Lunan."
-/>
+<Layout title="Terms of Service" description="Terms of service for Blab Bun." />
 ```
 
 In `privacy.astro`, change `<Layout>` to:
@@ -245,7 +242,7 @@ In `privacy.astro`, change `<Layout>` to:
 ```astro
 <Layout
   title="Privacy Policy"
-  description="Privacy policy for The Lunan — how data is handled and what is collected."
+  description="Privacy policy for Blab Bun — how data is handled and what is collected."
 />
 ```
 
@@ -311,13 +308,13 @@ const jsonLd = {
   datePublished: post.data.pubDate.toISOString(),
   author: {
     "@type": "Person",
-    name: "The Lunan",
-    url: `${Astro.site ?? "https://thelunan.com"}/about`,
+    name: "Blab Bun",
+    url: `${Astro.site ?? "https://blabbun.com"}/about`,
   },
   publisher: {
     "@type": "Organization",
-    name: "The Lunan",
-    url: Astro.site ?? "https://thelunan.com",
+    name: "Blab Bun",
+    url: Astro.site ?? "https://blabbun.com",
   },
   ...(post.data.image ? { image: post.data.image } : {}),
 };
@@ -360,7 +357,7 @@ import { defineConfig } from "astro/config";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://thelunan.com",
+  site: "https://blabbun.com",
   integrations: [svelte(), mdx()],
   vite: {
     plugins: [tailwindcss()],
@@ -375,7 +372,7 @@ import { getCollection } from "astro:content";
 import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async ({ site }) => {
-  const siteUrl = site?.toString().replace(/\/$/, "") ?? "https://thelunan.com";
+  const siteUrl = site?.toString().replace(/\/$/, "") ?? "https://blabbun.com";
 
   const posts = await getCollection("posts", ({ data }) => !data.draft);
 
@@ -411,7 +408,7 @@ ${allUrls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}
 User-agent: *
 Allow: /
 
-Sitemap: https://thelunan.com/sitemap.xml
+Sitemap: https://blabbun.com/sitemap.xml
 ```
 
 - [ ] **Step 4: Verify sitemap works**
@@ -721,22 +718,22 @@ import { expect, test } from "@playwright/test";
 test.describe("SEO meta tags", () => {
   test("homepage has correct title", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle("The Lunan");
+    await expect(page).toHaveTitle("Blab Bun");
   });
 
   test("archive page has correct title", async ({ page }) => {
     await page.goto("/archive");
-    await expect(page).toHaveTitle(/Archive · The Lunan/);
+    await expect(page).toHaveTitle(/Archive · Blab Bun/);
   });
 
   test("topics page has correct title", async ({ page }) => {
     await page.goto("/topics");
-    await expect(page).toHaveTitle(/Topics · The Lunan/);
+    await expect(page).toHaveTitle(/Topics · Blab Bun/);
   });
 
   test("about page has correct title", async ({ page }) => {
     await page.goto("/about");
-    await expect(page).toHaveTitle(/About · The Lunan/);
+    await expect(page).toHaveTitle(/About · Blab Bun/);
   });
 
   test("every page has a meta description", async ({ page }) => {
