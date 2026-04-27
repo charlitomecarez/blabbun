@@ -9,15 +9,15 @@
   const { hasMore, onLoadMore }: Props = $props();
 
   let sentinel = $state<HTMLElement | null>(null);
+  let intersecting = $state(false);
+
+  $effect(() => {
+    if (intersecting) onLoadMore();
+  });
 </script>
 
 {#if hasMore}
-  <IntersectionObserver
-    element={sentinel}
-    onobserve={(e) => {
-      if (e.detail.isIntersecting) onLoadMore();
-    }}
-  >
+  <IntersectionObserver element={sentinel} bind:intersecting>
     <div bind:this={sentinel} class="sentinel" aria-hidden="true"></div>
   </IntersectionObserver>
   <div class="loading" aria-label="Loading more posts">· · ·</div>
