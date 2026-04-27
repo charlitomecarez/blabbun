@@ -64,3 +64,11 @@ test("sort back to newest-first works", async ({ page }) => {
     "Traffic in the PH"
   );
 });
+
+test("archive shows end marker when all posts fit in initial view", async ({
+  page,
+}) => {
+  await page.goto("/archive");
+  // With 5 posts < 10 initial items, end marker is immediately visible
+  await expect(page.getByLabel("End of list")).toBeVisible();
+});
