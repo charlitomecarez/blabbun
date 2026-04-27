@@ -60,7 +60,7 @@ export const POST: APIRoute = async ({ request }) => {
           from: "onboarding@resend.dev",
           to: email,
           subject: "you're in.",
-          html: welcomeEmailHtml(),
+          html: welcomeEmailHtml(email),
         })
         .catch(console.error);
 

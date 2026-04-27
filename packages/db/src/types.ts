@@ -87,6 +87,21 @@ export type Database = {
         };
         Relationships: [];
       };
+      post_notifications: {
+        Row: {
+          notified_at: string;
+          post_slug: string;
+        };
+        Insert: {
+          notified_at?: string;
+          post_slug: string;
+        };
+        Update: {
+          notified_at?: string;
+          post_slug?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
@@ -99,3 +114,5 @@ export type CommentRow = Database["public"]["Tables"]["comments"]["Row"];
 export type PostClapRow = Database["public"]["Tables"]["post_claps"]["Row"];
 export type ClapVoteRow = Database["public"]["Tables"]["clap_votes"]["Row"];
 export type SubscriberRow = Database["public"]["Tables"]["subscribers"]["Row"];
+export type PostNotificationRow =
+  Database["public"]["Tables"]["post_notifications"]["Row"];

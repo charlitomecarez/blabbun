@@ -1,5 +1,7 @@
 import { Resend } from "resend";
 
+import { unsubscribeUrl } from "@/lib/unsubscribe";
+
 export function getResendClient(): Resend {
   return new Resend(import.meta.env.RESEND_API_KEY);
 }
@@ -12,7 +14,8 @@ function esc(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
-export function welcomeEmailHtml(): string {
+export function welcomeEmailHtml(email: string): string {
+  const unsubUrl = esc(unsubscribeUrl(email));
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,7 +50,7 @@ export function welcomeEmailHtml(): string {
             <td style="padding-top:24px;border-top:1px solid #e0d4c0">
               <p style="font-size:0.7rem;color:#c5b8a8;margin:0;line-height:1.7">
                 you subscribed at <a href="https://blabbun.com" style="color:#c4832a;text-decoration:none">blabbun.com</a>.
-                didn't mean to? just ignore this — you won't hear from us again unless a new post drops.
+                changed your mind? <a href="${unsubUrl}" style="color:#c4832a;text-decoration:none">unsubscribe</a>.
               </p>
             </td>
           </tr>
@@ -59,13 +62,12 @@ export function welcomeEmailHtml(): string {
 </html>`;
 }
 
-export function newPostEmailHtml(post: {
-  title: string;
-  slug: string;
-  description: string;
-  date: string;
-}): string {
+export function newPostEmailHtml(
+  post: { title: string; slug: string; description: string; date: string },
+  email: string
+): string {
   const url = `https://blabbun.com/${esc(post.slug)}`;
+  const unsubUrl = esc(unsubscribeUrl(email));
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -99,7 +101,7 @@ export function newPostEmailHtml(post: {
             <td style="padding-top:24px;border-top:1px solid #e0d4c0">
               <p style="font-size:0.7rem;color:#c5b8a8;margin:0;line-height:1.7">
                 you're on the <a href="https://blabbun.com" style="color:#c4832a;text-decoration:none">blab bun</a> mailing list.
-                didn't mean to subscribe? just ignore this.
+                done reading? <a href="${unsubUrl}" style="color:#c4832a;text-decoration:none">unsubscribe</a>.
               </p>
             </td>
           </tr>
