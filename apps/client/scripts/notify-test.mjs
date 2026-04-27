@@ -63,6 +63,7 @@ function parseFrontmatter(content) {
     description: get("description"),
     pubDate: get("pubDate"),
     draft: get("draft") === "true",
+    image: get("image"),
   };
 }
 
@@ -182,17 +183,23 @@ console.log(
 );
 console.log(`notified    : ${notifiedSlugs.size} posts already sent`);
 
-// 2. Find new posts
+// 2. Find the single most-recent unnotified post
 const today = new Date();
 const allPosts = readPosts();
-const newPosts = allPosts.filter(
-  (p) => new Date(p.pubDate) <= today && (FORCE || !notifiedSlugs.has(p.slug))
-);
+const post = allPosts
+  .filter(
+    (p) => new Date(p.pubDate) <= today && (FORCE || !notifiedSlugs.has(p.slug))
+  )
+  .sort(
+    (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+  )[0];
 
 console.log(`posts found : ${allPosts.length} published`);
-console.log(`to notify   : ${newPosts.length} new\n`);
+console.log(
+  `to notify   : ${post ? `"${post.title}"` : "none (all already sent)"}\n`
+);
 
-if (newPosts.length === 0) {
+if (!post) {
   console.log("nothing to send. publish a new post or use --force to re-send.");
   process.exit(0);
 }
@@ -203,7 +210,7 @@ if (subscribers.length === 0) {
 }
 
 // 3. Preview / send
-for (const post of newPosts) {
+{
   const date = new Date(post.pubDate).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -211,47 +218,47 @@ for (const post of newPosts) {
   });
 
   console.log(`── ${post.title}`);
-  console.log(`   slug: ${post.slug}`);
-  console.log(`   date: ${date}`);
-  console.log(`   to  : ${subscribers.length} subscriber(s)`);
+  console.log(`   slug : ${post.slug}`);
+  console.log(`   date : ${date}`);
+  console.log(`   image: ${post.image ?? "(none)"}`);
+  console.log(`   to   : ${subscribers.length} subscriber(s)`);
 
   if (DRY_RUN) {
     console.log("   (dry-run — skipping send)\n");
-    continue;
-  }
+  } else {
+    const messages = subscribers.map((sub) => ({
+      from: "onboarding@resend.dev",
+      to: sub.email,
+      subject: post.title,
+      html: newPostEmailHtml({ ...post, date }, sub.email),
+    }));
 
-  const messages = subscribers.map((sub) => ({
-    from: "onboarding@resend.dev",
-    to: sub.email,
-    subject: post.title,
-    html: newPostEmailHtml({ ...post, date }, sub.email),
-  }));
-
-  // Resend batch limit: 100 per call
-  for (let i = 0; i < messages.length; i += 100) {
-    const { error } = await resend.batch.send(messages.slice(i, i + 100));
-    if (error) {
-      console.error(`   resend error: ${error.message}`);
-      process.exit(1);
+    // Resend batch limit: 100 per call
+    for (let i = 0; i < messages.length; i += 100) {
+      const { error } = await resend.batch.send(messages.slice(i, i + 100));
+      if (error) {
+        console.error(`   resend error: ${error.message}`);
+        process.exit(1);
+      }
     }
-  }
 
-  if (!FORCE) {
-    const { error } = await supabase
-      .from("post_notifications")
-      .insert({ post_slug: post.slug });
-    if (error) {
-      console.error(`   db error: ${error.message}`);
-      process.exit(1);
+    if (!FORCE) {
+      const { error } = await supabase
+        .from("post_notifications")
+        .insert({ post_slug: post.slug });
+      if (error) {
+        console.error(`   db error: ${error.message}`);
+        process.exit(1);
+      }
     }
-  }
 
-  console.log(`   ✓ sent\n`);
+    console.log(`   ✓ sent\n`);
+  }
 }
 
 if (!DRY_RUN) {
   console.log(
-    `done. ${newPosts.length} post(s) notified to ${subscribers.length} subscriber(s).`
+    `done. notified ${subscribers.length} subscriber(s) about "${post.title}".`
   );
 } else {
   console.log(`dry-run complete. run with --send to actually send.`);

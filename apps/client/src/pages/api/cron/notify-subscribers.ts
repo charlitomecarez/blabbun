@@ -26,58 +26,59 @@ export const GET: APIRoute = async ({ request }) => {
   );
   const subscribers = subscribersResult.data ?? [];
 
-  const newPosts = allPosts.filter(
-    (p) =>
-      !p.data.draft &&
-      new Date(p.data.pubDate) <= today &&
-      !notifiedSlugs.has(p.id)
-  );
+  // Pick only the single most-recently published unnotified post
+  const post = allPosts
+    .filter(
+      (p) =>
+        !p.data.draft &&
+        new Date(p.data.pubDate) <= today &&
+        !notifiedSlugs.has(p.id)
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+    )[0];
 
-  if (newPosts.length === 0 || subscribers.length === 0) {
-    return jsonResponse({ notified: 0, posts: [] });
+  if (!post || subscribers.length === 0) {
+    return jsonResponse({ notified: 0, post: null });
   }
 
   const resend = getResendClient();
-  const notifiedTitles: string[] = [];
+  const date = new Date(post.data.pubDate).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
-  for (const post of newPosts) {
-    const date = new Date(post.data.pubDate).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+  // Each subscriber gets a personalized email with their own unsubscribe link
+  const messages = subscribers.map((sub) => ({
+    from: "onboarding@resend.dev",
+    to: sub.email,
+    subject: post.data.title,
+    html: newPostEmailHtml(
+      {
+        title: post.data.title,
+        slug: post.id,
+        description: post.data.description,
+        date,
+        image: post.data.image,
+      },
+      sub.email
+    ),
+  }));
 
-    // Each subscriber gets a personalized email with their own unsubscribe link
-    const messages = subscribers.map((sub) => ({
-      from: "onboarding@resend.dev",
-      to: sub.email,
-      subject: post.data.title,
-      html: newPostEmailHtml(
-        {
-          title: post.data.title,
-          slug: post.id,
-          description: post.data.description,
-          date,
-        },
-        sub.email
-      ),
-    }));
-
-    for (let i = 0; i < messages.length; i += 100) {
-      await resend.batch.send(messages.slice(i, i + 100));
-    }
-
-    await supabase
-      .from("post_notifications")
-      .insert({ post_slug: post.id })
-      .throwOnError();
-
-    notifiedTitles.push(post.data.title);
+  for (let i = 0; i < messages.length; i += 100) {
+    await resend.batch.send(messages.slice(i, i + 100));
   }
 
+  await supabase
+    .from("post_notifications")
+    .insert({ post_slug: post.id })
+    .throwOnError();
+
   return jsonResponse({
-    notified: notifiedTitles.length,
-    posts: notifiedTitles,
+    notified: 1,
+    post: post.data.title,
     subscribers: subscribers.length,
   });
 };

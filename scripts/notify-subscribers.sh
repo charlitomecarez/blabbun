@@ -19,15 +19,14 @@ if [[ -z "${CRON_SECRET:-}" ]]; then
   exit 1
 fi
 
-echo "→ POST $ENDPOINT"
+echo "→ GET $ENDPOINT"
 echo ""
 
-RESPONSE=$(curl -s -w "\n%{http_code}" \
+BODY=$(curl -s -o /tmp/_notify_body -w "%{http_code}" \
   -X GET "$ENDPOINT" \
   -H "Authorization: Bearer $CRON_SECRET")
-
-HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
-BODY=$(echo "$RESPONSE" | head -n-1)
+HTTP_STATUS="$BODY"
+BODY=$(cat /tmp/_notify_body)
 
 echo "$BODY" | python3 -m json.tool 2>/dev/null || echo "$BODY"
 echo ""
