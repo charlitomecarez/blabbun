@@ -56,8 +56,61 @@ const { data: comments } = await supabase
     </form>
   </div>
 
-  <div style="font-size:0.72rem;color:var(--muted);margin-bottom:12px">
-    {comments?.length ?? 0} total
+  <!-- Bulk action bar -->
+  <div
+    id="bulk-bar"
+    style="display:none;align-items:center;gap:12px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:8px"
+  >
+    <span id="selection-count" style="font-size:0.75rem;color:var(--muted)"
+      >0 selected</span
+    >
+    <button
+      id="delete-selected"
+      style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid #e05c5c;border-radius:3px;color:#e05c5c;cursor:pointer"
+      onmouseenter="this.style.background='rgba(224,92,92,0.08)'"
+      onmouseleave="this.style.background='none'">delete selected</button
+    >
+  </div>
+
+  <div
+    style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"
+  >
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="total-count" style="font-size:0.72rem;color:var(--muted)"
+        >{comments?.length ?? 0} total</span
+      >
+      {
+        !!comments?.length && (
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--muted);cursor:pointer;user-select:none">
+            <input
+              type="checkbox"
+              id="check-all"
+              style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"
+            />
+            select all
+          </label>
+        )
+      }
+    </div>
+    <div id="pagination" style="display:flex;align-items:center;gap:6px">
+      <button
+        id="prev-btn"
+        style="padding:3px 9px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;line-height:1"
+        onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+        onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+        >←</button
+      >
+      <span id="page-info" style="font-size:0.72rem;color:var(--muted)"
+        >page 1 of 1</span
+      >
+      <button
+        id="next-btn"
+        style="padding:3px 9px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;line-height:1"
+        onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+        onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+        >→</button
+      >
+    </div>
   </div>
 
   {
@@ -75,87 +128,99 @@ const { data: comments } = await supabase
             data-id={c.id}
             style="padding:14px 16px;border-bottom:1px solid var(--divider);background:var(--bg)"
           >
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <input
+                type="checkbox"
+                class="row-check"
+                data-id={c.id}
+                style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent);margin-top:2px;flex-shrink:0"
+              />
               <div style="min-width:0;flex:1">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
-                  <span style="font-size:0.7rem;font-weight:500;color:var(--accent)">
-                    {c.anon_name ?? "anonymous"}
-                  </span>
-                  <span style="font-size:0.65rem;color:var(--muted2)">on</span>
-                  <a
-                    href={`https://blabbun.com/${c.post_slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style="font-size:0.7rem;color:var(--muted);text-decoration:none"
-                    onmouseenter="this.style.color='var(--accent)'"
-                    onmouseleave="this.style.color='var(--muted)'"
-                  >
-                    /{c.post_slug}
-                  </a>
-                  {c.parent_id && (
-                    <span style="font-size:0.65rem;color:var(--muted2)">
-                      ↳ reply
-                    </span>
-                  )}
-                  <span style="font-size:0.65rem;color:var(--muted2)">
-                    {new Date(c.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </span>
-                </div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+                  <div style="min-width:0;flex:1">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+                      <span style="font-size:0.7rem;font-weight:500;color:var(--accent)">
+                        {c.anon_name ?? "anonymous"}
+                      </span>
+                      <span style="font-size:0.65rem;color:var(--muted2)">
+                        on
+                      </span>
+                      <a
+                        href={`https://blabbun.com/${c.post_slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style="font-size:0.7rem;color:var(--muted);text-decoration:none"
+                        onmouseenter="this.style.color='var(--accent)'"
+                        onmouseleave="this.style.color='var(--muted)'"
+                      >
+                        /{c.post_slug}
+                      </a>
+                      {c.parent_id && (
+                        <span style="font-size:0.65rem;color:var(--muted2)">
+                          ↳ reply
+                        </span>
+                      )}
+                      <span style="font-size:0.65rem;color:var(--muted2)">
+                        {new Date(c.created_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
 
-                <p
-                  class="body-text"
-                  style="font-size:0.8rem;color:var(--muted);line-height:1.6;text-wrap:pretty"
-                >
-                  {c.body}
-                </p>
-
-                <div class="edit-mode" style="display:none">
-                  <textarea
-                    class="edit-input"
-                    rows="2"
-                    style="width:100%;padding:6px 8px;font-size:0.78rem;font-family:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;resize:vertical"
-                  >
-                    {c.body}
-                  </textarea>
-                  <div style="display:flex;gap:6px;margin-top:6px">
-                    <button
-                      class="save-btn"
-                      onclick={`saveComment('${c.id}',this)`}
-                      style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer"
+                    <p
+                      class="body-text"
+                      style="font-size:0.8rem;color:var(--muted);line-height:1.6;text-wrap:pretty"
                     >
-                      save
+                      {c.body}
+                    </p>
+
+                    <div class="edit-mode" style="display:none">
+                      <textarea
+                        class="edit-input"
+                        rows="2"
+                        style="width:100%;padding:6px 8px;font-size:0.78rem;font-family:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;resize:vertical"
+                      >
+                        {c.body}
+                      </textarea>
+                      <div style="display:flex;gap:6px;margin-top:6px">
+                        <button
+                          class="save-btn"
+                          onclick={`saveComment('${c.id}',this)`}
+                          style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer"
+                        >
+                          save
+                        </button>
+                        <button
+                          class="cancel-btn"
+                          onclick={`cancelEdit('${c.id}')`}
+                          style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer"
+                        >
+                          cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-shrink:0">
+                    <button
+                      onclick={`startEdit('${c.id}')`}
+                      style="background:none;border:1px solid var(--border);border-radius:3px;padding:4px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;transition:border-color 0.1s,color 0.1s"
+                      onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+                      onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                    >
+                      edit
                     </button>
                     <button
-                      class="cancel-btn"
-                      onclick={`cancelEdit('${c.id}')`}
-                      style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer"
+                      onclick={`deleteComment('${c.id}')`}
+                      style="background:none;border:1px solid var(--border);border-radius:3px;padding:4px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;transition:border-color 0.1s,color 0.1s"
+                      onmouseenter="this.style.borderColor='#e05c5c';this.style.color='#e05c5c'"
+                      onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
                     >
-                      cancel
+                      delete
                     </button>
                   </div>
                 </div>
-              </div>
-              <div style="display:flex;gap:6px;flex-shrink:0">
-                <button
-                  onclick={`startEdit('${c.id}')`}
-                  style="background:none;border:1px solid var(--border);border-radius:3px;padding:4px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;transition:border-color 0.1s,color 0.1s"
-                  onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-                  onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
-                >
-                  edit
-                </button>
-                <button
-                  onclick={`deleteComment('${c.id}')`}
-                  style="background:none;border:1px solid var(--border);border-radius:3px;padding:4px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;transition:border-color 0.1s,color 0.1s"
-                  onmouseenter="this.style.borderColor='#e05c5c';this.style.color='#e05c5c'"
-                  onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
-                >
-                  delete
-                </button>
               </div>
             </div>
           </div>
@@ -166,6 +231,134 @@ const { data: comments } = await supabase
 </Layout>
 
 <script>
+  const PAGE_SIZE = 20;
+  let currentPage = 1;
+
+  function allRows(): HTMLElement[] {
+    return Array.from(
+      document.querySelectorAll<HTMLElement>("#comment-list [data-id]")
+    );
+  }
+
+  function pageRows(): HTMLElement[] {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return allRows().slice(start, start + PAGE_SIZE);
+  }
+
+  function totalPages(): number {
+    return Math.max(1, Math.ceil(allRows().length / PAGE_SIZE));
+  }
+
+  function updatePage() {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    allRows().forEach((row, i) => {
+      row.style.display = i >= start && i < end ? "" : "none";
+      if (i < start || i >= end) {
+        const cb = row.querySelector<HTMLInputElement>(".row-check");
+        if (cb) cb.checked = false;
+      }
+    });
+    updatePaginationUI();
+    updateSelectionUI();
+  }
+
+  function updatePaginationUI() {
+    const tp = totalPages();
+    const pageInfo = document.getElementById("page-info");
+    const prevBtn = document.getElementById(
+      "prev-btn"
+    ) as HTMLButtonElement | null;
+    const nextBtn = document.getElementById(
+      "next-btn"
+    ) as HTMLButtonElement | null;
+    if (pageInfo) pageInfo.textContent = `page ${currentPage} of ${tp}`;
+    if (prevBtn) {
+      prevBtn.disabled = currentPage <= 1;
+      prevBtn.style.opacity = currentPage <= 1 ? "0.4" : "1";
+    }
+    if (nextBtn) {
+      nextBtn.disabled = currentPage >= tp;
+      nextBtn.style.opacity = currentPage >= tp ? "0.4" : "1";
+    }
+    const pag = document.getElementById("pagination");
+    if (pag) pag.style.display = tp <= 1 ? "none" : "flex";
+  }
+
+  function getCheckedIds(): string[] {
+    return Array.from(
+      document.querySelectorAll<HTMLInputElement>(".row-check:checked")
+    ).map((cb) => cb.dataset.id!);
+  }
+
+  function updateSelectionUI() {
+    const ids = getCheckedIds();
+    const bar = document.getElementById("bulk-bar");
+    const countEl = document.getElementById("selection-count");
+    if (bar) bar.style.display = ids.length > 0 ? "flex" : "none";
+    if (countEl) countEl.textContent = `${ids.length} selected`;
+
+    const pageChecks = pageRows().map((r) =>
+      r.querySelector<HTMLInputElement>(".row-check")
+    );
+    const checkedCount = pageChecks.filter((cb) => cb?.checked).length;
+    const all = pageChecks.length;
+    const headerCb = document.getElementById(
+      "check-all"
+    ) as HTMLInputElement | null;
+    if (headerCb) {
+      headerCb.checked = all > 0 && checkedCount === all;
+      headerCb.indeterminate = checkedCount > 0 && checkedCount < all;
+    }
+  }
+
+  document.getElementById("prev-btn")?.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      updatePage();
+    }
+  });
+  document.getElementById("next-btn")?.addEventListener("click", () => {
+    if (currentPage < totalPages()) {
+      currentPage++;
+      updatePage();
+    }
+  });
+
+  document.getElementById("check-all")?.addEventListener("change", (e) => {
+    const checked = (e.target as HTMLInputElement).checked;
+    pageRows().forEach((row) => {
+      const cb = row.querySelector<HTMLInputElement>(".row-check");
+      if (cb) cb.checked = checked;
+    });
+    updateSelectionUI();
+  });
+
+  document.getElementById("comment-list")?.addEventListener("change", (e) => {
+    if ((e.target as HTMLElement).classList.contains("row-check")) {
+      updateSelectionUI();
+    }
+  });
+
+  document
+    .getElementById("delete-selected")
+    ?.addEventListener("click", async () => {
+      const ids = getCheckedIds();
+      if (!ids.length) return;
+      if (!confirm(`delete ${ids.length} comment${ids.length > 1 ? "s" : ""}?`))
+        return;
+      await Promise.all(
+        ids.map((id) => fetch(`/api/comments/${id}`, { method: "DELETE" }))
+      );
+      ids.forEach((id) =>
+        document.querySelector(`[data-id="${id}"]`)?.remove()
+      );
+      const total = document.getElementById("total-count");
+      if (total) total.textContent = `${allRows().length} total`;
+      if (currentPage > totalPages()) currentPage = totalPages();
+      updatePage();
+    });
+
   function getRow(id: string) {
     return document.querySelector(`[data-id="${id}"]`);
   }
@@ -215,8 +408,13 @@ const { data: comments } = await supabase
   async function deleteComment(id: string) {
     if (!confirm("delete this comment?")) return;
     const res = await fetch(`/api/comments/${id}`, { method: "DELETE" });
-    if (res.ok) getRow(id)?.remove();
-    else alert("failed to delete");
+    if (res.ok) {
+      getRow(id)?.remove();
+      const total = document.getElementById("total-count");
+      if (total) total.textContent = `${allRows().length} total`;
+      if (currentPage > totalPages()) currentPage = totalPages();
+      updatePage();
+    } else alert("failed to delete");
   }
 
   document
@@ -240,4 +438,6 @@ const { data: comments } = await supabase
     });
 
   Object.assign(window, { startEdit, cancelEdit, saveComment, deleteComment });
+
+  updatePage();
 </script>

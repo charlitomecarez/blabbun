@@ -18,7 +18,6 @@ const { data: subscribers } = await supabase
 <Layout title="subscribers">
   <!-- Notify subscribers -->
   <div
-    id="notify-section"
     style="border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:16px;background:var(--bg2)"
   >
     <div
@@ -89,8 +88,47 @@ const { data: subscribers } = await supabase
     </form>
   </div>
 
-  <div style="font-size:0.72rem;color:var(--muted);margin-bottom:12px">
-    {subscribers?.length ?? 0} total
+  <!-- Bulk action bar -->
+  <div
+    id="bulk-bar"
+    style="display:none;align-items:center;gap:12px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:8px"
+  >
+    <span id="selection-count" style="font-size:0.75rem;color:var(--muted)"
+      >0 selected</span
+    >
+    <button
+      id="delete-selected"
+      style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid #e05c5c;border-radius:3px;color:#e05c5c;cursor:pointer"
+      onmouseenter="this.style.background='rgba(224,92,92,0.08)'"
+      onmouseleave="this.style.background='none'">delete selected</button
+    >
+  </div>
+
+  <div
+    style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"
+  >
+    <span id="total-count" style="font-size:0.72rem;color:var(--muted)"
+      >{subscribers?.length ?? 0} total</span
+    >
+    <div id="pagination" style="display:flex;align-items:center;gap:6px">
+      <button
+        id="prev-btn"
+        style="padding:3px 9px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;line-height:1"
+        onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+        onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+        >←</button
+      >
+      <span id="page-info" style="font-size:0.72rem;color:var(--muted)"
+        >page 1 of 1</span
+      >
+      <button
+        id="next-btn"
+        style="padding:3px 9px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;line-height:1"
+        onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+        onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+        >→</button
+      >
+    </div>
   </div>
 
   {
@@ -103,6 +141,13 @@ const { data: subscribers } = await supabase
         <table style="width:100%;border-collapse:collapse">
           <thead>
             <tr style="background:var(--bg2)">
+              <th style="padding:10px 12px;width:36px;text-align:center">
+                <input
+                  type="checkbox"
+                  id="check-all"
+                  style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent)"
+                />
+              </th>
               <th style="text-align:left;padding:10px 16px;font-size:0.68rem;font-weight:500;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase">
                 email
               </th>
@@ -118,6 +163,14 @@ const { data: subscribers } = await supabase
                 data-id={s.id}
                 style="border-top:1px solid var(--divider);background:var(--bg)"
               >
+                <td style="padding:12px;text-align:center">
+                  <input
+                    type="checkbox"
+                    class="row-check"
+                    data-id={s.id}
+                    style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent)"
+                  />
+                </td>
                 <td style="padding:12px 16px;font-size:0.8rem;color:var(--text)">
                   <span class="email-text">{s.email}</span>
                   <div class="edit-mode" style="display:none">
@@ -181,6 +234,147 @@ const { data: subscribers } = await supabase
 </Layout>
 
 <script>
+  const PAGE_SIZE = 20;
+  let currentPage = 1;
+
+  function allRows(): HTMLElement[] {
+    return Array.from(
+      document.querySelectorAll<HTMLElement>("tbody tr[data-id]")
+    );
+  }
+
+  function pageRows(): HTMLElement[] {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return allRows().slice(start, start + PAGE_SIZE);
+  }
+
+  function totalPages(): number {
+    return Math.max(1, Math.ceil(allRows().length / PAGE_SIZE));
+  }
+
+  function updatePage() {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    allRows().forEach((row, i) => {
+      row.style.display = i >= start && i < end ? "" : "none";
+      if (i < start || i >= end) {
+        const cb = row.querySelector<HTMLInputElement>(".row-check");
+        if (cb) cb.checked = false;
+      }
+    });
+    updatePaginationUI();
+    updateSelectionUI();
+  }
+
+  function updatePaginationUI() {
+    const tp = totalPages();
+    const pageInfo = document.getElementById("page-info");
+    const prevBtn = document.getElementById(
+      "prev-btn"
+    ) as HTMLButtonElement | null;
+    const nextBtn = document.getElementById(
+      "next-btn"
+    ) as HTMLButtonElement | null;
+    if (pageInfo) pageInfo.textContent = `page ${currentPage} of ${tp}`;
+    if (prevBtn) {
+      prevBtn.disabled = currentPage <= 1;
+      prevBtn.style.opacity = currentPage <= 1 ? "0.4" : "1";
+    }
+    if (nextBtn) {
+      nextBtn.disabled = currentPage >= tp;
+      nextBtn.style.opacity = currentPage >= tp ? "0.4" : "1";
+    }
+    const pag = document.getElementById("pagination");
+    if (pag) pag.style.display = tp <= 1 ? "none" : "flex";
+  }
+
+  function getCheckedIds(): string[] {
+    return Array.from(
+      document.querySelectorAll<HTMLInputElement>(".row-check:checked")
+    ).map((cb) => cb.dataset.id!);
+  }
+
+  function updateSelectionUI() {
+    const ids = getCheckedIds();
+    const bar = document.getElementById("bulk-bar");
+    const countEl = document.getElementById("selection-count");
+    if (bar) bar.style.display = ids.length > 0 ? "flex" : "none";
+    if (countEl) countEl.textContent = `${ids.length} selected`;
+
+    const pageChecks = pageRows().map((r) =>
+      r.querySelector<HTMLInputElement>(".row-check")
+    );
+    const checkedCount = pageChecks.filter((cb) => cb?.checked).length;
+    const all = pageChecks.length;
+    const headerCb = document.getElementById(
+      "check-all"
+    ) as HTMLInputElement | null;
+    if (headerCb) {
+      headerCb.checked = all > 0 && checkedCount === all;
+      headerCb.indeterminate = checkedCount > 0 && checkedCount < all;
+    }
+  }
+
+  // Pagination
+  document.getElementById("prev-btn")?.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      updatePage();
+    }
+  });
+  document.getElementById("next-btn")?.addEventListener("click", () => {
+    if (currentPage < totalPages()) {
+      currentPage++;
+      updatePage();
+    }
+  });
+
+  // Select all (current page)
+  document.getElementById("check-all")?.addEventListener("change", (e) => {
+    const checked = (e.target as HTMLInputElement).checked;
+    pageRows().forEach((row) => {
+      const cb = row.querySelector<HTMLInputElement>(".row-check");
+      if (cb) cb.checked = checked;
+    });
+    updateSelectionUI();
+  });
+
+  // Row checkboxes
+  document.querySelector("tbody")?.addEventListener("change", (e) => {
+    if ((e.target as HTMLElement).classList.contains("row-check")) {
+      updateSelectionUI();
+    }
+  });
+
+  // Bulk delete
+  document
+    .getElementById("delete-selected")
+    ?.addEventListener("click", async () => {
+      const ids = getCheckedIds();
+      if (!ids.length) return;
+      if (
+        !confirm(`delete ${ids.length} subscriber${ids.length > 1 ? "s" : ""}?`)
+      )
+        return;
+
+      await Promise.all(
+        ids.map((id) => fetch(`/api/subscribers/${id}`, { method: "DELETE" }))
+      );
+      ids.forEach((id) => {
+        document.querySelector(`[data-id="${id}"]`)?.remove();
+      });
+
+      const total = document.getElementById("total-count");
+      if (total) {
+        const n = allRows().length;
+        total.textContent = `${n} total`;
+      }
+
+      if (currentPage > totalPages()) currentPage = totalPages();
+      updatePage();
+    });
+
+  // Existing single-row functions
   function getRow(id: string) {
     return document.querySelector(`[data-id="${id}"]`);
   }
@@ -225,8 +419,13 @@ const { data: subscribers } = await supabase
   async function deleteSubscriber(id: string) {
     if (!confirm("delete this subscriber?")) return;
     const res = await fetch(`/api/subscribers/${id}`, { method: "DELETE" });
-    if (res.ok) getRow(id)?.remove();
-    else alert("failed to delete");
+    if (res.ok) {
+      getRow(id)?.remove();
+      const total = document.getElementById("total-count");
+      if (total) total.textContent = `${allRows().length} total`;
+      if (currentPage > totalPages()) currentPage = totalPages();
+      updatePage();
+    } else alert("failed to delete");
   }
 
   document
@@ -249,13 +448,6 @@ const { data: subscribers } = await supabase
       }
     });
 
-  Object.assign(window, {
-    startEdit,
-    cancelEdit,
-    saveSubscriber,
-    deleteSubscriber,
-  });
-
   document
     .getElementById("notify-form")
     ?.addEventListener("submit", async (e) => {
@@ -266,18 +458,15 @@ const { data: subscribers } = await supabase
       const { title, slug, description } = Object.fromEntries(
         new FormData(form)
       );
-
       btn.disabled = true;
       btn.textContent = "sending…";
       result.style.display = "none";
-
       const res = await fetch("/api/notify-subscribers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, slug, description }),
       });
       const j = await res.json();
-
       result.style.display = "block";
       if (res.ok) {
         result.style.color = "var(--muted)";
@@ -290,8 +479,17 @@ const { data: subscribers } = await supabase
         result.style.color = "var(--accent)";
         result.textContent = `! ${j.error ?? "failed to send"}`;
       }
-
       btn.disabled = false;
       btn.textContent = "send to all subscribers";
     });
+
+  Object.assign(window, {
+    startEdit,
+    cancelEdit,
+    saveSubscriber,
+    deleteSubscriber,
+  });
+
+  // Init
+  updatePage();
 </script>
