@@ -54,7 +54,7 @@ const allTags = [
       </div>
     </div>
 
-    <HomeFeed {feedItems} {allTags} client:load />
+    <HomeFeed feedItems={feedItems} allTags={allTags} client:load />
 
     <!-- Newsletter (inline, matching design) -->
     <NewsletterBar client:visible />
