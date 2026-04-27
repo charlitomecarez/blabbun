@@ -2,11 +2,16 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
 import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import Layout from "../layouts/Layout.astro";
 
-const POSTS_DIR = join(process.cwd(), "apps/client/src/content/posts");
+// posts.astro is at apps/admin/src/pages/ — 3 levels up reaches apps/
+const POSTS_DIR = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "../../../client/src/content/posts"
+);
 
 interface PostMeta {
   slug: string;
@@ -293,7 +298,6 @@ const today = new Date().toISOString().split("T")[0];
         </div>
 
         <div>
-          // eslint-disable-next-line jsx-a11y/label-has-associated-control
           <label
             for="f-content"
             style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"

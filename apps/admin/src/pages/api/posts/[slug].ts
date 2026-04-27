@@ -1,9 +1,14 @@
 import { existsSync, readFileSync, unlinkSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import type { APIRoute } from "astro";
 
-const POSTS_DIR = join(process.cwd(), "apps/client/src/content/posts");
+// [slug].ts is at apps/admin/src/pages/api/posts/ — 5 levels up reaches apps/
+const POSTS_DIR = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "../../../../../client/src/content/posts"
+);
 
 function filePath(slug: string) {
   return join(POSTS_DIR, `${slug}.mdx`);
