@@ -1,4 +1,3 @@
-import type { CommentRow } from "@blabbun/db";
 import type { APIRoute } from "astro";
 
 import { getSupabaseClient, jsonResponse } from "@/lib/api";
@@ -47,7 +46,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     return jsonResponse({ error: "Comment body is required" }, 400);
   }
 
-  const insert: Partial<CommentRow> = {
+  const insert = {
     post_slug: slug!,
     body: body.body.trim(),
     parent_id: body.parent_id ?? null,

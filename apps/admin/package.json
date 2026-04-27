@@ -8,8 +8,9 @@
     "build": "astro build",
     "preview": "astro preview --port 4322",
     "astro": "astro",
-    "lint": "eslint .",
+    "lint": "astro check && eslint .",
     "lint:fix": "eslint . --fix",
+    "typecheck": "astro check",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "cd:root": "cd ../.. && $SHELL",
@@ -31,6 +32,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.8",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^25.6.0",
