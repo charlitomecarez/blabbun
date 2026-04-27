@@ -1,66 +1,101 @@
-export interface CommentRow {
-  id: string;
-  post_slug: string;
-  body: string;
-  created_at: string;
-  parent_id: string | null;
-  anon_name: string | null;
-}
-
-export interface PostClapRow {
-  post_slug: string;
-  count: number;
-}
-
-export interface ClapVoteRow {
-  post_slug: string;
-  ip_hash: string;
-  created_at: string;
-}
-
-export interface SubscriberRow {
-  id: string;
-  email: string;
-  subscribed_at: string;
-}
-
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       comments: {
-        Row: CommentRow;
-        Insert: Omit<CommentRow, "id" | "created_at"> & {
-          id?: string;
-          created_at?: string;
+        Row: {
+          anon_name: string | null;
+          body: string;
+          created_at: string;
+          id: string;
+          parent_id: string | null;
+          post_slug: string;
         };
-        Update: Partial<CommentRow>;
+        Insert: {
+          anon_name?: string | null;
+          body: string;
+          created_at?: string;
+          id?: string;
+          parent_id?: string | null;
+          post_slug: string;
+        };
+        Update: {
+          anon_name?: string | null;
+          body?: string;
+          created_at?: string;
+          id?: string;
+          parent_id?: string | null;
+          post_slug?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "comments_parent_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: false;
+            referencedRelation: "comments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      clap_votes: {
+        Row: {
+          created_at: string;
+          ip_hash: string;
+          post_slug: string;
+        };
+        Insert: {
+          created_at?: string;
+          ip_hash: string;
+          post_slug: string;
+        };
+        Update: {
+          created_at?: string;
+          ip_hash?: string;
+          post_slug?: string;
+        };
         Relationships: [];
       };
       post_claps: {
-        Row: PostClapRow;
-        Insert: { post_slug: string; count?: number };
-        Update: { count?: number };
-        Relationships: [];
-      };
-      clap_votes: {
-        Row: ClapVoteRow;
-        Insert: { post_slug: string; ip_hash: string; created_at?: string };
-        Update: never;
+        Row: {
+          count: number;
+          post_slug: string;
+        };
+        Insert: {
+          count?: number;
+          post_slug: string;
+        };
+        Update: {
+          count?: number;
+          post_slug?: string;
+        };
         Relationships: [];
       };
       subscribers: {
-        Row: SubscriberRow;
-        Insert: Omit<SubscriberRow, "id" | "subscribed_at"> & {
+        Row: {
+          email: string;
+          id: string;
+          subscribed_at: string;
+        };
+        Insert: {
+          email: string;
           id?: string;
           subscribed_at?: string;
         };
-        Update: Partial<SubscriberRow>;
+        Update: {
+          email?: string;
+          id?: string;
+          subscribed_at?: string;
+        };
         Relationships: [];
       };
     };
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
+    Enums: { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
   };
-}
+};
+
+export type CommentRow = Database["public"]["Tables"]["comments"]["Row"];
+export type PostClapRow = Database["public"]["Tables"]["post_claps"]["Row"];
+export type ClapVoteRow = Database["public"]["Tables"]["clap_votes"]["Row"];
+export type SubscriberRow = Database["public"]["Tables"]["subscribers"]["Row"];
