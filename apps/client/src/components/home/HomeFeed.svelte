@@ -22,7 +22,6 @@
 
   const { feedItems, allTags }: Props = $props();
 
-  // svelte-ignore state_referenced_locally
   let activeTag = $state("all");
   let visibleCount = $state(10);
 
