@@ -6,13 +6,13 @@ import { Resend } from "resend";
 
 import { unsubscribeUrl } from "@/lib/unsubscribe";
 
-const _logoB64 = readFileSync(
+// Read once on first import — swap to a hosted URL once you have a domain
+const LOGO_SRC = `data:image/png;base64,${readFileSync(
   join(
     dirname(fileURLToPath(import.meta.url)),
     "../../public/blabbun-email.png"
   )
-).toString("base64");
-const LOGO_SRC = `data:image/png;base64,${_logoB64}`;
+).toString("base64")}`;
 
 export function getResendClient(): Resend {
   return new Resend(import.meta.env.RESEND_API_KEY);

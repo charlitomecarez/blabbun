@@ -18,7 +18,9 @@ import { readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const LOGO_SRC = `data:image/png;base64,${readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../public/blabbun-email.png")).toString("base64")}`;
+const LOGO_SRC = `data:image/png;base64,${readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), "../public/blabbun-email.png")
+).toString("base64")}`;
 
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
