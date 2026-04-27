@@ -1,6 +1,8 @@
 <script lang="ts">
   import { tagClass } from "@blabbun/utils";
 
+  import InfiniteScroll from "@/components/InfiniteScroll.svelte";
+
   interface PostItem {
     title: string;
     description: string;
@@ -26,6 +28,7 @@
   let activeTag = $state(lockedTag ?? null);
   let sort = $state<"newest" | "oldest">("newest");
   let month = $state("all");
+  let visibleCount = $state(10);
 
   const months = $derived(
     [...new Set(posts.map((p) => p.pubDateRaw.slice(0, 7)))].sort().reverse()
@@ -41,6 +44,16 @@
           : Date.parse(a.pubDateRaw) - Date.parse(b.pubDateRaw)
       )
   );
+
+  const visible = $derived(filtered.slice(0, visibleCount));
+  const hasMore = $derived(visibleCount < filtered.length);
+
+  $effect(() => {
+    activeTag;
+    sort;
+    month; // track — reset count when any filter changes
+    visibleCount = 10;
+  });
 </script>
 
 <div class="archive-root">
@@ -89,9 +102,9 @@
   {#if filtered.length === 0}
     <p style="color:var(--muted);font-size:0.8rem">nothing matches.</p>
   {:else}
-    <!-- Archive list — AllPostsView style: compact rows with hover title color -->
+    <!-- Archive list -->
     <div class="archive-list">
-      {#each filtered as p}
+      {#each visible as p}
         <div class="archive-row">
           <!-- Stretched link -->
           <a href={p.href} class="archive-link" aria-label={p.title}></a>
@@ -110,6 +123,7 @@
         </div>
       {/each}
     </div>
+    <InfiniteScroll {hasMore} onLoadMore={() => (visibleCount += 10)} />
   {/if}
 </div>
 
