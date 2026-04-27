@@ -57,14 +57,17 @@ export type Database = {
       post_claps: {
         Row: {
           count: number;
+          created_at: string;
           post_slug: string;
         };
         Insert: {
           count?: number;
+          created_at?: string;
           post_slug: string;
         };
         Update: {
           count?: number;
+          created_at?: string;
           post_slug?: string;
         };
         Relationships: [];

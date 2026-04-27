@@ -236,7 +236,7 @@ const { data: comments } = await supabase
 
   function allRows(): HTMLElement[] {
     return Array.from(
-      document.querySelectorAll<HTMLElement>("#comment-list [data-id]")
+      document.querySelectorAll<HTMLElement>("#comment-list > [data-id]")
     );
   }
 
