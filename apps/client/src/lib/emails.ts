@@ -1,6 +1,18 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { Resend } from "resend";
 
 import { unsubscribeUrl } from "@/lib/unsubscribe";
+
+const _logoB64 = readFileSync(
+  join(
+    dirname(fileURLToPath(import.meta.url)),
+    "../../public/blabbun-email.png"
+  )
+).toString("base64");
+const LOGO_SRC = `data:image/png;base64,${_logoB64}`;
 
 export function getResendClient(): Resend {
   return new Resend(import.meta.env.RESEND_API_KEY);
@@ -32,7 +44,7 @@ export function welcomeEmailHtml(email: string): string {
           <tr>
             <td style="padding-bottom:24px;border-bottom:1px solid #e0d4c0">
               <a href="https://blabbun.com" style="text-decoration:none">
-                <img src="https://blabbun.com/blabbun.png" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;border-radius:3px;margin-right:8px" />
+                <img src="${LOGO_SRC}" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;border-radius:3px;margin-right:8px" />
                 <span style="font-size:0.95rem;font-weight:500;color:#c4832a;letter-spacing:0.04em;vertical-align:middle">blab bun</span>
               </a>
             </td>
@@ -100,7 +112,7 @@ export function newPostEmailHtml(
           <tr>
             <td style="padding:28px 36px 24px;border-bottom:1px solid #e0d4c0">
               <a href="https://blabbun.com" style="text-decoration:none">
-                <img src="https://blabbun.com/blabbun.png" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;border-radius:3px;margin-right:8px" />
+                <img src="${LOGO_SRC}" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;border-radius:3px;margin-right:8px" />
                 <span style="font-size:0.95rem;font-weight:500;color:#c4832a;letter-spacing:0.04em;vertical-align:middle">blab bun</span>
               </a>
               <span style="font-size:0.72rem;color:#c5b8a8;margin-left:10px">new post</span>
