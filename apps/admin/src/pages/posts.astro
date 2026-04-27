@@ -1,0 +1,468 @@
+---
+/* eslint-disable jsx-a11y/label-has-associated-control */
+
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
+import Layout from "../layouts/Layout.astro";
+
+const POSTS_DIR = join(process.cwd(), "apps/client/src/content/posts");
+
+interface PostMeta {
+  slug: string;
+  title: string;
+  description: string;
+  pubDate: string;
+  draft: boolean;
+  tags: string[];
+}
+
+function parseMeta(slug: string, raw: string): PostMeta {
+  const fm = raw.match(/^---\n([\s\S]*?)\n---/);
+  const block = fm?.[1] ?? "";
+  const get = (key: string) => {
+    const m = block.match(new RegExp(`^${key}:\\s*(.+)$`, "m"));
+    return m ? m[1].trim().replace(/^["']|["']$/g, "") : "";
+  };
+  const tagsMatch = block.match(/^tags:\s*\[([^\]]*)\]/m);
+  const tags = tagsMatch
+    ? tagsMatch[1]
+        .split(",")
+        .map((t) => t.trim().replace(/^["']|["']$/g, ""))
+        .filter(Boolean)
+    : [];
+  return {
+    slug,
+    title: get("title"),
+    description: get("description"),
+    pubDate: get("pubDate"),
+    draft: get("draft") === "true",
+    tags,
+  };
+}
+
+const allFiles = readdirSync(POSTS_DIR)
+  .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"))
+  .sort()
+  .reverse();
+
+const posts = allFiles.map((f) => {
+  const slug = f.replace(/\.(mdx?|md)$/, "");
+  const raw = readFileSync(join(POSTS_DIR, f), "utf-8");
+  return parseMeta(slug, raw);
+});
+
+const today = new Date().toISOString().split("T")[0];
+---
+
+<Layout title="posts">
+  <div
+    style="display:grid;grid-template-columns:1fr 340px;gap:32px;align-items:start"
+  >
+    <!-- Post list -->
+    <div>
+      <div
+        style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px"
+      >
+        {posts.length} posts
+      </div>
+      <div
+        id="post-list"
+        style="border:1px solid var(--border);border-radius:4px;overflow:hidden"
+      >
+        {
+          posts.length === 0 ? (
+            <p style="font-size:0.8rem;color:var(--muted);padding:24px">
+              no posts yet.
+            </p>
+          ) : (
+            posts.map((p) => (
+              <div
+                data-slug={p.slug}
+                style="padding:12px 16px;border-bottom:1px solid var(--divider);background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px"
+              >
+                <div style="min-width:0;flex:1">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;flex-wrap:wrap">
+                    {p.draft && (
+                      <span style="font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;color:#c4832a;background:rgba(196,131,42,0.1);padding:1px 6px;border-radius:2px">
+                        draft
+                      </span>
+                    )}
+                    <span style="font-size:0.8rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                      {p.title}
+                    </span>
+                  </div>
+                  <div style="font-size:0.68rem;color:var(--muted2)">
+                    {p.pubDate} · /{p.slug}
+                  </div>
+                </div>
+                <div style="display:flex;gap:6px;flex-shrink:0">
+                  <button
+                    onclick={`editPost('${p.slug}')`}
+                    style="background:none;border:1px solid var(--border);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit"
+                    onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+                    onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                  >
+                    edit
+                  </button>
+                  <button
+                    onclick={`deletePost('${p.slug}')`}
+                    style="background:none;border:1px solid var(--border);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit"
+                    onmouseenter="this.style.borderColor='#e05c5c';this.style.color='#e05c5c'"
+                    onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                  >
+                    delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )
+        }
+      </div>
+    </div>
+
+    <!-- Editor form -->
+    <div style="position:sticky;top:24px">
+      <div
+        id="form-label"
+        style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px"
+      >
+        new post
+      </div>
+      <div
+        id="form-error"
+        style="display:none;font-size:0.75rem;color:#c0392b;margin-bottom:10px"
+      >
+      </div>
+      <form id="post-form" style="display:flex;flex-direction:column;gap:10px">
+        <input type="hidden" id="f-overwrite" name="overwrite" value="false" />
+
+        <div>
+          <label
+            for="f-title"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >title *</label
+          >
+          <input
+            id="f-title"
+            name="title"
+            type="text"
+            required
+            placeholder="post title"
+            style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+          />
+        </div>
+
+        <div>
+          <label
+            for="f-slug"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >slug</label
+          >
+          <input
+            id="f-slug"
+            name="slug"
+            type="text"
+            placeholder="auto-generated"
+            style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+          />
+        </div>
+
+        <div>
+          <label
+            for="f-description"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >description *</label
+          >
+          <input
+            id="f-description"
+            name="description"
+            type="text"
+            required
+            placeholder="one-line summary"
+            style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+          />
+        </div>
+
+        <div
+          style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end"
+        >
+          <div>
+            <label
+              for="f-pubDate"
+              style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+              >date *</label
+            >
+            <input
+              id="f-pubDate"
+              name="pubDate"
+              type="date"
+              value={today}
+              required
+              style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+            />
+          </div>
+          <label
+            style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--muted);cursor:pointer;padding-bottom:9px;white-space:nowrap"
+          >
+            <input
+              id="f-draft"
+              type="checkbox"
+              style="accent-color:var(--accent)"
+            />
+            draft
+          </label>
+        </div>
+
+        <div>
+          <label
+            for="f-tags"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >tags</label
+          >
+          <input
+            id="f-tags"
+            name="tags"
+            type="text"
+            placeholder="RANTS, LIFE STUFF, EDITORIAL"
+            style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+          />
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">
+            {
+              ["RANTS", "LIFE STUFF", "EDITORIAL", "TECH", "PERSONAL"].map(
+                (tag) => (
+                  <button
+                    type="button"
+                    onclick={`addTag('${tag}')`}
+                    style="padding:2px 8px;font-size:0.62rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);cursor:pointer;letter-spacing:0.04em"
+                    onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+                    onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                  >
+                    + {tag}
+                  </button>
+                )
+              )
+            }
+          </div>
+        </div>
+
+        <div>
+          <label
+            for="f-image"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >image URL</label
+          >
+          <input
+            id="f-image"
+            name="image"
+            type="url"
+            placeholder="https://..."
+            style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+          />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <label
+              for="f-imageSource"
+              style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+              >image source</label
+            >
+            <input
+              id="f-imageSource"
+              name="imageSource"
+              type="text"
+              placeholder="Unsplash"
+              style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+            />
+          </div>
+          <div>
+            <label
+              for="f-imageSourceUrl"
+              style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+              >source URL</label
+            >
+            <input
+              id="f-imageSourceUrl"
+              name="imageSourceUrl"
+              type="url"
+              placeholder="https://..."
+              style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+            />
+          </div>
+        </div>
+
+        <div>
+          // eslint-disable-next-line jsx-a11y/label-has-associated-control
+          <label
+            for="f-content"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >body (MDX)</label
+          >
+          <textarea
+            id="f-content"
+            name="content"
+            rows="14"
+            placeholder="Write your post in Markdown / MDX..."
+            style="width:100%;padding:8px 10px;font-size:0.75rem;font-family:'IBM Plex Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;resize:vertical;box-sizing:border-box;line-height:1.6"
+          ></textarea>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button
+            type="submit"
+            id="submit-btn"
+            style="padding:7px 16px;font-size:0.75rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer"
+            >save post</button
+          >
+          <button
+            type="button"
+            id="reset-btn"
+            onclick="resetForm()"
+            style="padding:7px 14px;font-size:0.75rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer"
+            >clear</button
+          >
+        </div>
+      </form>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const $ = (id: string) =>
+    document.getElementById(id) as
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | null;
+
+  function slugify(s: string) {
+    return s
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+  }
+
+  // Auto-generate slug from title (only when slug is untouched)
+  let slugManuallyEdited = false;
+  $("f-slug")?.addEventListener("input", () => {
+    slugManuallyEdited = true;
+  });
+  $("f-title")?.addEventListener("input", (e) => {
+    if (!slugManuallyEdited) {
+      const slugEl = $("f-slug") as HTMLInputElement;
+      if (slugEl) slugEl.value = slugify((e.target as HTMLInputElement).value);
+    }
+  });
+
+  function addTag(tag: string) {
+    const el = $("f-tags") as HTMLInputElement;
+    if (!el) return;
+    const current = el.value
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+    if (!current.includes(tag)) {
+      el.value = [...current, tag].join(", ");
+    }
+  }
+
+  function resetForm() {
+    const form = document.getElementById("post-form") as HTMLFormElement;
+    form?.reset();
+    ($("f-overwrite") as HTMLInputElement).value = "false";
+    slugManuallyEdited = false;
+    document.getElementById("form-label")!.textContent = "new post";
+    document.getElementById("form-error")!.style.display = "none";
+    ($("submit-btn") as HTMLButtonElement).textContent = "save post";
+  }
+
+  async function editPost(slug: string) {
+    const res = await fetch(`/api/posts/${slug}`);
+    if (!res.ok) {
+      alert("failed to load post");
+      return;
+    }
+    const p = await res.json();
+
+    ($("f-title") as HTMLInputElement).value = p.title;
+    ($("f-slug") as HTMLInputElement).value = p.slug;
+    ($("f-description") as HTMLInputElement).value = p.description;
+    ($("f-pubDate") as HTMLInputElement).value = p.pubDate;
+    ($("f-draft") as HTMLInputElement).checked = p.draft;
+    ($("f-tags") as HTMLInputElement).value = p.tags.join(", ");
+    ($("f-image") as HTMLInputElement).value = p.image ?? "";
+    ($("f-imageSource") as HTMLInputElement).value = p.imageSource ?? "";
+    ($("f-imageSourceUrl") as HTMLInputElement).value = p.imageSourceUrl ?? "";
+    ($("f-content") as HTMLTextAreaElement).value = p.body;
+    ($("f-overwrite") as HTMLInputElement).value = "true";
+    slugManuallyEdited = true;
+
+    document.getElementById("form-label")!.textContent = `editing — ${slug}`;
+    ($("submit-btn") as HTMLButtonElement).textContent = "update post";
+    document
+      .getElementById("post-form")
+      ?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  async function deletePost(slug: string) {
+    if (!confirm(`delete "${slug}"? this removes the MDX file permanently.`))
+      return;
+    const res = await fetch(`/api/posts/${slug}`, { method: "DELETE" });
+    if (res.ok) {
+      document.querySelector(`[data-slug="${slug}"]`)?.remove();
+    } else {
+      alert("failed to delete");
+    }
+  }
+
+  document
+    .getElementById("post-form")
+    ?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("submit-btn") as HTMLButtonElement;
+      const errEl = document.getElementById("form-error")!;
+
+      const slug =
+        ($("f-slug") as HTMLInputElement).value.trim() ||
+        slugify(($("f-title") as HTMLInputElement).value);
+
+      const payload = {
+        title: ($("f-title") as HTMLInputElement).value,
+        slug,
+        description: ($("f-description") as HTMLInputElement).value,
+        pubDate: ($("f-pubDate") as HTMLInputElement).value,
+        draft: String(($("f-draft") as HTMLInputElement).checked),
+        tags: ($("f-tags") as HTMLInputElement).value,
+        image: ($("f-image") as HTMLInputElement).value,
+        imageSource: ($("f-imageSource") as HTMLInputElement).value,
+        imageSourceUrl: ($("f-imageSourceUrl") as HTMLInputElement).value,
+        content: ($("f-content") as HTMLTextAreaElement).value,
+        overwrite: ($("f-overwrite") as HTMLInputElement).value,
+      };
+
+      btn.disabled = true;
+      btn.textContent = "saving…";
+      errEl.style.display = "none";
+
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+
+      if (res.ok) {
+        // Refresh the page to show updated list
+        location.reload();
+      } else {
+        errEl.textContent = json.error ?? "failed to save";
+        errEl.style.display = "block";
+        btn.disabled = false;
+        btn.textContent = "save post";
+      }
+    });
+
+  Object.assign(window, { editPost, deletePost, addTag, resetForm });
+</script>
