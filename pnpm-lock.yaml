@@ -139,6 +139,9 @@ importers:
       svelte:
         specifier: ^5.55.4
         version: 5.55.4(@typescript-eslint/types@8.59.0)
+      svelte-intersection-observer:
+        specifier: ^1.1.1
+        version: 1.1.1
       tailwindcss:
         specifier: ^4.2.2
         version: 4.2.2
@@ -3483,6 +3486,9 @@ packages:
     peerDependencies:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: '>=5.0.0'
+
+  svelte-intersection-observer@1.1.1:
+    resolution: {integrity: sha512-T5Jkj5pkwhZcDIOQZh0tayAOnzJWRsE8Op667kAHlxLXV7TTsqLfkx1mkLLtPGMckpXQLLsrChHHnIb9HqvNzQ==}
 
   svelte2tsx@0.7.53:
     resolution: {integrity: sha512-ljVSwmnYRDHRm8+7ICP6QoAN7U7vgOFfPBLN6T745YWNYqRRSzHxlrzUVqMjYls2Un8MzJissfziy/38e6Deeg==}
@@ -7901,6 +7907,8 @@ snapshots:
       typescript: 5.9.3
     transitivePeerDependencies:
       - picomatch
+
+  svelte-intersection-observer@1.1.1: {}
 
   svelte2tsx@0.7.53(svelte@5.55.4(@typescript-eslint/types@8.59.0))(typescript@5.9.3):
     dependencies:
