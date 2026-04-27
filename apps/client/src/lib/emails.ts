@@ -31,7 +31,10 @@ export function welcomeEmailHtml(email: string): string {
         <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#f5ede0;border:1px solid #e0d4c0;border-radius:4px;padding:36px">
           <tr>
             <td style="padding-bottom:24px;border-bottom:1px solid #e0d4c0">
-              <a href="https://blabbun.com" style="font-size:0.95rem;font-weight:500;color:#c4832a;text-decoration:none;letter-spacing:0.04em">blab bun</a>
+              <a href="https://blabbun.com" style="text-decoration:none">
+                <img src="https://blabbun.com/blabbun.png" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;border-radius:3px;margin-right:8px" />
+                <span style="font-size:0.95rem;font-weight:500;color:#c4832a;letter-spacing:0.04em;vertical-align:middle">blab bun</span>
+              </a>
             </td>
           </tr>
           <tr>
@@ -96,7 +99,10 @@ export function newPostEmailHtml(
         <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#f5ede0;border:1px solid #e0d4c0;border-radius:4px;overflow:hidden">
           <tr>
             <td style="padding:28px 36px 24px;border-bottom:1px solid #e0d4c0">
-              <a href="https://blabbun.com" style="font-size:0.95rem;font-weight:500;color:#c4832a;text-decoration:none;letter-spacing:0.04em">blab bun</a>
+              <a href="https://blabbun.com" style="text-decoration:none">
+                <img src="https://blabbun.com/blabbun.png" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;border-radius:3px;margin-right:8px" />
+                <span style="font-size:0.95rem;font-weight:500;color:#c4832a;letter-spacing:0.04em;vertical-align:middle">blab bun</span>
+              </a>
               <span style="font-size:0.72rem;color:#c5b8a8;margin-left:10px">new post</span>
             </td>
           </tr>
