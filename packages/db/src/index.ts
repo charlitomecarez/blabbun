@@ -5,5 +5,6 @@ export type {
   CommentRow,
   Database,
   PostClapRow,
+  PostNotificationRow,
   SubscriberRow,
 } from "./types.js";

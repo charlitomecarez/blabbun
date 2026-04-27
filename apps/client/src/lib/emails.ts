@@ -1,4 +1,18 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { Resend } from "resend";
+
+import { unsubscribeUrl } from "@/lib/unsubscribe";
+
+// Read once on first import — swap to a hosted URL once you have a domain
+const LOGO_SRC = `data:image/png;base64,${readFileSync(
+  join(
+    dirname(fileURLToPath(import.meta.url)),
+    "../../public/blabbun-email.png"
+  )
+).toString("base64")}`;
 
 export function getResendClient(): Resend {
   return new Resend(import.meta.env.RESEND_API_KEY);
@@ -12,7 +26,8 @@ function esc(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
-export function welcomeEmailHtml(): string {
+export function welcomeEmailHtml(email: string): string {
+  const unsubUrl = esc(unsubscribeUrl(email));
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,7 +43,10 @@ export function welcomeEmailHtml(): string {
         <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#f5ede0;border:1px solid #e0d4c0;border-radius:4px;padding:36px">
           <tr>
             <td style="padding-bottom:24px;border-bottom:1px solid #e0d4c0">
-              <a href="https://blabbun.com" style="font-size:0.95rem;font-weight:500;color:#c4832a;text-decoration:none;letter-spacing:0.04em">blab bun</a>
+              <a href="https://blabbun.com" style="text-decoration:none">
+                <img src="${LOGO_SRC}" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;border-radius:3px;margin-right:8px" />
+                <span style="font-size:0.95rem;font-weight:500;color:#c4832a;letter-spacing:0.04em;vertical-align:middle">blab bun</span>
+              </a>
             </td>
           </tr>
           <tr>
@@ -47,7 +65,7 @@ export function welcomeEmailHtml(): string {
             <td style="padding-top:24px;border-top:1px solid #e0d4c0">
               <p style="font-size:0.7rem;color:#c5b8a8;margin:0;line-height:1.7">
                 you subscribed at <a href="https://blabbun.com" style="color:#c4832a;text-decoration:none">blabbun.com</a>.
-                didn't mean to? just ignore this — you won't hear from us again unless a new post drops.
+                changed your mind? <a href="${unsubUrl}" style="color:#c4832a;text-decoration:none">unsubscribe</a>.
               </p>
             </td>
           </tr>
@@ -59,13 +77,25 @@ export function welcomeEmailHtml(): string {
 </html>`;
 }
 
-export function newPostEmailHtml(post: {
-  title: string;
-  slug: string;
-  description: string;
-  date: string;
-}): string {
+export function newPostEmailHtml(
+  post: {
+    title: string;
+    slug: string;
+    description: string;
+    date: string;
+    image?: string;
+  },
+  email: string
+): string {
   const url = `https://blabbun.com/${esc(post.slug)}`;
+  const unsubUrl = esc(unsubscribeUrl(email));
+  const imageRow = post.image
+    ? `<tr>
+            <td style="padding:0;margin:0;line-height:0">
+              <img src="${esc(post.image)}" alt="" width="560" style="display:block;width:100%;max-width:560px;height:220px;object-fit:cover;border-bottom:1px solid #e0d4c0" />
+            </td>
+          </tr>`
+    : "";
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,15 +108,19 @@ export function newPostEmailHtml(post: {
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#fdf9f4;padding:48px 20px">
     <tr>
       <td align="center">
-        <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#f5ede0;border:1px solid #e0d4c0;border-radius:4px;padding:36px">
+        <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#f5ede0;border:1px solid #e0d4c0;border-radius:4px;overflow:hidden">
           <tr>
-            <td style="padding-bottom:24px;border-bottom:1px solid #e0d4c0">
-              <a href="https://blabbun.com" style="font-size:0.95rem;font-weight:500;color:#c4832a;text-decoration:none;letter-spacing:0.04em">blab bun</a>
+            <td style="padding:28px 36px 24px;border-bottom:1px solid #e0d4c0">
+              <a href="https://blabbun.com" style="text-decoration:none">
+                <img src="${LOGO_SRC}" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;border-radius:3px;margin-right:8px" />
+                <span style="font-size:0.95rem;font-weight:500;color:#c4832a;letter-spacing:0.04em;vertical-align:middle">blab bun</span>
+              </a>
               <span style="font-size:0.72rem;color:#c5b8a8;margin-left:10px">new post</span>
             </td>
           </tr>
+          ${imageRow}
           <tr>
-            <td style="padding:32px 0 28px">
+            <td style="padding:32px 36px 28px">
               <div style="font-size:0.68rem;color:#9c8b78;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px">${esc(post.date)}</div>
               <h1 style="font-size:1.2rem;font-weight:500;color:#231e17;margin:0 0 16px;line-height:1.4">
                 <a href="${url}" style="color:#231e17;text-decoration:none">${esc(post.title)}</a>
@@ -96,10 +130,10 @@ export function newPostEmailHtml(post: {
             </td>
           </tr>
           <tr>
-            <td style="padding-top:24px;border-top:1px solid #e0d4c0">
+            <td style="padding:0 36px 28px;border-top:1px solid #e0d4c0;padding-top:24px">
               <p style="font-size:0.7rem;color:#c5b8a8;margin:0;line-height:1.7">
                 you're on the <a href="https://blabbun.com" style="color:#c4832a;text-decoration:none">blab bun</a> mailing list.
-                didn't mean to subscribe? just ignore this.
+                done reading? <a href="${unsubUrl}" style="color:#c4832a;text-decoration:none">unsubscribe</a>.
               </p>
             </td>
           </tr>
