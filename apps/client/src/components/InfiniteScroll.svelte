@@ -8,11 +8,11 @@
 
   const { hasMore, onLoadMore }: Props = $props();
 
-  let sentinel = $state<HTMLElement | null>(null);
+  let sentinel: HTMLElement | null = null;
   let intersecting = $state(false);
 
   $effect(() => {
-    if (intersecting) onLoadMore();
+    if (intersecting && hasMore) onLoadMore();
   });
 </script>
 
