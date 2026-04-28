@@ -24,6 +24,16 @@
 
   const { posts, tags, lockedTag }: Props = $props();
 
+  const TAG_LIMIT = 5;
+  let tagsExpanded = $state(false);
+  const visibleTags = $derived(
+    tagsExpanded ||
+      (activeTag !== null && !tags.slice(0, TAG_LIMIT).includes(activeTag))
+      ? tags
+      : tags.slice(0, TAG_LIMIT)
+  );
+  const hiddenCount = $derived(Math.max(0, tags.length - TAG_LIMIT));
+
   // svelte-ignore state_referenced_locally
   let activeTag = $state(lockedTag ?? null);
   let sort = $state<"newest" | "oldest">("newest");
@@ -68,7 +78,7 @@
             class:active={!activeTag}
             onclick={() => (activeTag = null)}>all</button
           >
-          {#each tags as t}
+          {#each visibleTags as t}
             <button
               class="tag-btn"
               class:active={activeTag === t}
@@ -76,6 +86,17 @@
               >/ {t.toLowerCase()}</button
             >
           {/each}
+          {#if !tagsExpanded && hiddenCount > 0}
+            <button
+              class="tag-btn tag-more"
+              onclick={() => (tagsExpanded = true)}>+{hiddenCount} more</button
+            >
+          {:else if tagsExpanded && hiddenCount > 0}
+            <button
+              class="tag-btn tag-more"
+              onclick={() => (tagsExpanded = false)}>less</button
+            >
+          {/if}
         </div>
       </div>
     {/if}
@@ -185,6 +206,14 @@
   .tag-btn:hover {
     color: var(--accent);
     font-weight: 500;
+  }
+  .tag-more {
+    color: var(--muted2);
+    font-size: 0.65rem;
+  }
+  .tag-more:hover {
+    color: var(--accent);
+    font-weight: 400;
   }
 
   /* ─── Archive row ─────────────────────────────────────────── */
