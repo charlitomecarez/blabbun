@@ -1,8 +1,6 @@
 name: Deploy
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -44,7 +42,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config dist/server/wrangler.json --commit-dirty=true
+          command: deploy --config dist/server/wrangler.json
           workingDirectory: apps/client
 
   deploy-admin:
@@ -81,5 +79,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config dist/server/wrangler.json --commit-dirty=true
+          command: deploy --config dist/server/wrangler.json
           workingDirectory: apps/admin
