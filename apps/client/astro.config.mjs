@@ -1,14 +1,14 @@
 // @ts-check
+import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
 import svelte from "@astrojs/svelte";
-import vercel from "@astrojs/vercel";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
   site: "https://blabbun.com",
   output: "server",
-  adapter: vercel(),
+  adapter: cloudflare(),
   devToolbar: { enabled: false },
   security: { checkOrigin: false },
   integrations: [svelte(), mdx()],

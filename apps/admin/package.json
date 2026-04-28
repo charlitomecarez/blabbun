@@ -19,8 +19,8 @@
     "cd:types": "cd ../../packages/types && $SHELL"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^13.2.1",
     "@astrojs/svelte": "^8.0.5",
-    "@astrojs/vercel": "^10.0.4",
     "@blabbun/db": "workspace:*",
     "@blabbun/types": "workspace:*",
     "@blabbun/ui": "workspace:*",
