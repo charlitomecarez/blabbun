@@ -8,5 +8,5 @@ pattern = "blabbun.com"
 [[custom_domains]]
 pattern = "www.blabbun.com"
 
-[[triggers.crons]]
+[triggers]
 crons = ["0 9 * * *"]
