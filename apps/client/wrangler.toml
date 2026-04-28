@@ -2,12 +2,5 @@ name = "blabbun-client"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-pages_build_output_dir = "./dist"
-
-[vars]
-# Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY as secrets via:
-# wrangler pages secret put SUPABASE_URL
-# wrangler pages secret put SUPABASE_SERVICE_ROLE_KEY
-
 [[triggers.crons]]
 crons = ["0 9 * * *"]
