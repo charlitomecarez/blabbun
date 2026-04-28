@@ -1,18 +1,22 @@
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 
-import { getSupabaseClient, jsonResponse } from "@/lib/api";
+import { getRuntimeEnv, getSupabaseClient, jsonResponse } from "@/lib/api";
 import { getResendClient, newPostEmailHtml } from "@/lib/emails";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request }) => {
-  const secret = import.meta.env.CRON_SECRET;
+export const GET: APIRoute = async ({ request, locals }) => {
+  const env = getRuntimeEnv(locals);
+  const secret = env.CRON_SECRET ?? import.meta.env.CRON_SECRET;
   if (!secret || request.headers.get("authorization") !== `Bearer ${secret}`) {
     return jsonResponse({ error: "unauthorized" }, 401);
   }
 
-  const supabase = getSupabaseClient();
+  const supabase = getSupabaseClient(
+    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+  );
 
   const [allPosts, notifiedResult, subscribersResult] = await Promise.all([
     getCollection("posts"),
@@ -43,7 +47,11 @@ export const GET: APIRoute = async ({ request }) => {
     return jsonResponse({ notified: 0, post: null });
   }
 
-  const resend = getResendClient();
+  const unsubscribeSecret =
+    env.UNSUBSCRIBE_SECRET ?? import.meta.env.UNSUBSCRIBE_SECRET ?? "";
+  const resend = getResendClient(
+    env.RESEND_API_KEY ?? import.meta.env.RESEND_API_KEY
+  );
   const date = new Date(post.data.pubDate).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -63,7 +71,8 @@ export const GET: APIRoute = async ({ request }) => {
         date,
         image: post.data.image,
       },
-      sub.email
+      sub.email,
+      unsubscribeSecret
     ),
   }));
 

@@ -1,21 +1,15 @@
-import { getSupabaseClient } from "@/lib/api";
+import type { SupabaseClient } from "@blabbun/db";
 
 export interface PostStats {
   claps: number;
   commentCount: number;
 }
 
-/**
- * Fetches clap counts and top-level comment counts for a list of post slugs.
- * Runs both queries in parallel. Returns a map keyed by slug — unknown slugs
- * get zeroed stats so callers never need to null-check individual entries.
- */
 export async function fetchPostStats(
-  slugs: string[]
+  slugs: string[],
+  supabase: SupabaseClient
 ): Promise<Record<string, PostStats>> {
   if (slugs.length === 0) return {};
-
-  const supabase = getSupabaseClient();
 
   const [clapsResult, commentsResult] = await Promise.all([
     supabase

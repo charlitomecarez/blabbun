@@ -5,6 +5,11 @@ import { verifyUnsubscribeToken } from "@/lib/unsubscribe";
 
 export const prerender = false;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const runtimeEnv = (Astro.locals as any).runtime?.env ?? {};
+const secret: string =
+  runtimeEnv.UNSUBSCRIBE_SECRET ?? import.meta.env.UNSUBSCRIBE_SECRET ?? "";
+
 const url = new URL(Astro.request.url);
 const done = url.searchParams.get("done") === "true";
 
@@ -17,17 +22,19 @@ if (Astro.request.method === "POST") {
   email = form.get("email")?.toString() ?? "";
   token = form.get("token")?.toString() ?? "";
 
-  const secret = import.meta.env.UNSUBSCRIBE_SECRET as string;
   if (!secret || !verifyUnsubscribeToken(email, token, secret)) {
     formError = "This unsubscribe link is invalid or has expired.";
   } else {
-    const supabase = getSupabaseClient();
+    const supabase = getSupabaseClient(
+      runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+      runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+        import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    );
     await supabase.from("subscribers").delete().eq("email", email);
     return Astro.redirect("/unsubscribe?done=true");
   }
 }
 
-const secret = import.meta.env.UNSUBSCRIBE_SECRET as string;
 const validLink =
   !done &&
   email &&

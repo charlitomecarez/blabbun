@@ -4,10 +4,12 @@ import type { APIRoute } from "astro";
 export const prerender = false;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getClient(): any {
+function getClient(locals: App.Locals): any {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const env = (locals as any).runtime?.env ?? {};
   return createSupabaseClient(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
 }
 
@@ -18,12 +20,12 @@ function json(data: unknown, status = 200) {
   });
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const { post_slug, body, anon_name, parent_id } = await request.json();
   if (!post_slug?.trim() || !body?.trim())
     return json({ error: "post_slug and body are required" }, 400);
 
-  const supabase = getClient();
+  const supabase = getClient(locals);
   const { data, error } = await supabase
     .from("comments")
     .insert({

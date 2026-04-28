@@ -3,15 +3,15 @@ import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@blabbun/db";
 import { createSupabaseClient } from "@blabbun/db";
 
-/**
- * Returns a Supabase client authenticated with the service role key.
- * Use only in server-side API routes — never expose this key to the browser.
- */
-export function getSupabaseClient(): SupabaseClient {
-  return createSupabaseClient(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+export type RuntimeEnv = Record<string, string | undefined>;
+
+export function getRuntimeEnv(locals: App.Locals): RuntimeEnv {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return ((locals as any).runtime?.env ?? {}) as RuntimeEnv;
+}
+
+export function getSupabaseClient(url: string, key: string): SupabaseClient {
+  return createSupabaseClient(url, key);
 }
 
 /**

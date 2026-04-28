@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 
-import { getSupabaseClient, jsonResponse } from "@/lib/api";
+import { getRuntimeEnv, getSupabaseClient, jsonResponse } from "@/lib/api";
 import { getResendClient, welcomeEmailHtml } from "@/lib/emails";
 
 export const prerender = false;
@@ -17,7 +17,7 @@ function parseEmails(raw: string | string[]): string[] {
     .filter(Boolean);
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const body = (await request.json()) as { email?: string | string[] };
 
   if (!body.email) {
@@ -37,8 +37,16 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  const supabase = getSupabaseClient();
-  const resend = getResendClient();
+  const env = getRuntimeEnv(locals);
+  const supabase = getSupabaseClient(
+    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+  const resend = getResendClient(
+    env.RESEND_API_KEY ?? import.meta.env.RESEND_API_KEY
+  );
+  const unsubscribeSecret =
+    env.UNSUBSCRIBE_SECRET ?? import.meta.env.UNSUBSCRIBE_SECRET ?? "";
 
   const results = await Promise.all(
     emails.map(async (email) => {
@@ -60,7 +68,7 @@ export const POST: APIRoute = async ({ request }) => {
           from: "onboarding@resend.dev",
           to: email,
           subject: "you're in.",
-          html: welcomeEmailHtml(email),
+          html: welcomeEmailHtml(email, unsubscribeSecret),
         })
         .catch(console.error);
 

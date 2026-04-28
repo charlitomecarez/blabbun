@@ -71,7 +71,7 @@ function newPostEmailHtml(post: {
 </html>`;
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const { title, slug, description, date } = (await request.json()) as {
     title?: string;
     slug?: string;
@@ -83,11 +83,16 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: "title and slug are required" }, 400);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const runtimeEnv = (locals as any).runtime?.env ?? {};
   const supabase = createSupabaseClient(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
-  const resend = new Resend(import.meta.env.RESEND_API_KEY);
+  const resend = new Resend(
+    runtimeEnv.RESEND_API_KEY ?? import.meta.env.RESEND_API_KEY
+  );
 
   const { data: subscribers, error } = await supabase
     .from("subscribers")

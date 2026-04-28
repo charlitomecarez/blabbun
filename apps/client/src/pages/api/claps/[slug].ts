@@ -1,12 +1,21 @@
 import type { APIRoute } from "astro";
 
-import { getSupabaseClient, hashIp, jsonResponse } from "@/lib/api";
+import {
+  getRuntimeEnv,
+  getSupabaseClient,
+  hashIp,
+  jsonResponse,
+} from "@/lib/api";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async ({ params, request, locals }) => {
   const { slug } = params;
-  const supabase = getSupabaseClient();
+  const env = getRuntimeEnv(locals);
+  const supabase = getSupabaseClient(
+    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+  );
   const hash = hashIp(request);
 
   const [clapsResult, voteResult] = await Promise.all([
@@ -32,9 +41,13 @@ export const GET: APIRoute = async ({ params, request }) => {
   });
 };
 
-export const POST: APIRoute = async ({ params, request }) => {
+export const POST: APIRoute = async ({ params, request, locals }) => {
   const { slug } = params;
-  const supabase = getSupabaseClient();
+  const env = getRuntimeEnv(locals);
+  const supabase = getSupabaseClient(
+    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+  );
   const hash = hashIp(request);
 
   const [voteResult, clapResult] = await Promise.all([
