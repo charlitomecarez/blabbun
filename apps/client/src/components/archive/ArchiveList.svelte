@@ -1,6 +1,8 @@
 <script lang="ts">
   import { tagClass } from "@blabbun/utils";
 
+  import InfiniteScroll from "@/components/InfiniteScroll.svelte";
+
   interface PostItem {
     title: string;
     description: string;
@@ -24,8 +26,20 @@
 
   // svelte-ignore state_referenced_locally
   let activeTag = $state(lockedTag ?? null);
+
+  const TAG_LIMIT = 5;
+  let tagsExpanded = $state(false);
+  const visibleTags = $derived(
+    tagsExpanded ||
+      (activeTag !== null &&
+        !tags.slice(0, TAG_LIMIT).includes(activeTag ?? ""))
+      ? tags
+      : tags.slice(0, TAG_LIMIT)
+  );
+  const hiddenCount = $derived(Math.max(0, tags.length - TAG_LIMIT));
   let sort = $state<"newest" | "oldest">("newest");
   let month = $state("all");
+  let visibleCount = $state(10);
 
   const months = $derived(
     [...new Set(posts.map((p) => p.pubDateRaw.slice(0, 7)))].sort().reverse()
@@ -41,6 +55,16 @@
           : Date.parse(a.pubDateRaw) - Date.parse(b.pubDateRaw)
       )
   );
+
+  const visible = $derived(filtered.slice(0, visibleCount));
+  const hasMore = $derived(visibleCount < filtered.length);
+
+  $effect(() => {
+    activeTag;
+    sort;
+    month; // track — reset count when any filter changes
+    visibleCount = 10;
+  });
 </script>
 
 <div class="archive-root">
@@ -55,7 +79,7 @@
             class:active={!activeTag}
             onclick={() => (activeTag = null)}>all</button
           >
-          {#each tags as t}
+          {#each visibleTags as t}
             <button
               class="tag-btn"
               class:active={activeTag === t}
@@ -63,6 +87,17 @@
               >/ {t.toLowerCase()}</button
             >
           {/each}
+          {#if !tagsExpanded && hiddenCount > 0}
+            <button
+              class="tag-btn tag-more"
+              onclick={() => (tagsExpanded = true)}>+{hiddenCount} more</button
+            >
+          {:else if tagsExpanded && hiddenCount > 0}
+            <button
+              class="tag-btn tag-more"
+              onclick={() => (tagsExpanded = false)}>less</button
+            >
+          {/if}
         </div>
       </div>
     {/if}
@@ -89,9 +124,9 @@
   {#if filtered.length === 0}
     <p style="color:var(--muted);font-size:0.8rem">nothing matches.</p>
   {:else}
-    <!-- Archive list — AllPostsView style: compact rows with hover title color -->
+    <!-- Archive list -->
     <div class="archive-list">
-      {#each filtered as p}
+      {#each visible as p}
         <div class="archive-row">
           <!-- Stretched link -->
           <a href={p.href} class="archive-link" aria-label={p.title}></a>
@@ -110,6 +145,7 @@
         </div>
       {/each}
     </div>
+    <InfiniteScroll {hasMore} onLoadMore={() => (visibleCount += 10)} />
   {/if}
 </div>
 
@@ -171,6 +207,14 @@
   .tag-btn:hover {
     color: var(--accent);
     font-weight: 500;
+  }
+  .tag-more {
+    color: var(--muted2);
+    font-size: 0.65rem;
+  }
+  .tag-more:hover {
+    color: var(--accent);
+    font-weight: 400;
   }
 
   /* ─── Archive row ─────────────────────────────────────────── */

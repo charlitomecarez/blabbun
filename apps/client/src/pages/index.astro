@@ -1,8 +1,8 @@
 ---
-import { FeedItem } from "@blabbun/ui/components/cards";
 import { readTime } from "@blabbun/utils";
 import { getCollection } from "astro:content";
 
+import HomeFeed from "@/components/home/HomeFeed.svelte";
 import NewsletterBar from "@/components/home/NewsletterBar.svelte";
 import Layout from "@/layouts/Layout.astro";
 import { fetchPostStats } from "@/lib/stats";
@@ -40,7 +40,7 @@ const allTags = [
   <main
     style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
   >
-    <!-- Subtitle line (exact from design) -->
+    <!-- Subtitle line -->
     <div
       style="
         margin-bottom:24px;padding-bottom:20px;
@@ -54,67 +54,9 @@ const allTags = [
       </div>
     </div>
 
-    <!-- Tag filter (client-side) -->
-    <div
-      id="tag-filters"
-      style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"
-    >
-      <button
-        data-tag="all"
-        style="background:none;border:none;padding:3px 0;font-size:0.7rem;font-family:inherit;cursor:pointer;letter-spacing:0.03em;color:var(--accent);font-weight:500"
-        >all</button
-      >
-      {
-        allTags.map((t) => (
-          <button
-            data-tag={t}
-            style="background:none;border:none;padding:3px 0;font-size:0.7rem;font-family:inherit;cursor:pointer;letter-spacing:0.03em;color:var(--muted);font-weight:400"
-          >
-            / {t.toLowerCase()}
-          </button>
-        ))
-      }
-    </div>
-
-    <!-- Post list -->
-    <div
-      id="post-list"
-      style="padding-left:20px;padding-right:20px;animation:fadeIn 0.2s ease"
-    >
-      {
-        feedItems.map((item) => (
-          <div data-tag={item.tag}>
-            <FeedItem {...item} />
-          </div>
-        ))
-      }
-    </div>
+    <HomeFeed feedItems={feedItems} allTags={allTags} client:load />
 
     <!-- Newsletter (inline, matching design) -->
     <NewsletterBar client:visible />
   </main>
 </Layout>
-
-<script>
-  // Tag filter logic
-  const filters = document.querySelectorAll<HTMLButtonElement>(
-    "#tag-filters button"
-  );
-  const items = document.querySelectorAll<HTMLElement>("#post-list [data-tag]");
-  let active = "all";
-
-  filters.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      active = btn.dataset.tag ?? "all";
-      filters.forEach((b) => {
-        const isActive = b.dataset.tag === active;
-        b.style.color = isActive ? "var(--accent)" : "var(--muted)";
-        b.style.fontWeight = isActive ? "500" : "400";
-      });
-      items.forEach((item) => {
-        const match = active === "all" || item.dataset.tag === active;
-        (item as HTMLElement).style.display = match ? "" : "none";
-      });
-    });
-  });
-</script>

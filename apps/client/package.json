@@ -31,6 +31,7 @@
     "astro": "^6.1.6",
     "resend": "^6.12.2",
     "svelte": "^5.55.4",
+    "svelte-intersection-observer": "^1.1.1",
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
