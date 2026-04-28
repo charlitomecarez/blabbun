@@ -11,6 +11,7 @@ import { shuffle } from "lodash-es";
 
 import ClapShare from "@/components/post/ClapShare.svelte";
 import Comments from "@/components/post/Comments.svelte";
+import FloatingNewsletter from "@/components/post/FloatingNewsletter.svelte";
 import Layout from "@/layouts/Layout.astro";
 import { fetchPostStats } from "@/lib/stats";
 
@@ -228,4 +229,6 @@ const jsonLd = {
       }
     });
   </script>
+
+  <FloatingNewsletter client:load postSlug={post.id} />
 </Layout>
