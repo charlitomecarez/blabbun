@@ -5,3 +5,6 @@ compatibility_flags = ["nodejs_compat"]
 
 [[custom_domains]]
 pattern = "admin.blabbun.com"
+
+[assets]
+run_worker_first = true

@@ -11,3 +11,6 @@ pattern = "www.blabbun.com"
 
 [triggers]
 crons = ["0 9 * * *"]
+
+[assets]
+run_worker_first = true

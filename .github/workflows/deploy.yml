@@ -37,6 +37,7 @@ jobs:
             delete cfg.images;
             if (cfg.previews) { delete cfg.previews.images; cfg.previews.kv_namespaces = (cfg.previews.kv_namespaces || []).filter(kv => kv.id); }
             cfg.custom_domains = [{ pattern: 'blabbun.com' }, { pattern: 'www.blabbun.com' }];
+            if (cfg.assets) cfg.assets.run_worker_first = true;
             fs.writeFileSync('wrangler.json', JSON.stringify(cfg));
           "
 
@@ -93,6 +94,7 @@ jobs:
             delete cfg.images;
             if (cfg.previews) { delete cfg.previews.images; cfg.previews.kv_namespaces = (cfg.previews.kv_namespaces || []).filter(kv => kv.id); }
             cfg.custom_domains = [{ pattern: 'admin.blabbun.com' }];
+            if (cfg.assets) cfg.assets.run_worker_first = true;
             fs.writeFileSync('wrangler.json', JSON.stringify(cfg));
           "
 
