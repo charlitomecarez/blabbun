@@ -29,12 +29,22 @@ jobs:
       - name: Build client
         run: pnpm --filter @blabbun/client build
 
-      - name: Deploy to Cloudflare Pages
+      - name: Strip unbound KV namespaces from wrangler config
+        working-directory: apps/client/dist/server
+        run: |
+          node -e "
+            const fs = require('fs');
+            const cfg = JSON.parse(fs.readFileSync('wrangler.json', 'utf8'));
+            cfg.kv_namespaces = (cfg.kv_namespaces || []).filter(kv => kv.id);
+            fs.writeFileSync('wrangler.json', JSON.stringify(cfg));
+          "
+
+      - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=blabbun-client --commit-dirty=true
+          command: deploy --config dist/server/wrangler.json --commit-dirty=true
           workingDirectory: apps/client
 
   deploy-admin:
@@ -56,10 +66,20 @@ jobs:
       - name: Build admin
         run: pnpm --filter @blabbun/admin build
 
-      - name: Deploy to Cloudflare Pages
+      - name: Strip unbound KV namespaces from wrangler config
+        working-directory: apps/admin/dist/server
+        run: |
+          node -e "
+            const fs = require('fs');
+            const cfg = JSON.parse(fs.readFileSync('wrangler.json', 'utf8'));
+            cfg.kv_namespaces = (cfg.kv_namespaces || []).filter(kv => kv.id);
+            fs.writeFileSync('wrangler.json', JSON.stringify(cfg));
+          "
+
+      - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=blabbun-admin --commit-dirty=true
+          command: deploy --config dist/server/wrangler.json --commit-dirty=true
           workingDirectory: apps/admin

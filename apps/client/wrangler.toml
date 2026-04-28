@@ -2,5 +2,11 @@ name = "blabbun-client"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
+[[custom_domains]]
+pattern = "blabbun.com"
+
+[[custom_domains]]
+pattern = "www.blabbun.com"
+
 [[triggers.crons]]
 crons = ["0 9 * * *"]
