@@ -27,13 +27,14 @@ jobs:
       - name: Build client
         run: pnpm --filter @blabbun/client build
 
-      - name: Strip unbound KV namespaces from wrangler config
+      - name: Patch generated wrangler config
         working-directory: apps/client/dist/server
         run: |
           node -e "
             const fs = require('fs');
             const cfg = JSON.parse(fs.readFileSync('wrangler.json', 'utf8'));
             cfg.kv_namespaces = (cfg.kv_namespaces || []).filter(kv => kv.id);
+            cfg.custom_domains = [{ pattern: 'blabbun.com' }, { pattern: 'www.blabbun.com' }];
             fs.writeFileSync('wrangler.json', JSON.stringify(cfg));
           "
 
@@ -64,13 +65,14 @@ jobs:
       - name: Build admin
         run: pnpm --filter @blabbun/admin build
 
-      - name: Strip unbound KV namespaces from wrangler config
+      - name: Patch generated wrangler config
         working-directory: apps/admin/dist/server
         run: |
           node -e "
             const fs = require('fs');
             const cfg = JSON.parse(fs.readFileSync('wrangler.json', 'utf8'));
             cfg.kv_namespaces = (cfg.kv_namespaces || []).filter(kv => kv.id);
+            cfg.custom_domains = [{ pattern: 'admin.blabbun.com' }];
             fs.writeFileSync('wrangler.json', JSON.stringify(cfg));
           "
 
