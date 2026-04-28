@@ -24,18 +24,19 @@
 
   const { posts, tags, lockedTag }: Props = $props();
 
+  // svelte-ignore state_referenced_locally
+  let activeTag = $state(lockedTag ?? null);
+
   const TAG_LIMIT = 5;
   let tagsExpanded = $state(false);
   const visibleTags = $derived(
     tagsExpanded ||
-      (activeTag !== null && !tags.slice(0, TAG_LIMIT).includes(activeTag))
+      (activeTag !== null &&
+        !tags.slice(0, TAG_LIMIT).includes(activeTag ?? ""))
       ? tags
       : tags.slice(0, TAG_LIMIT)
   );
   const hiddenCount = $derived(Math.max(0, tags.length - TAG_LIMIT));
-
-  // svelte-ignore state_referenced_locally
-  let activeTag = $state(lockedTag ?? null);
   let sort = $state<"newest" | "oldest">("newest");
   let month = $state("all");
   let visibleCount = $state(10);
