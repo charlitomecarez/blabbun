@@ -13,7 +13,20 @@ import ClapShare from "@/components/post/ClapShare.svelte";
 import Comments from "@/components/post/Comments.svelte";
 import FloatingNewsletter from "@/components/post/FloatingNewsletter.svelte";
 import Layout from "@/layouts/Layout.astro";
+import { getSupabaseClient } from "@/lib/api";
 import { fetchPostStats } from "@/lib/stats";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts", ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id } }));
+}
+
+const runtimeEnv = (Astro.locals as any).runtime?.env ?? {};
+const supabase = getSupabaseClient(
+  runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+  runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 const { slug } = Astro.params;
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
@@ -30,7 +43,10 @@ const hasImage = !!post.data.image;
 
 const otherPosts = allPosts.filter((p) => p.id !== post.id);
 const relatedSlice = shuffle(otherPosts).slice(0, 3);
-const relatedStats = await fetchPostStats(relatedSlice.map((p) => p.id));
+const relatedStats = await fetchPostStats(
+  relatedSlice.map((p) => p.id),
+  supabase
+);
 
 const relatedPosts = relatedSlice.map((p) => ({
   title: p.data.title,

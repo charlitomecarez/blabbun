@@ -5,6 +5,16 @@ import { getCollection } from "astro:content";
 import ArchiveList from "@/components/archive/ArchiveList.svelte";
 import Layout from "@/layouts/Layout.astro";
 
+export async function getStaticPaths() {
+  const posts = await getCollection("posts", ({ data }) => !data.draft);
+  const tags = [
+    ...new Set(
+      posts.flatMap((p) => p.data.tags ?? []).map((t) => t.toUpperCase())
+    ),
+  ];
+  return tags.map((tag) => ({ params: { tag } }));
+}
+
 const { tag: rawTag } = Astro.params;
 const tag = rawTag || "";
 
