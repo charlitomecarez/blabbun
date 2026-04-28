@@ -34,8 +34,10 @@
     refreshCooldown();
 
     function onScroll() {
-      const threshold = document.documentElement.scrollHeight * 0.3;
-      if (window.scrollY > threshold) visible = true;
+      const scrollable =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const threshold = scrollable * 0.3;
+      if (window.scrollY >= threshold) visible = true;
     }
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
@@ -118,6 +120,7 @@
   <!-- Desktop card -->
   <div
     class="fn-desktop"
+    role="complementary"
     class:fn-show={visible}
     aria-label="Newsletter signup"
   >
@@ -153,13 +156,22 @@
   </div>
 
   <!-- Mobile bar -->
-  <div class="fn-mobile" class:fn-show={visible} aria-label="Newsletter signup">
+  <div
+    class="fn-mobile"
+    role="complementary"
+    class:fn-show={visible}
+    aria-label="Newsletter signup"
+  >
     {#if succeeded}
-      <span class="fn-info">{info}</span>
+      <div aria-live="polite" aria-atomic="true">
+        <span class="fn-info">{info}</span>
+      </div>
     {:else}
       <span class="fn-mobile-label">subscribe</span>
       <form class="fn-mobile-form" onsubmit={submit}>
-        {#if err}<span class="fn-err fn-mobile-err">! {err}</span>{/if}
+        <div aria-live="polite" aria-atomic="true">
+          {#if err}<span class="fn-err fn-mobile-err">! {err}</span>{/if}
+        </div>
         <input
           bind:value={email}
           class="fn-input fn-mobile-input"
@@ -204,7 +216,7 @@
       display: block;
     }
     .fn-mobile {
-      display: none !important;
+      display: none;
     }
   }
 
@@ -339,6 +351,11 @@
   .fn-btn:disabled {
     opacity: 0.6;
     cursor: default;
+  }
+
+  .fn-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   .fn-mobile-btn {
