@@ -1,4 +1,3 @@
-// @ts-check
 import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
 import svelte from "@astrojs/svelte";
@@ -7,15 +6,20 @@ import { defineConfig } from "astro/config";
 
 export default defineConfig({
   site: "https://blabbun.com",
-  output: "server",
+
+  output: "static",
   adapter: cloudflare(),
+
   devToolbar: { enabled: false },
   security: { checkOrigin: false },
+
   integrations: [svelte(), mdx()],
+
   image: {
     domains: ["images.unsplash.com"],
     remotePatterns: [{ protocol: "https" }],
   },
+
   vite: {
     plugins: [tailwindcss()],
     build: {
@@ -30,5 +34,6 @@ export default defineConfig({
       ],
     },
   },
+
   compressHTML: true,
 });

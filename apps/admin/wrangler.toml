@@ -7,4 +7,10 @@ compatibility_flags = ["nodejs_compat"]
 pattern = "admin.blabbun.com"
 
 [assets]
-run_worker_first = true
+directory = "./dist"
+run_worker_first = false
+
+[observability]
+[observability.logs]
+enabled = false
+invocation_logs = true
