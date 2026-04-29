@@ -3,32 +3,30 @@ import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout title="help" description="Help for Blab Bun.">
-  <main
-    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
-  >
-    <div style="animation:fadeIn 0.2s ease">
+  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-8">
+    <div class="animate-[fadeIn_0.2s_ease]">
       <a
         href="/"
-        style="background:none;border:none;color:var(--accent);font-size:0.76rem;cursor:pointer;font-family:inherit;padding:0;margin-bottom:28px;display:inline-block;text-decoration:none"
+        class="mb-7 inline-block text-[0.76rem] text-[var(--accent)] no-underline"
       >
         ← back
       </a>
-      <h1
-        style="font-size:1.05rem;font-weight:600;margin-bottom:24px;margin-top:20px"
-      >
-        help
-      </h1>
+
+      <h1 class="mt-5 mb-6 text-[1.05rem] font-semibold">help</h1>
+
       <div
-        style="font-size:0.82rem;color:var(--muted);line-height:1.9;max-width:540px"
+        class="max-w-[540px] text-[0.82rem] leading-[1.9] text-[var(--muted)]"
       >
-        <p style="margin-bottom:14px">
+        <p class="mb-3.5">
           got a question? something broken? something you disagree with and want
           to talk about?
         </p>
-        <p style="margin-bottom:14px">
+
+        <p class="mb-3.5">
           leave an anonymous comment on any post — it's the best way to reach
           me. i read all of them.
         </p>
+
         <p>
           if it's something bigger, you can probably find me on the internet
           somewhere. i'm not hard to locate if you actually look.

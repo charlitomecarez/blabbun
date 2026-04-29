@@ -194,3 +194,184 @@ body.dark .tag-default {
   background: #1e1a14;
   color: #a09080;
 }
+
+/* ─── Comment components (extracted from Svelte scoped styles to avoid JS-bundled CSS) ── */
+.comment-item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.comment-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.comment-author {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+.comment-time {
+  font-size: 0.65rem;
+  color: var(--muted2);
+  font-weight: 400;
+}
+.comment-body {
+  font-size: 0.84rem;
+  line-height: 1.65;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.reply-body {
+  font-size: 0.8rem;
+}
+.reply-toggle {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.7rem;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 0.02em;
+  transition: color 0.12s;
+}
+.reply-toggle:hover {
+  color: var(--accent);
+}
+.replies-thread {
+  margin-top: 10px;
+  margin-left: 14px;
+  padding-left: 12px;
+  border-left: 2px solid var(--accent-soft);
+}
+.reply-item {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.reply-form {
+  padding-top: 10px;
+}
+.reply-textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  color: var(--text);
+  width: 100%;
+  outline: none;
+  resize: none;
+  font-family: inherit;
+  line-height: 1.6;
+  display: block;
+}
+.reply-actions {
+  margin-top: 6px;
+  display: flex;
+  gap: 8px;
+}
+.reply-submit {
+  background: var(--accent);
+  border: none;
+  border-radius: 3px;
+  padding: 7px 16px;
+  font-size: 0.72rem;
+  font-family: inherit;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.reply-submit:disabled {
+  opacity: 0.4;
+}
+.reply-cancel {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.72rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.reply-cancel:hover {
+  color: var(--accent);
+}
+.list-header {
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+}
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.load-more {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.74rem;
+  color: var(--accent);
+  cursor: pointer;
+  margin-top: 12px;
+  padding: 0;
+}
+.load-more:hover {
+  text-decoration: underline;
+}
+.form-wrap {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--divider);
+}
+.form-label {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+  letter-spacing: 0.04em;
+}
+.form-name {
+  color: var(--accent);
+}
+.form-error {
+  font-size: 0.7rem;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.form-success {
+  font-size: 0.7rem;
+  color: #3a8c5a;
+  margin-bottom: 8px;
+}
+.form-textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: var(--text);
+  width: 100%;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+  margin-bottom: 10px;
+  display: block;
+}
+.submit-btn {
+  background: var(--accent);
+  border: none;
+  border-radius: 3px;
+  padding: 9px 20px;
+  font-size: 0.74rem;
+  font-family: inherit;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: opacity 0.15s;
+}
+.submit-btn:disabled {
+  opacity: 0.6;
+}

@@ -37,49 +37,52 @@ const items = [
 ---
 
 <Layout title="/now" description="what i'm doing right now.">
-  <main
-    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
-  >
-    <div style="animation:fadeIn 0.2s ease">
+  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-8 py-10">
+    <div class="animate-[fadeIn_0.2s_ease]">
+      <!-- back -->
       <a
         href="/"
-        style="background:none;border:none;color:var(--accent);font-size:0.76rem;cursor:pointer;font-family:inherit;padding:0;margin-bottom:32px;display:inline-block;text-decoration:none"
+        class="mb-8 inline-block text-[0.76rem] text-[var(--accent)] no-underline"
       >
         ← back
       </a>
 
-      <div style="margin-bottom:32px;margin-top:20px">
-        <h1
-          style="font-size:1.1rem;font-weight:600;margin-bottom:6px;color:var(--text)"
-        >
+      <!-- header -->
+      <div class="mt-5 mb-8">
+        <h1 class="mb-1.5 text-[1.1rem] font-semibold text-[var(--text)]">
           now
         </h1>
-        <div style="font-size:0.7rem;color:var(--muted)">
+
+        <div class="text-[0.7rem] text-[var(--muted)]">
           a snapshot of what's going on — updated Apr 2026 ·{" "}
           <a
             href="https://nownownow.com/about"
             target="_blank"
             rel="noopener noreferrer"
-            style="color:var(--accent);text-decoration:none"
-            >what is a /now page?</a
+            class="text-[var(--accent)] no-underline"
           >
+            what is a /now page?
+          </a>
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:36px;max-width:560px">
+      <!-- sections -->
+      <div class="flex max-w-[560px] flex-col gap-9">
         {
           items.map(({ section, entries }) => (
             <div>
-              <div style="font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;border-bottom:1px solid var(--divider);padding-bottom:8px">
+              <div class="mb-3.5 border-b border-[var(--divider)] pb-2 text-[0.65rem] tracking-[0.08em] text-[var(--muted)] uppercase">
                 {section}
               </div>
-              <div style="display:flex;flex-direction:column;gap:10px">
+
+              <div class="flex flex-col gap-2.5">
                 {entries.map((entry) => (
-                  <div style="display:flex;gap:12px;align-items:flex-start">
-                    <span style="color:var(--accent);font-size:0.8rem;margin-top:2px;flex-shrink:0">
+                  <div class="flex items-start gap-3">
+                    <span class="mt-[2px] flex-shrink-0 text-[0.8rem] text-[var(--accent)]">
                       —
                     </span>
-                    <p style="font-size:0.84rem;line-height:1.7;color:var(--muted)">
+
+                    <p class="text-[0.84rem] leading-[1.7] text-[var(--muted)]">
                       {entry}
                     </p>
                   </div>
@@ -90,15 +93,20 @@ const items = [
         }
       </div>
 
+      <!-- footer -->
       <div
-        style="margin-top:48px;padding-top:24px;border-top:1px solid var(--divider);font-size:0.68rem;color:var(--muted)"
+        class="mt-12 border-t border-[var(--divider)] pt-6 text-[0.68rem] text-[var(--muted)]"
       >
-        inspired by <a
+        inspired by{" "}
+        <a
           href="https://nownownow.com"
           target="_blank"
           rel="noopener noreferrer"
-          style="color:var(--accent);text-decoration:none">nownownow.com</a
-        > — the /now page movement
+          class="text-[var(--accent)] no-underline"
+        >
+          nownownow.com
+        </a>
+        {" "}— the /now page movement
       </div>
     </div>
   </main>
