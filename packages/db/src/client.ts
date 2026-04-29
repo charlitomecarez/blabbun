@@ -4,7 +4,9 @@ import type { Database } from "./types.js";
 
 export function createSupabaseClient(url: string, key: string) {
   return createClient<Database>(url, key, {
-    global: { fetch: (...args: Parameters<typeof fetch>) => fetch(...args) },
+    global: {
+      fetch: globalThis.fetch.bind(globalThis),
+    },
   });
 }
 
