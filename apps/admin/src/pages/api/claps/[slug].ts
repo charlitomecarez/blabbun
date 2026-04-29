@@ -1,13 +1,15 @@
 import { createSupabaseClient } from "@blabbun/db";
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getClient(): any {
+function getClient() {
+  const runtimeEnv = env as unknown as Record<string, string | undefined>;
   return createSupabaseClient(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
 }
 

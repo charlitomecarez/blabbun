@@ -1,5 +1,6 @@
 import { createSupabaseClient } from "@blabbun/db";
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import { Resend } from "resend";
 
 export const prerender = false;
@@ -83,11 +84,15 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: "title and slug are required" }, 400);
   }
 
+  const runtimeEnv = env as unknown as Record<string, string | undefined>;
   const supabase = createSupabaseClient(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
-  const resend = new Resend(import.meta.env.RESEND_API_KEY);
+  const resend = new Resend(
+    runtimeEnv.RESEND_API_KEY ?? import.meta.env.RESEND_API_KEY
+  );
 
   const { data: subscribers, error } = await supabase
     .from("subscribers")
@@ -119,7 +124,7 @@ export const POST: APIRoute = async ({ request }) => {
     const batch = emails.slice(i, i + BATCH);
     const { error: sendError } = await resend.batch.send(
       batch.map((to) => ({
-        from: "onboarding@resend.dev",
+        from: "Blab Bun <noreply@blabbun.com>",
         to,
         subject: `new post: ${title}`,
         html,

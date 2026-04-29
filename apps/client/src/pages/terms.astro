@@ -3,53 +3,61 @@ import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout title="terms" description="Terms, privacy, and help for Blab Bun.">
-  <main
-    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
-  >
-    <div style="animation:fadeIn 0.2s ease">
+  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-8 py-10">
+    <div class="animate-[fadeIn_0.2s_ease]">
+      <!-- back -->
       <a
         href="/"
-        style="background:none;border:none;color:var(--accent);font-size:0.76rem;cursor:pointer;font-family:inherit;padding:0;margin-bottom:28px;display:inline-block;text-decoration:none"
+        class="mb-7 inline-block text-[0.76rem] text-[var(--accent)] no-underline"
       >
         ← back
       </a>
-      <h1
-        style="font-size:1.05rem;font-weight:600;margin-bottom:24px;margin-top:20px"
-      >
-        terms
-      </h1>
+
+      <!-- title -->
+      <h1 class="mt-5 mb-6 text-[1.05rem] font-semibold">terms</h1>
+
+      <!-- intro -->
       <div
-        style="font-size:0.82rem;color:var(--muted);line-height:1.9;max-width:540px"
+        class="max-w-[540px] space-y-3.5 text-[0.82rem] leading-[1.9] text-[var(--muted)]"
       >
-        <p style="margin-bottom:14px">
+        <p>
           this is a personal blog. i write what i think. that means sometimes
           i'm wrong, sometimes i'm sloppy, and occasionally i write something at
           11pm that probably needed one more edit.
         </p>
-        <p style="margin-bottom:14px">
+
+        <p>
           by reading this you agree to take everything here with at least a
           small grain of salt. none of this is legal, medical, financial, or
           professional advice of any kind.
         </p>
-        <p style="margin-bottom:28px">
+
+        <p>
           if something i wrote genuinely bothered you, you're welcome to leave
           an anonymous comment. i read all of them.
         </p>
+      </div>
 
-        <div
-          style="border-top:1px solid var(--divider);padding-top:24px;display:flex;flex-direction:column;gap:16px"
-        >
-          <div>
-            <div
-              style="font-size:0.65rem;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:8px;color:var(--muted)"
-            >
-              privacy
-            </div>
-            <p style="margin-bottom:8px">
+      <!-- sections -->
+      <div
+        class="mt-8 flex max-w-[540px] flex-col gap-6 border-t border-[var(--divider)] pt-6"
+      >
+        <!-- privacy -->
+        <div>
+          <div
+            class="mb-2 text-[0.65rem] tracking-[0.07em] text-[var(--muted)] uppercase"
+          >
+            privacy
+          </div>
+
+          <div
+            class="space-y-2 text-[0.82rem] leading-[1.9] text-[var(--muted)]"
+          >
+            <p>
               i don't collect your data. i don't have analytics. i can't see who
               you are or where you're from.
             </p>
-            <p style="margin-bottom:8px">
+            <p>
               if you subscribe to the newsletter, i get your email address and
               nothing else. i won't sell it, share it, or use it for anything
               other than sending you the occasional post.
@@ -59,17 +67,24 @@ import Layout from "@/layouts/Layout.astro";
               yours.
             </p>
           </div>
-          <div style="border-top:1px solid var(--divider);padding-top:16px">
-            <div
-              style="font-size:0.65rem;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:8px;color:var(--muted)"
-            >
-              help
-            </div>
-            <p style="margin-bottom:8px">
+        </div>
+
+        <!-- help -->
+        <div class="border-t border-[var(--divider)] pt-4">
+          <div
+            class="mb-2 text-[0.65rem] tracking-[0.07em] text-[var(--muted)] uppercase"
+          >
+            help
+          </div>
+
+          <div
+            class="space-y-2 text-[0.82rem] leading-[1.9] text-[var(--muted)]"
+          >
+            <p>
               got a question? something broken? something you disagree with and
               want to talk about?
             </p>
-            <p style="margin-bottom:8px">
+            <p>
               leave an anonymous comment on any post — it's the best way to
               reach me. i read all of them.
             </p>

@@ -19,8 +19,7 @@ export function verifyUnsubscribeToken(
   }
 }
 
-export function unsubscribeUrl(email: string): string {
-  const secret = import.meta.env.UNSUBSCRIBE_SECRET as string;
+export function unsubscribeUrl(email: string, secret: string): string {
   const token = sign(email, secret);
   const params = new URLSearchParams({ email, token });
   return `https://blabbun.com/unsubscribe?${params}`;

@@ -1,9 +1,13 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { getSupabaseClient } from "@/lib/api";
+import { getRuntimeEnv, getSupabaseClient } from "@/lib/api";
 import { verifyUnsubscribeToken } from "@/lib/unsubscribe";
 
 export const prerender = false;
+
+const runtimeEnv = getRuntimeEnv(Astro.locals);
+const secret: string =
+  runtimeEnv.UNSUBSCRIBE_SECRET ?? import.meta.env.UNSUBSCRIBE_SECRET ?? "";
 
 const url = new URL(Astro.request.url);
 const done = url.searchParams.get("done") === "true";
@@ -17,17 +21,19 @@ if (Astro.request.method === "POST") {
   email = form.get("email")?.toString() ?? "";
   token = form.get("token")?.toString() ?? "";
 
-  const secret = import.meta.env.UNSUBSCRIBE_SECRET as string;
   if (!secret || !verifyUnsubscribeToken(email, token, secret)) {
     formError = "This unsubscribe link is invalid or has expired.";
   } else {
-    const supabase = getSupabaseClient();
+    const supabase = getSupabaseClient(
+      runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+      runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+        import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    );
     await supabase.from("subscribers").delete().eq("email", email);
     return Astro.redirect("/unsubscribe?done=true");
   }
 }
 
-const secret = import.meta.env.UNSUBSCRIBE_SECRET as string;
 const validLink =
   !done &&
   email &&
@@ -38,70 +44,72 @@ const validLink =
 
 <Layout title="unsubscribe" description="Manage your subscription to blab bun.">
   <main
-    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh;display:flex;flex-direction:column;justify-content:center"
+    class="mx-auto flex min-h-[60vh] w-full max-w-[680px] flex-1 flex-col justify-center px-8"
   >
-    <div style="animation:fadeIn 0.2s ease">
+    <div class="animate-[fadeIn_0.2s_ease]">
       {
         done ? (
           <>
-            <div style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px">
+            <div class="mb-4 text-[0.68rem] tracking-[0.06em] text-[var(--muted)] uppercase">
               unsubscribed
             </div>
-            <h1 style="font-size:1.2rem;font-weight:600;color:var(--text);margin-bottom:12px;line-height:1.4">
+
+            <h1 class="mb-3 text-[1.2rem] leading-[1.4] font-semibold text-[var(--text)]">
               you're out.
             </h1>
-            <p style="font-size:0.84rem;color:var(--muted);line-height:1.8;margin-bottom:32px;max-width:440px;text-wrap:pretty">
+
+            <p class="mb-8 max-w-[440px] text-[0.84rem] leading-[1.8] text-pretty text-[var(--muted)]">
               you won't hear from blab bun again. no confirmation emails, no
               "we'll miss you" sequence. just silence.
             </p>
-            <div style="display:flex;gap:12px;flex-wrap:wrap">
-              <a
-                href="/"
-                style="font-size:0.78rem;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:3px;padding:7px 14px;transition:background 0.15s"
-                onmouseenter="this.style.background='var(--accent-soft)'"
-                onmouseleave="this.style.background='transparent'"
-              >
-                ← go home
-              </a>
-            </div>
+
+            <a
+              href="/"
+              class="inline-block rounded-[3px] border border-[var(--accent)] px-[14px] py-[7px] text-[0.78rem] text-[var(--accent)] no-underline transition-colors hover:bg-[var(--accent-soft)]"
+            >
+              ← go home
+            </a>
           </>
         ) : validLink ? (
           <>
-            <div style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px">
+            <div class="mb-4 text-[0.68rem] tracking-[0.06em] text-[var(--muted)] uppercase">
               unsubscribe
             </div>
-            <h1 style="font-size:1.2rem;font-weight:600;color:var(--text);margin-bottom:12px;line-height:1.4">
+
+            <h1 class="mb-3 text-[1.2rem] leading-[1.4] font-semibold text-[var(--text)]">
               leave the list?
             </h1>
-            <p style="font-size:0.84rem;color:var(--muted);line-height:1.8;margin-bottom:8px;max-width:440px;text-wrap:pretty">
+
+            <p class="mb-2 max-w-[440px] text-[0.84rem] leading-[1.8] text-pretty text-[var(--muted)]">
               this will remove{" "}
-              <strong style="color:var(--text);font-weight:500">{email}</strong>{" "}
+              <strong class="font-medium text-[var(--text)]">{email}</strong>{" "}
               from the blab bun mailing list.
             </p>
-            <p style="font-size:0.84rem;color:var(--muted);line-height:1.8;margin-bottom:32px;max-width:440px;text-wrap:pretty">
+
+            <p class="mb-8 max-w-[440px] text-[0.84rem] leading-[1.8] text-pretty text-[var(--muted)]">
               no hard feelings. you can always resubscribe from the homepage.
             </p>
+
             {formError && (
-              <p style="font-size:0.78rem;color:#c0392b;margin-bottom:20px;line-height:1.6">
+              <p class="mb-5 text-[0.78rem] leading-[1.6] text-red-600">
                 {formError}
               </p>
             )}
-            <form method="POST" style="display:flex;gap:12px;flex-wrap:wrap">
+
+            <form class="flex flex-wrap gap-3" method="POST">
               <input type="hidden" name="email" value={email} />
               <input type="hidden" name="token" value={token} />
+
               <button
                 type="submit"
-                style="font-size:0.78rem;font-family:inherit;cursor:pointer;background:#c4832a;color:#fff;border:none;border-radius:3px;padding:8px 18px;transition:opacity 0.15s;letter-spacing:0.02em"
-                onmouseenter="this.style.opacity='0.85'"
-                onmouseleave="this.style.opacity='1'"
+                class="font-inherit cursor-pointer rounded-[3px] border-none bg-[#c4832a] px-[18px] py-[8px] text-[0.78rem] text-white transition-opacity hover:opacity-80"
               >
                 yes, unsubscribe me
               </button>
+
               <a
                 href="/"
-                style="font-size:0.78rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:3px;padding:7px 14px;transition:background 0.15s"
-                onmouseenter="this.style.background='var(--bg2)'"
-                onmouseleave="this.style.background='transparent'"
+                class="rounded-[3px] border border-[var(--border)] px-[14px] py-[7px] text-[0.78rem] text-[var(--muted)] no-underline transition-colors hover:bg-[var(--bg2)]"
               >
                 never mind
               </a>
@@ -109,21 +117,22 @@ const validLink =
           </>
         ) : (
           <>
-            <div style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px">
+            <div class="mb-4 text-[0.68rem] tracking-[0.06em] text-[var(--muted)] uppercase">
               invalid link
             </div>
-            <h1 style="font-size:1.2rem;font-weight:600;color:var(--text);margin-bottom:12px;line-height:1.4">
+
+            <h1 class="mb-3 text-[1.2rem] leading-[1.4] font-semibold text-[var(--text)]">
               this link doesn't work.
             </h1>
-            <p style="font-size:0.84rem;color:var(--muted);line-height:1.8;margin-bottom:32px;max-width:440px;text-wrap:pretty">
+
+            <p class="mb-8 max-w-[440px] text-[0.84rem] leading-[1.8] text-pretty text-[var(--muted)]">
               it's either expired, malformed, or you got here by accident. try
               clicking the unsubscribe link directly from the email.
             </p>
+
             <a
               href="/"
-              style="font-size:0.78rem;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:3px;padding:7px 14px;transition:background 0.15s;display:inline-block"
-              onmouseenter="this.style.background='var(--accent-soft)'"
-              onmouseleave="this.style.background='transparent'"
+              class="inline-block rounded-[3px] border border-[var(--accent)] px-[14px] py-[7px] text-[0.78rem] text-[var(--accent)] no-underline transition-colors hover:bg-[var(--accent-soft)]"
             >
               ← go home
             </a>

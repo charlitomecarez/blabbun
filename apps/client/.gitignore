@@ -39,3 +39,6 @@ apps/*/node_modules/
 
 # env vars
 .env.local
+
+# cloudflare
+.wrangler
