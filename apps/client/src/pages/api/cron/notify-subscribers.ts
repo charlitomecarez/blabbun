@@ -60,7 +60,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   // Each subscriber gets a personalized email with their own unsubscribe link
   const messages = subscribers.map((sub) => ({
-    from: "onboarding@resend.dev",
+    from: "Blabbun <noreply@blabbun.com>",
     to: sub.email,
     subject: post.data.title,
     html: newPostEmailHtml(
