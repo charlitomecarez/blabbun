@@ -238,7 +238,7 @@ if (subscribers.length === 0) {
     console.log("   (dry-run — skipping send)\n");
   } else {
     const messages = subscribers.map((sub) => ({
-      from: "Blabbun <noreply@blabbun.com>",
+      from: "Blab Bun <noreply@blabbun.com>",
       to: sub.email,
       subject: post.title,
       html: newPostEmailHtml({ ...post, date }, sub.email),
