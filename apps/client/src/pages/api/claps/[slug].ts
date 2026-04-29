@@ -16,7 +16,7 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
     env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
     env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
-  const hash = hashIp(request);
+  const hash = await hashIp(request);
 
   const [clapsResult, voteResult] = await Promise.all([
     supabase
@@ -48,7 +48,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
     env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
-  const hash = hashIp(request);
+  const hash = await hashIp(request);
 
   const [voteResult, clapResult] = await Promise.all([
     supabase

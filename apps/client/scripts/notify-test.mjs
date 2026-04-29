@@ -155,7 +155,11 @@ function newPostEmailHtml(post, email) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  global: {
+    fetch: globalThis.fetch.bind(globalThis),
+  },
+});
 const resend = RESEND_KEY ? new Resend(RESEND_KEY) : null;
 
 console.log(`\n🐰 blab bun · notify-subscribers`);

@@ -1,5 +1,3 @@
-import { createHash } from "node:crypto";
-
 import type { SupabaseClient } from "@blabbun/db";
 import { createSupabaseClient } from "@blabbun/db";
 
@@ -31,8 +29,12 @@ export function jsonResponse(data: unknown, status = 200): Response {
  * Falls back to "unknown" when the header is absent — prevents server errors
  * while still allowing dedup logic to function (all unknown IPs share one hash).
  */
-export function hashIp(request: Request): string {
+export async function hashIp(request: Request): Promise<string> {
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  return createHash("sha256").update(ip).digest("hex");
+  const data = new TextEncoder().encode(ip);
+  const buffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(buffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
