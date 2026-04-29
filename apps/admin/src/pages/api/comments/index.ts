@@ -1,15 +1,15 @@
 import { createSupabaseClient } from "@blabbun/db";
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getClient(locals: App.Locals): any {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const env = (locals as any).runtime?.env ?? {};
+function getClient() {
+  const runtimeEnv = env as unknown as Record<string, string | undefined>;
   return createSupabaseClient(
-    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
-    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
 }
 
@@ -20,12 +20,12 @@ function json(data: unknown, status = 200) {
   });
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   const { post_slug, body, anon_name, parent_id } = await request.json();
   if (!post_slug?.trim() || !body?.trim())
     return json({ error: "post_slug and body are required" }, 400);
 
-  const supabase = getClient(locals);
+  const supabase = getClient();
   const { data, error } = await supabase
     .from("comments")
     .insert({

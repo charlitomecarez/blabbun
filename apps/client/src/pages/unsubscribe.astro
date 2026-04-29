@@ -1,12 +1,11 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { getSupabaseClient } from "@/lib/api";
+import { getRuntimeEnv, getSupabaseClient } from "@/lib/api";
 import { verifyUnsubscribeToken } from "@/lib/unsubscribe";
 
 export const prerender = false;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const runtimeEnv = (Astro.locals as any).runtime?.env ?? {};
+const runtimeEnv = getRuntimeEnv(Astro.locals);
 const secret: string =
   runtimeEnv.UNSUBSCRIBE_SECRET ?? import.meta.env.UNSUBSCRIBE_SECRET ?? "";
 

@@ -5,11 +5,10 @@ import { getCollection } from "astro:content";
 import HomeFeed from "@/components/home/HomeFeed.svelte";
 import NewsletterBar from "@/components/home/NewsletterBar.svelte";
 import Layout from "@/layouts/Layout.astro";
-import { getSupabaseClient } from "@/lib/api";
+import { getRuntimeEnv, getSupabaseClient } from "@/lib/api";
 import { fetchPostStats } from "@/lib/stats";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const runtimeEnv = (Astro.locals as any).runtime?.env ?? {};
+const runtimeEnv = getRuntimeEnv(Astro.locals);
 const supabase = getSupabaseClient(
   runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
   runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??

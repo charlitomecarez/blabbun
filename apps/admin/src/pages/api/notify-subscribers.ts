@@ -1,5 +1,6 @@
 import { createSupabaseClient } from "@blabbun/db";
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import { Resend } from "resend";
 
 export const prerender = false;
@@ -71,7 +72,7 @@ function newPostEmailHtml(post: {
 </html>`;
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   const { title, slug, description, date } = (await request.json()) as {
     title?: string;
     slug?: string;
@@ -83,8 +84,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return json({ error: "title and slug are required" }, 400);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const runtimeEnv = (locals as any).runtime?.env ?? {};
+  const runtimeEnv = env as unknown as Record<string, string | undefined>;
   const supabase = createSupabaseClient(
     runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
     runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??

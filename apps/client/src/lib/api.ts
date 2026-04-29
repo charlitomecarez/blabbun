@@ -1,11 +1,11 @@
 import type { SupabaseClient } from "@blabbun/db";
 import { createSupabaseClient } from "@blabbun/db";
+import { env } from "cloudflare:workers";
 
 export type RuntimeEnv = Record<string, string | undefined>;
 
-export function getRuntimeEnv(locals: App.Locals): RuntimeEnv {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return ((locals as any).runtime?.env ?? {}) as RuntimeEnv;
+export function getRuntimeEnv(_locals: App.Locals): RuntimeEnv {
+  return env as unknown as RuntimeEnv;
 }
 
 export function getSupabaseClient(url: string, key: string): SupabaseClient {
