@@ -1,18 +1,8 @@
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { Resend } from "resend";
 
 import { unsubscribeUrl } from "@/lib/unsubscribe";
 
-// Read once on first import — swap to a hosted URL once you have a domain
-const LOGO_SRC = `data:image/png;base64,${readFileSync(
-  join(
-    dirname(fileURLToPath(import.meta.url)),
-    "../../public/blabbun-email.png"
-  )
-).toString("base64")}`;
+const LOGO_SRC = "https://blabbun.com/blabbun-email.png";
 
 export function getResendClient(apiKey: string): Resend {
   return new Resend(apiKey);
