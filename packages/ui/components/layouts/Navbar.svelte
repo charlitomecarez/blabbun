@@ -139,10 +139,11 @@
       "
     >
       <img
-        src="/blabbun.png"
+        src="/blabbun-logo.webp"
         alt="blab bun"
         width="28"
         height="28"
+        fetchpriority="high"
         style="width:28px;height:28px;object-fit:contain;flex-shrink:0"
       />
       <span

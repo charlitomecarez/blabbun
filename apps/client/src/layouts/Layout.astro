@@ -52,13 +52,21 @@ const totalWords = allPosts.reduce(
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/png" href="/blabbun.png" />
-    <link rel="apple-touch-icon" href="/blabbun.png" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/webp" href="/blabbun-logo.webp" />
+    <link rel="apple-touch-icon" href="/blabbun-logo.webp" />
     <link
       rel="alternate"
       type="application/rss+xml"
       title="Blab Bun"
       href="/rss.xml"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/ibm-plex-mono-400.woff2"
+      crossorigin
     />
     <meta name="generator" content={Astro.generator} />
 
@@ -137,26 +145,36 @@ const totalWords = allPosts.reduce(
       })}
     />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Non-blocking font load: print trick swaps to all once loaded -->
-    <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap"
-      rel="stylesheet"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap"
-        rel="stylesheet"
-      />
-    </noscript>
+    <style>
+      @font-face {
+        font-family: "IBM Plex Mono";
+        font-style: normal;
+        font-display: swap;
+        font-weight: 400;
+        src: url("/fonts/ibm-plex-mono-400.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "IBM Plex Mono";
+        font-style: normal;
+        font-display: swap;
+        font-weight: 500;
+        src: url("/fonts/ibm-plex-mono-500.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "IBM Plex Mono";
+        font-style: normal;
+        font-display: swap;
+        font-weight: 600;
+        src: url("/fonts/ibm-plex-mono-600.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "IBM Plex Mono";
+        font-style: italic;
+        font-display: swap;
+        font-weight: 400;
+        src: url("/fonts/ibm-plex-mono-400-italic.woff2") format("woff2");
+      }
+    </style>
     <meta
       name="theme-color"
       content="#fdf9f4"
