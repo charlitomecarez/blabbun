@@ -16,10 +16,7 @@ import Layout from "@/layouts/Layout.astro";
 import { getSupabaseClient } from "@/lib/api";
 import { fetchPostStats } from "@/lib/stats";
 
-export async function getStaticPaths() {
-  const posts = await getCollection("posts", ({ data }) => !data.draft);
-  return posts.map((post) => ({ params: { slug: post.id } }));
-}
+export const prerender = false;
 
 const runtimeEnv = (Astro.locals as any).runtime?.env ?? {};
 const supabase = getSupabaseClient(
