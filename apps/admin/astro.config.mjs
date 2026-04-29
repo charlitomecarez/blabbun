@@ -11,15 +11,14 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
-  },
-
-  ssr: {
-    noExternal: [
-      "@blabbun/utils",
-      "@blabbun/db",
-      "@blabbun/types",
-      "@blabbun/ui",
-    ],
+    ssr: {
+      noExternal: [
+        "@blabbun/utils",
+        "@blabbun/db",
+        "@blabbun/types",
+        "@blabbun/ui",
+      ],
+    },
   },
 
   devToolbar: { enabled: false },
