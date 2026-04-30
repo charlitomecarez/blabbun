@@ -26,6 +26,7 @@
     "@blabbun/ui": "workspace:*",
     "@tailwindcss/vite": "^4.2.2",
     "astro": "^6.1.6",
+    "marked": "^18.0.2",
     "resend": "^6.12.2",
     "svelte": "^5.55.4",
     "tailwindcss": "^4.2.2",
