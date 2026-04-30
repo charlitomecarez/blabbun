@@ -1,14 +1,9 @@
-import { existsSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
-// index.ts is at apps/admin/src/pages/api/posts/ — 5 levels up reaches apps/
-const POSTS_DIR = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../../../../client/src/content/posts"
-);
+import { getPostFile, upsertPostFile } from "../../../lib/github";
+
+export const prerender = false;
 
 function slugify(title: string): string {
   return title
@@ -80,9 +75,11 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  const filePath = join(POSTS_DIR, `${slug}.mdx`);
+  const runtimeEnv = env as unknown as Record<string, string | undefined>;
+  const token = runtimeEnv.GITHUB_TOKEN ?? import.meta.env.GITHUB_TOKEN ?? "";
 
-  if (!body.overwrite && existsSync(filePath)) {
+  const existing = await getPostFile(token, slug);
+  if (!body.overwrite && existing) {
     return new Response(
       JSON.stringify({ error: `slug "${slug}" already exists` }),
       { status: 409 }
@@ -101,6 +98,13 @@ export const POST: APIRoute = async ({ request }) => {
     body: content ?? "",
   });
 
-  writeFileSync(filePath, mdx, "utf-8");
+  try {
+    await upsertPostFile(token, slug, mdx, existing?.sha);
+  } catch (err) {
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
+      status: 500,
+    });
+  }
+
   return new Response(JSON.stringify({ ok: true, slug }), { status: 200 });
 };
