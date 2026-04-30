@@ -383,6 +383,8 @@ const today = new Date().toISOString().split("T")[0];
 </Layout>
 
 <script>
+  import { marked } from "marked";
+
   const $ = (id: string) =>
     document.getElementById(id) as
       | HTMLInputElement
@@ -430,6 +432,7 @@ const today = new Date().toISOString().split("T")[0];
     document.getElementById("form-label")!.textContent = "new post";
     document.getElementById("form-error")!.style.display = "none";
     ($("submit-btn") as HTMLButtonElement).textContent = "save post";
+    updatePreview();
   }
 
   async function editPost(slug: string) {
@@ -469,6 +472,7 @@ const today = new Date().toISOString().split("T")[0];
     document
       .getElementById("post-form")
       ?.scrollIntoView({ behavior: "smooth" });
+    updatePreview();
   }
 
   async function deletePost(slug: string) {
@@ -527,6 +531,58 @@ const today = new Date().toISOString().split("T")[0];
         btn.textContent = "save post";
       }
     });
+
+  function updatePreview() {
+    const title = ($("f-title") as HTMLInputElement)?.value ?? "";
+    const description = ($("f-description") as HTMLInputElement)?.value ?? "";
+    const pubDate = ($("f-pubDate") as HTMLInputElement)?.value ?? "";
+    const image = ($("f-image") as HTMLInputElement)?.value ?? "";
+    const content = ($("f-content") as HTMLTextAreaElement)?.value ?? "";
+
+    const isEmpty = !title && !description && !content;
+
+    const emptyEl = document.getElementById("preview-empty");
+    const contentEl = document.getElementById("preview-content");
+    if (emptyEl) emptyEl.style.display = isEmpty ? "block" : "none";
+    if (contentEl) contentEl.style.display = isEmpty ? "none" : "block";
+    if (isEmpty) return;
+
+    const imageWrap = document.getElementById("preview-image-wrap");
+    const imageEl = document.getElementById(
+      "preview-image"
+    ) as HTMLImageElement | null;
+    if (imageWrap && imageEl) {
+      imageWrap.style.display = image ? "block" : "none";
+      imageEl.src = image;
+    }
+
+    const dateEl = document.getElementById("preview-date");
+    if (dateEl) {
+      dateEl.textContent = pubDate
+        ? new Date(pubDate + "T00:00:00").toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "—";
+    }
+
+    const titleEl = document.getElementById("preview-title");
+    if (titleEl) titleEl.textContent = title || "untitled";
+
+    const descEl = document.getElementById("preview-description");
+    if (descEl) descEl.textContent = description;
+
+    const bodyEl = document.getElementById("preview-body");
+    if (bodyEl)
+      bodyEl.innerHTML = marked.parse(content, { async: false }) as string;
+  }
+
+  ["f-title", "f-description", "f-pubDate", "f-image", "f-content"].forEach(
+    (id) =>
+      document.getElementById(id)?.addEventListener("input", updatePreview)
+  );
+  updatePreview();
 
   Object.assign(window, { editPost, deletePost, addTag, resetForm });
 </script>
