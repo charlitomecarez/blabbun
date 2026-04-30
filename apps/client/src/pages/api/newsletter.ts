@@ -62,15 +62,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
         return { email, status: "error", error: error.message };
       }
 
-      // Fire-and-forget — don't block the response on email delivery
-      resend.emails
-        .send({
+      try {
+        await resend.emails.send({
           from: "Blab Bun <noreply@blabbun.com>",
           to: email,
           subject: "you're in.",
           html: welcomeEmailHtml(email, unsubscribeSecret),
-        })
-        .catch(console.error);
+        });
+      } catch (err) {
+        console.error("resend welcome email failed:", err);
+      }
 
       return { email, status: "subscribed" };
     })
