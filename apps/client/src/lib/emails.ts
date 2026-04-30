@@ -76,7 +76,7 @@ export function welcomeEmailHtml(
           <tr>
             <td style="padding-top:24px;border-top:1px solid #e0d4c0">
               <p style="font-size:0.7rem;color:#c5b8a8;margin:0 0 8px;line-height:1.7">
-                if this landed in promotions, drag it to your primary inbox — that's the only way to make sure you don't miss new posts.
+                📌 <strong style="color:#9c8b78">using gmail?</strong> drag this email to your <strong style="color:#9c8b78">Primary</strong> tab so you don't miss new posts. you only have to do it once.
               </p>
               <p style="font-size:0.7rem;color:#c5b8a8;margin:0;line-height:1.7">
                 you subscribed at <a href="https://blabbun.com" style="color:#c4832a;text-decoration:none">blabbun.com</a>.
