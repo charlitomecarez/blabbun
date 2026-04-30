@@ -383,6 +383,7 @@ const today = new Date().toISOString().split("T")[0];
 </Layout>
 
 <script>
+  import DOMPurify from "dompurify";
   import { marked } from "marked";
 
   const $ = (id: string) =>
@@ -575,7 +576,9 @@ const today = new Date().toISOString().split("T")[0];
 
     const bodyEl = document.getElementById("preview-body");
     if (bodyEl)
-      bodyEl.innerHTML = marked.parse(content, { async: false }) as string;
+      bodyEl.innerHTML = DOMPurify.sanitize(
+        marked.parse(content, { async: false }) as string
+      );
   }
 
   ["f-title", "f-description", "f-pubDate", "f-image", "f-content"].forEach(
