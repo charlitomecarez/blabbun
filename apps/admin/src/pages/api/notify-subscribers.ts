@@ -124,7 +124,7 @@ export const POST: APIRoute = async ({ request }) => {
     const batch = emails.slice(i, i + BATCH);
     const { error: sendError } = await resend.batch.send(
       batch.map((to) => ({
-        from: "Blab Bun <noreply@blabbun.com>",
+        from: "Blab Bun <noreply@email.blabbun.com>",
         to,
         subject: `new post: ${title}`,
         html,
