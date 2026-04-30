@@ -126,6 +126,53 @@
   .feed-card:hover .feed-img {
     transform: scale(1.02);
   }
+  @media (max-width: 640px) {
+    /* Break out of <main> px-8 (2rem) + #post-list padding (20px) on both sides */
+    .feed-card {
+      margin-left: calc(-2rem - 10px);
+      margin-right: calc(-2rem - 10px);
+      padding: 18px 1.25rem;
+    }
+    /* Hide gutter arrow — no gutter on mobile */
+    .feed-arrow {
+      display: none;
+    }
+    /* Image bleeds out of the card's own 1.25rem padding */
+    .feed-img-wrap {
+      margin-left: -1.25rem;
+      margin-right: -1.25rem;
+      width: calc(100% + 2.5rem);
+      border-radius: 0;
+      height: 180px;
+      margin-bottom: 14px;
+    }
+    .feed-meta-top {
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .feed-date {
+      font-size: 0.65rem;
+    }
+    .feed-badge {
+      font-size: 0.65rem;
+    }
+    .feed-title {
+      font-size: 1rem;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .feed-excerpt {
+      font-size: 0.76rem;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .feed-meta-bottom {
+      gap: 10px;
+    }
+    .feed-stat {
+      font-size: 0.64rem;
+    }
+  }
 
   /* ─── Date + badge row ────────────────────────────────────── */
   .feed-meta-top {

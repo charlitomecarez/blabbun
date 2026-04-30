@@ -3,37 +3,33 @@ import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout title="saved" description="Your bookmarked posts.">
-  <main
-    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
-  >
-    <div style="animation:fadeIn 0.2s ease">
+  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-8">
+    <div class="animate-[fadeIn_0.2s_ease]">
+      <!-- back -->
       <a
         href="/"
-        style="background:none;border:none;color:var(--accent);font-size:0.76rem;cursor:pointer;font-family:inherit;padding:0;margin-bottom:28px;display:inline-block;text-decoration:none"
+        class="mb-7 inline-block text-[0.76rem] text-[var(--accent)] no-underline"
       >
         ← back
       </a>
 
-      <h1
-        style="font-size:1.05rem;font-weight:600;margin-bottom:6px;margin-top:20px"
-      >
-        saved
-      </h1>
-      <div
-        id="saved-count"
-        style="font-size:0.72rem;color:var(--muted);margin-bottom:24px"
-      >
+      <!-- header -->
+      <h1 class="mt-5 mb-1.5 text-[1.05rem] font-semibold">saved</h1>
+
+      <div id="saved-count" class="mb-6 text-[0.72rem] text-[var(--muted)]">
         0 posts bookmarked
       </div>
 
+      <!-- empty state -->
       <div
         id="saved-empty"
-        style="padding:40px 0;font-size:0.8rem;color:var(--muted);border-top:1px solid var(--divider)"
+        class="border-t border-[var(--divider)] py-10 text-[0.8rem] text-[var(--muted)]"
       >
         nothing saved yet. hit the 🔖 on any post to save it for later.
       </div>
 
-      <div id="saved-list" style="padding-left:20px;display:none"></div>
+      <!-- saved list -->
+      <div id="saved-list" class="hidden pl-5"></div>
     </div>
   </main>
 </Layout>

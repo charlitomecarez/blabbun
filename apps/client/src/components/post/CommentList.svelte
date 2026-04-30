@@ -30,7 +30,7 @@
 </div>
 
 {#if comments.length > 0}
-  <div class="list">
+  <div class="comment-list">
     {#each visibleComments as comment (comment.id)}
       <CommentItem {comment} {activeReplyId} {onReplyToggle} {onReplySubmit} />
     {/each}
@@ -46,33 +46,3 @@
     load more ({comments.length - visibleCount} remaining)
   </button>
 {/if}
-
-<style>
-  .list-header {
-    font-size: 0.72rem;
-    color: var(--muted);
-    letter-spacing: 0.06em;
-    margin-bottom: 24px;
-    text-transform: uppercase;
-  }
-
-  .list {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .load-more {
-    background: none;
-    border: none;
-    font-family: inherit;
-    font-size: 0.74rem;
-    color: var(--accent);
-    cursor: pointer;
-    margin-top: 12px;
-    padding: 0;
-  }
-  .load-more:hover {
-    text-decoration: underline;
-  }
-</style>
