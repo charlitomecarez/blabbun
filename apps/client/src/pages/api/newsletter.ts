@@ -70,7 +70,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       const unsubUrl = unsubscribeUrl(email, unsubscribeSecret);
       try {
         await resend.emails.send({
-          from: "Blab Bun <hello@mail.blabbun.com>",
+          from: "Blab Bun <hello@email.blabbun.com>",
           replyTo: "hello@blabbun.com",
           to: email,
           subject: "you're in.",
