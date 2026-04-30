@@ -16,6 +16,23 @@ function esc(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
+export function welcomeEmailText(
+  email: string,
+  unsubscribeSecret: string
+): string {
+  const unsubUrl = unsubscribeUrl(email, unsubscribeSecret);
+  return `you're in.
+
+no schedule. no issues.
+
+just an email when something new drops — could be tomorrow. could be never.
+
+read the archive → https://blabbun.com
+
+---
+you subscribed at blabbun.com. changed your mind? ${unsubUrl}`;
+}
+
 export function welcomeEmailHtml(
   email: string,
   unsubscribeSecret: string
