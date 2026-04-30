@@ -22,7 +22,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Send subscriber notifications
-        run: node apps/client/scripts/notify-test.mjs --send
+        run: node scripts/notify-test.mjs --send
+        working-directory: apps/client
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
