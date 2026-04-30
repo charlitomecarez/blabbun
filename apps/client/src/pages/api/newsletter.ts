@@ -6,7 +6,6 @@ import {
   welcomeEmailHtml,
   welcomeEmailText,
 } from "@/lib/emails";
-import { unsubscribeUrl } from "@/lib/unsubscribe";
 
 export const prerender = false;
 
@@ -67,7 +66,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
         return { email, status: "error", error: error.message };
       }
 
-      const unsubUrl = unsubscribeUrl(email, unsubscribeSecret);
       try {
         await resend.emails.send({
           from: "Blab Bun <hello@email.blabbun.com>",
@@ -76,10 +74,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
           subject: "you're in.",
           html: welcomeEmailHtml(email, unsubscribeSecret),
           text: welcomeEmailText(email, unsubscribeSecret),
-          headers: {
-            "List-Unsubscribe": `<${unsubUrl}>`,
-            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-          },
         });
       } catch (err) {
         console.error("resend welcome email failed:", err);
