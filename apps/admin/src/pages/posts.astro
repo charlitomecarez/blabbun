@@ -1,17 +1,10 @@
 ---
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
-import { readdirSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { env } from "cloudflare:workers";
 
 import Layout from "../layouts/Layout.astro";
-
-// posts.astro is at apps/admin/src/pages/ — 3 levels up reaches apps/
-const POSTS_DIR = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../../client/src/content/posts"
-);
+import { listPostFiles } from "../lib/github";
 
 interface PostMeta {
   slug: string;
@@ -46,227 +39,289 @@ function parseMeta(slug: string, raw: string): PostMeta {
   };
 }
 
-const allFiles = readdirSync(POSTS_DIR)
-  .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"))
-  .sort()
-  .reverse();
+const runtimeEnv = env as unknown as Record<string, string | undefined>;
+const token = runtimeEnv.GITHUB_TOKEN ?? import.meta.env.GITHUB_TOKEN ?? "";
 
-const posts = allFiles.map((f) => {
-  const slug = f.replace(/\.(mdx?|md)$/, "");
-  const raw = readFileSync(join(POSTS_DIR, f), "utf-8");
-  return parseMeta(slug, raw);
-});
+const files = await listPostFiles(token);
+files.sort((a, b) => b.name.localeCompare(a.name));
+
+const posts = await Promise.all(
+  files.map(async (f) => {
+    const slug = f.name.replace(/\.(mdx?|md)$/, "");
+    const raw = await fetch(f.download_url).then((r) => r.text());
+    return parseMeta(slug, raw);
+  })
+);
 
 const today = new Date().toISOString().split("T")[0];
 ---
 
 <Layout title="posts">
-  <!-- Editor form -->
-  <div
-    style="border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:24px;background:var(--bg2)"
-  >
+  <div style="display:flex;gap:24px;align-items:flex-start;margin-bottom:24px">
+    <!-- Editor form -->
     <div
-      id="form-label"
-      style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px"
+      style="flex:1;min-width:0;border:1px solid var(--border);border-radius:4px;padding:20px;background:var(--bg2)"
     >
-      new post
-    </div>
-    <div
-      id="form-error"
-      style="display:none;font-size:0.75rem;color:#c0392b;margin-bottom:10px"
-    >
-    </div>
-    <form
-      id="post-form"
-      style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px"
-    >
-      <input type="hidden" id="f-overwrite" name="overwrite" value="false" />
-
-      <div>
-        <label
-          for="f-title"
-          style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
-          >title *</label
-        >
-        <input
-          id="f-title"
-          name="title"
-          type="text"
-          required
-          placeholder="post title"
-          style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
-        />
-      </div>
-
-      <div>
-        <label
-          for="f-slug"
-          style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
-          >slug</label
-        >
-        <input
-          id="f-slug"
-          name="slug"
-          type="text"
-          placeholder="auto-generated"
-          style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
-        />
-      </div>
-
-      <div style="grid-column:1/-1">
-        <label
-          for="f-description"
-          style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
-          >description *</label
-        >
-        <input
-          id="f-description"
-          name="description"
-          type="text"
-          required
-          placeholder="one-line summary"
-          style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
-        />
-      </div>
-
       <div
-        style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end"
+        id="form-label"
+        style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px"
       >
+        new post
+      </div>
+      <div
+        id="form-error"
+        style="display:none;font-size:0.75rem;color:#c0392b;margin-bottom:10px"
+      >
+      </div>
+      <form
+        id="post-form"
+        style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px"
+      >
+        <input type="hidden" id="f-overwrite" name="overwrite" value="false" />
+
         <div>
           <label
-            for="f-pubDate"
+            for="f-title"
             style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
-            >date *</label
+            >title *</label
           >
           <input
-            id="f-pubDate"
-            name="pubDate"
-            type="date"
-            value={today}
+            id="f-title"
+            name="title"
+            type="text"
             required
+            placeholder="post title"
             style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
           />
         </div>
-        <label
-          style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--muted);cursor:pointer;padding-bottom:9px;white-space:nowrap"
-        >
-          <input
-            id="f-draft"
-            type="checkbox"
-            style="accent-color:var(--accent)"
-          />
-          draft
-        </label>
-      </div>
 
-      <div>
-        <label
-          for="f-tags"
-          style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
-          >tags</label
+        <div>
+          <label
+            for="f-slug"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >slug</label
+          >
+          <input
+            id="f-slug"
+            name="slug"
+            type="text"
+            placeholder="auto-generated"
+            style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+          />
+        </div>
+
+        <div style="grid-column:1/-1">
+          <label
+            for="f-description"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >description *</label
+          >
+          <input
+            id="f-description"
+            name="description"
+            type="text"
+            required
+            placeholder="one-line summary"
+            style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+          />
+        </div>
+
+        <div
+          style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end"
         >
-        <input
-          id="f-tags"
-          name="tags"
-          type="text"
-          placeholder="RANTS, LIFE STUFF, EDITORIAL"
-          style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
-        />
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">
-          {
-            ["RANTS", "LIFE STUFF", "EDITORIAL", "TECH", "PERSONAL"].map(
-              (tag) => (
-                <button
-                  type="button"
-                  onclick={`addTag('${tag}')`}
-                  style="padding:2px 8px;font-size:0.62rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);cursor:pointer;letter-spacing:0.04em"
-                  onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-                  onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
-                >
-                  + {tag}
-                </button>
+          <div>
+            <label
+              for="f-pubDate"
+              style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+              >date *</label
+            >
+            <input
+              id="f-pubDate"
+              name="pubDate"
+              type="date"
+              value={today}
+              required
+              style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+            />
+          </div>
+          <label
+            style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--muted);cursor:pointer;padding-bottom:9px;white-space:nowrap"
+          >
+            <input
+              id="f-draft"
+              type="checkbox"
+              style="accent-color:var(--accent)"
+            />
+            draft
+          </label>
+        </div>
+
+        <div>
+          <label
+            for="f-tags"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >tags</label
+          >
+          <input
+            id="f-tags"
+            name="tags"
+            type="text"
+            placeholder="RANTS, LIFE STUFF, EDITORIAL"
+            style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+          />
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">
+            {
+              ["RANTS", "LIFE STUFF", "EDITORIAL", "TECH", "PERSONAL"].map(
+                (tag) => (
+                  <button
+                    type="button"
+                    onclick={`addTag('${tag}')`}
+                    style="padding:2px 8px;font-size:0.62rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);cursor:pointer;letter-spacing:0.04em"
+                    onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+                    onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                  >
+                    + {tag}
+                  </button>
+                )
               )
-            )
-          }
+            }
+          </div>
+        </div>
+
+        <div style="grid-column:1/-1">
+          <label
+            for="f-image"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >image URL</label
+          >
+          <input
+            id="f-image"
+            name="image"
+            type="url"
+            placeholder="https://..."
+            style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+          />
+        </div>
+
+        <div>
+          <label
+            for="f-imageSource"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >image source</label
+          >
+          <input
+            id="f-imageSource"
+            name="imageSource"
+            type="text"
+            placeholder="Unsplash"
+            style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+          />
+        </div>
+
+        <div>
+          <label
+            for="f-imageSourceUrl"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >source URL</label
+          >
+          <input
+            id="f-imageSourceUrl"
+            name="imageSourceUrl"
+            type="url"
+            placeholder="https://..."
+            style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
+          />
+        </div>
+
+        <div style="grid-column:1/-1">
+          <label
+            for="f-content"
+            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
+            >body (MDX)</label
+          >
+          <textarea
+            id="f-content"
+            name="content"
+            rows="14"
+            placeholder="Write your post in Markdown / MDX..."
+            style="width:100%;padding:8px 10px;font-size:0.75rem;font-family:'IBM Plex Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;resize:vertical;box-sizing:border-box;line-height:1.6"
+          ></textarea>
+        </div>
+
+        <div style="grid-column:1/-1;display:flex;gap:8px">
+          <button
+            type="submit"
+            id="submit-btn"
+            style="padding:7px 16px;font-size:0.75rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer"
+            >save post</button
+          >
+          <button
+            type="button"
+            onclick="resetForm()"
+            style="padding:7px 14px;font-size:0.75rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer"
+            >clear</button
+          >
+        </div>
+      </form>
+    </div><!-- end form -->
+
+    <!-- Live preview panel -->
+    <div
+      id="post-preview"
+      style="flex:1;min-width:0;position:sticky;top:24px;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--bg2)"
+    >
+      <div
+        id="preview-empty"
+        style="padding:48px 24px;text-align:center;color:var(--muted);font-size:0.75rem"
+      >
+        start typing to preview
+      </div>
+      <div id="preview-content" style="display:none">
+        <div id="preview-image-wrap" style="display:none">
+          <img
+            id="preview-image"
+            src=""
+            alt=""
+            style="width:100%;height:200px;object-fit:cover;display:block;border-bottom:1px solid var(--border)"
+          />
+        </div>
+        <div style="padding:20px 24px">
+          <div
+            style="display:flex;align-items:center;gap:8px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)"
+          >
+            <span
+              style="font-size:0.9rem;font-weight:500;color:#c4832a;letter-spacing:0.04em;font-family:'IBM Plex Mono',monospace"
+              >blab bun</span
+            >
+            <span
+              style="font-size:0.62rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase"
+              >preview</span
+            >
+          </div>
+          <div
+            id="preview-date"
+            style="font-size:0.65rem;color:var(--muted2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px"
+          >
+          </div>
+          <div
+            id="preview-title"
+            style="font-size:1.1rem;font-weight:500;color:var(--text);margin-bottom:10px;line-height:1.4;font-family:'IBM Plex Mono',monospace"
+          >
+          </div>
+          <div
+            id="preview-description"
+            style="font-size:0.8rem;color:var(--muted);line-height:1.7;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)"
+          >
+          </div>
+          <div
+            id="preview-body"
+            style="font-size:0.82rem;color:var(--text);line-height:1.8;overflow-wrap:break-word"
+          >
+          </div>
         </div>
       </div>
-
-      <div style="grid-column:1/-1">
-        <label
-          for="f-image"
-          style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
-          >image URL</label
-        >
-        <input
-          id="f-image"
-          name="image"
-          type="url"
-          placeholder="https://..."
-          style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
-        />
-      </div>
-
-      <div>
-        <label
-          for="f-imageSource"
-          style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
-          >image source</label
-        >
-        <input
-          id="f-imageSource"
-          name="imageSource"
-          type="text"
-          placeholder="Unsplash"
-          style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
-        />
-      </div>
-
-      <div>
-        <label
-          for="f-imageSourceUrl"
-          style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
-          >source URL</label
-        >
-        <input
-          id="f-imageSourceUrl"
-          name="imageSourceUrl"
-          type="url"
-          placeholder="https://..."
-          style="width:100%;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;box-sizing:border-box"
-        />
-      </div>
-
-      <div style="grid-column:1/-1">
-        <label
-          for="f-content"
-          style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
-          >body (MDX)</label
-        >
-        <textarea
-          id="f-content"
-          name="content"
-          rows="14"
-          placeholder="Write your post in Markdown / MDX..."
-          style="width:100%;padding:8px 10px;font-size:0.75rem;font-family:'IBM Plex Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;resize:vertical;box-sizing:border-box;line-height:1.6"
-        ></textarea>
-      </div>
-
-      <div style="grid-column:1/-1;display:flex;gap:8px">
-        <button
-          type="submit"
-          id="submit-btn"
-          style="padding:7px 16px;font-size:0.75rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer"
-          >save post</button
-        >
-        <button
-          type="button"
-          onclick="resetForm()"
-          style="padding:7px 14px;font-size:0.75rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer"
-          >clear</button
-        >
-      </div>
-    </form>
-  </div>
+    </div>
+  </div><!-- end flex wrapper -->
 
   <!-- Post list -->
   <div style="font-size:0.72rem;color:var(--muted);margin-bottom:12px">
@@ -383,7 +438,18 @@ const today = new Date().toISOString().split("T")[0];
       alert("failed to load post");
       return;
     }
-    const p = await res.json();
+    const p = (await res.json()) as {
+      title: string;
+      slug: string;
+      description: string;
+      pubDate: string;
+      draft: boolean;
+      tags: string[];
+      image?: string;
+      imageSource?: string;
+      imageSourceUrl?: string;
+      body: string;
+    };
 
     ($("f-title") as HTMLInputElement).value = p.title;
     ($("f-slug") as HTMLInputElement).value = p.slug;
@@ -450,10 +516,9 @@ const today = new Date().toISOString().split("T")[0];
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const json = await res.json();
+      const json = (await res.json()) as { error?: string };
 
       if (res.ok) {
-        // Refresh the page to show updated list
         location.reload();
       } else {
         errEl.textContent = json.error ?? "failed to save";
