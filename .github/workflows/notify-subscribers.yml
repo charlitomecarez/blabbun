@@ -9,23 +9,7 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v3
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --shamefully-hoist
-
       - name: Send subscriber notifications
-        run: node scripts/notify-test.mjs --send
-        working-directory: apps/client
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          UNSUBSCRIBE_SECRET: ${{ secrets.UNSUBSCRIBE_SECRET }}
+        run: |
+          curl -sf -X GET "https://blabbun.com/api/cron/notify-subscribers" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
