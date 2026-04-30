@@ -13,7 +13,11 @@ import ClapShare from "@/components/post/ClapShare.svelte";
 import Comments from "@/components/post/Comments.svelte";
 import FloatingNewsletter from "@/components/post/FloatingNewsletter.svelte";
 import Layout from "@/layouts/Layout.astro";
-import { fetchPostStats } from "@/lib/stats";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts", ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id } }));
+}
 
 const { slug } = Astro.params;
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
@@ -30,7 +34,6 @@ const hasImage = !!post.data.image;
 
 const otherPosts = allPosts.filter((p) => p.id !== post.id);
 const relatedSlice = shuffle(otherPosts).slice(0, 3);
-const relatedStats = await fetchPostStats(relatedSlice.map((p) => p.id));
 
 const relatedPosts = relatedSlice.map((p) => ({
   title: p.data.title,
@@ -42,8 +45,6 @@ const relatedPosts = relatedSlice.map((p) => ({
     day: "numeric",
     year: "numeric",
   }),
-  claps: relatedStats[p.id]?.claps,
-  commentCount: relatedStats[p.id]?.commentCount,
 }));
 
 const jsonLd = {
@@ -72,7 +73,7 @@ const jsonLd = {
   description={post.data.description}
   ogImage={post.data.image}
 >
-  <ReadingProgress client:load />
+  <ReadingProgress client:idle />
 
   <main
     style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
@@ -230,5 +231,5 @@ const jsonLd = {
     });
   </script>
 
-  <FloatingNewsletter client:load postSlug={post.id} />
+  <FloatingNewsletter client:idle postSlug={post.id} />
 </Layout>

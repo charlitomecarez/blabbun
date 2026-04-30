@@ -1,12 +1,16 @@
 import type { APIRoute } from "astro";
 
-import { getSupabaseClient, jsonResponse } from "@/lib/api";
+import { getRuntimeEnv, getSupabaseClient, jsonResponse } from "@/lib/api";
 
 export const prerender = false;
 
 /** Pings Supabase with a lightweight query to prevent connection timeouts on the free tier. */
-export const GET: APIRoute = async () => {
-  const supabase = getSupabaseClient();
+export const GET: APIRoute = async ({ locals }) => {
+  const env = getRuntimeEnv(locals);
+  const supabase = getSupabaseClient(
+    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+  );
   const { error } = await supabase.from("comments").select("id").limit(1);
 
   if (error) {

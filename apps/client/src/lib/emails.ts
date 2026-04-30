@@ -1,21 +1,11 @@
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { Resend } from "resend";
 
 import { unsubscribeUrl } from "@/lib/unsubscribe";
 
-// Read once on first import — swap to a hosted URL once you have a domain
-const LOGO_SRC = `data:image/png;base64,${readFileSync(
-  join(
-    dirname(fileURLToPath(import.meta.url)),
-    "../../public/blabbun-email.png"
-  )
-).toString("base64")}`;
+const LOGO_SRC = "https://blabbun.com/blabbun-email.png";
 
-export function getResendClient(): Resend {
-  return new Resend(import.meta.env.RESEND_API_KEY);
+export function getResendClient(apiKey: string): Resend {
+  return new Resend(apiKey);
 }
 
 function esc(text: string): string {
@@ -26,8 +16,11 @@ function esc(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
-export function welcomeEmailHtml(email: string): string {
-  const unsubUrl = esc(unsubscribeUrl(email));
+export function welcomeEmailHtml(
+  email: string,
+  unsubscribeSecret: string
+): string {
+  const unsubUrl = esc(unsubscribeUrl(email, unsubscribeSecret));
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,10 +78,11 @@ export function newPostEmailHtml(
     date: string;
     image?: string;
   },
-  email: string
+  email: string,
+  unsubscribeSecret: string
 ): string {
   const url = `https://blabbun.com/${esc(post.slug)}`;
-  const unsubUrl = esc(unsubscribeUrl(email));
+  const unsubUrl = esc(unsubscribeUrl(email, unsubscribeSecret));
   const imageRow = post.image
     ? `<tr>
             <td style="padding:0;margin:0;line-height:0">

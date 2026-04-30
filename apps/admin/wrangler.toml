@@ -1,0 +1,16 @@
+name = "blabbun-admin"
+account_id = "ea34ec600104eb55cd5df21faec4d56c"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[[custom_domains]]
+pattern = "admin.blabbun.com"
+
+[assets]
+directory = "./dist"
+run_worker_first = false
+
+[observability]
+[observability.logs]
+enabled = false
+invocation_logs = true

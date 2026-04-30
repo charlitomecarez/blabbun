@@ -2,13 +2,6 @@ name: Deploy Admin
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "apps/admin/**"
-      - "packages/**"
-      - "pnpm-lock.yaml"
-      - "package.json"
 
 jobs:
   lint:

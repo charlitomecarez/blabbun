@@ -1,17 +1,30 @@
 ---
+export const prerender = false;
+
 import { readTime } from "@blabbun/utils";
 import { getCollection } from "astro:content";
 
 import HomeFeed from "@/components/home/HomeFeed.svelte";
 import NewsletterBar from "@/components/home/NewsletterBar.svelte";
 import Layout from "@/layouts/Layout.astro";
+import { getRuntimeEnv, getSupabaseClient } from "@/lib/api";
 import { fetchPostStats } from "@/lib/stats";
+
+const runtimeEnv = getRuntimeEnv(Astro.locals);
+const supabase = getSupabaseClient(
+  runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+  runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
-const stats = await fetchPostStats(posts.slice(0, 10).map((p) => p.id));
+const stats = await fetchPostStats(
+  posts.slice(0, 10).map((p) => p.id),
+  supabase
+);
 
 const feedItems = posts.map((post) => ({
   date: post.data.pubDate.toLocaleDateString("en-US", {
@@ -37,26 +50,20 @@ const allTags = [
 ---
 
 <Layout>
-  <main
-    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
-  >
-    <!-- Subtitle line -->
+  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4">
+    <!-- subtitle -->
     <div
-      style="
-        margin-bottom:24px;padding-bottom:20px;
-        border-bottom:1px solid var(--divider);
-        animation:fadeIn 0.2s ease;
-      "
+      class="mb-6 animate-[fadeIn_0.2s_ease] border-b border-[var(--divider)] py-3 pb-5 sm:py-8"
     >
-      <div style="font-size:0.72rem;color:var(--muted);line-height:1.7">
+      <div class="text-[0.72rem] leading-[1.7] text-[var(--muted)]">
         unfiltered takes &amp; half-baked thoughts — probably should've kept to
         myself
       </div>
     </div>
 
-    <HomeFeed feedItems={feedItems} allTags={allTags} client:load />
+    <HomeFeed feedItems={feedItems} allTags={allTags} client:idle />
 
-    <!-- Newsletter (inline, matching design) -->
+    <!-- newsletter -->
     <NewsletterBar client:visible />
   </main>
 </Layout>

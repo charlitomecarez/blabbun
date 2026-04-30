@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 
 import type { APIRoute } from "astro";
 
+export const prerender = false;
+
 // [slug].ts is at apps/admin/src/pages/api/posts/ — 5 levels up reaches apps/
 const POSTS_DIR = join(
   dirname(fileURLToPath(import.meta.url)),

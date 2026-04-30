@@ -2,13 +2,6 @@ name: Deploy Client
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "apps/client/**"
-      - "packages/**"
-      - "pnpm-lock.yaml"
-      - "package.json"
 
 jobs:
   lint:

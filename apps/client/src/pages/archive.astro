@@ -1,15 +1,28 @@
 ---
+export const prerender = false;
+
 import { getCollection } from "astro:content";
 
 import ArchiveList from "@/components/archive/ArchiveList.svelte";
 import Layout from "@/layouts/Layout.astro";
+import { getRuntimeEnv, getSupabaseClient } from "@/lib/api";
 import { fetchPostStats } from "@/lib/stats";
+
+const runtimeEnv = getRuntimeEnv(Astro.locals);
+const supabase = getSupabaseClient(
+  runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+  runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 const allPosts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
-const stats = await fetchPostStats(allPosts.map((p) => p.id));
+const stats = await fetchPostStats(
+  allPosts.map((p) => p.id),
+  supabase
+);
 
 const postItems = allPosts.map((post) => ({
   title: post.data.title,
@@ -42,11 +55,9 @@ const allTags = [
   title="Archive"
   description={`All ${allPosts.length} posts from Blab Bun.`}
 >
-  <main
-    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
-  >
+  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-8">
     <h1
-      style="font-size:1.05rem;font-weight:600;margin-bottom:22px;animation:fadeIn 0.2s ease"
+      class="mb-[22px] animate-[fadeIn_0.2s_ease] text-[1.05rem] font-semibold"
     >
       all posts
     </h1>

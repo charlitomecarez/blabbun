@@ -1,12 +1,16 @@
 import type { APIRoute } from "astro";
 
-import { getSupabaseClient, jsonResponse } from "@/lib/api";
+import { getRuntimeEnv, getSupabaseClient, jsonResponse } from "@/lib/api";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params, locals }) => {
   const { slug } = params;
-  const supabase = getSupabaseClient();
+  const env = getRuntimeEnv(locals);
+  const supabase = getSupabaseClient(
+    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+  );
 
   const { data, error } = await supabase
     .from("comments")
@@ -27,9 +31,13 @@ export const GET: APIRoute = async ({ params }) => {
   return jsonResponse(nested);
 };
 
-export const POST: APIRoute = async ({ params, request }) => {
+export const POST: APIRoute = async ({ params, request, locals }) => {
   const { slug } = params;
-  const supabase = getSupabaseClient();
+  const env = getRuntimeEnv(locals);
+  const supabase = getSupabaseClient(
+    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+  );
 
   let body: { body?: string; parent_id?: string; anon_name?: string };
   try {

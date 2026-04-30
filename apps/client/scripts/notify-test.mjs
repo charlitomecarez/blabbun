@@ -155,7 +155,11 @@ function newPostEmailHtml(post, email) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  global: {
+    fetch: globalThis.fetch.bind(globalThis),
+  },
+});
 const resend = RESEND_KEY ? new Resend(RESEND_KEY) : null;
 
 console.log(`\n🐰 blab bun · notify-subscribers`);
@@ -234,7 +238,7 @@ if (subscribers.length === 0) {
     console.log("   (dry-run — skipping send)\n");
   } else {
     const messages = subscribers.map((sub) => ({
-      from: "onboarding@resend.dev",
+      from: "Blab Bun <noreply@blabbun.com>",
       to: sub.email,
       subject: post.title,
       html: newPostEmailHtml({ ...post, date }, sub.email),

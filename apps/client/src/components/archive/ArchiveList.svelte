@@ -227,6 +227,35 @@
     cursor: pointer;
     position: relative;
   }
+
+  @media (max-width: 640px) {
+    /* Remove gutter — no room for it on mobile */
+    .archive-list {
+      padding-left: 0;
+    }
+    /* Break out of <main> px-8 (2rem) on both sides, add internal padding */
+    .archive-row {
+      margin-left: -2rem;
+      margin-right: -2rem;
+      padding: 13px 1.25rem;
+    }
+    .archive-meta {
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .archive-date {
+      font-size: 0.64rem;
+    }
+    .archive-badge {
+      font-size: 0.64rem;
+    }
+    .archive-stats {
+      font-size: 0.6rem;
+    }
+    .archive-title {
+      font-size: 0.84rem;
+    }
+  }
   .archive-link {
     position: absolute;
     inset: 0;
