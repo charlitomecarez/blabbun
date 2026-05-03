@@ -35,13 +35,24 @@ export const POST: APIRoute = async ({ request }) => {
       import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
-  const { data: user } = await supabase
+  const DUMMY_HASH =
+    "$2b$08$gj3nS5yeObufCruCxiMJ0eAMKTCbV5hdGmOFj62YzCxH3i7gnBRsy";
+
+  const { data: user, error: dbError } = await supabase
     .from("admin_users")
     .select("id, email, role, password_hash")
     .eq("email", email)
     .single();
 
-  if (!user || !(await bcrypt.compare(password, user.password_hash)))
+  if (dbError && dbError.code !== "PGRST116")
+    return json({ error: "server error" }, 500);
+
+  const passwordMatch = await bcrypt.compare(
+    password,
+    user?.password_hash ?? DUMMY_HASH
+  );
+
+  if (!user || !passwordMatch)
     return json({ error: "invalid credentials" }, 401);
 
   const token = await signToken(
