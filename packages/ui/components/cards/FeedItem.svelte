@@ -40,7 +40,7 @@
     <div class="feed-img-wrap">
       <img
         src={imageUrl}
-        alt=""
+        alt={title}
         width="616"
         height="140"
         loading="lazy"
