@@ -5,6 +5,9 @@ import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 function getClient() {
   const runtimeEnv = env as unknown as Record<string, string | undefined>;
   return createSupabaseClient(
@@ -23,15 +26,22 @@ function json(data: unknown, status = 200) {
 
 export const PATCH: APIRoute = async ({ params, request }) => {
   const { id } = params;
+  if (!id || !UUID_RE.test(id)) return json({ error: "invalid id" }, 400);
   const body = await request.json().catch(() => ({}));
 
   const updates: Record<string, string> = {};
   if (typeof body.email === "string" && body.email.trim())
     updates.email = body.email.trim().toLowerCase();
-  if (typeof body.role === "string" && body.role.trim())
+  if (typeof body.role === "string" && body.role.trim()) {
+    if (!["admin"].includes(body.role.trim()))
+      return json({ error: "invalid role" }, 400);
     updates.role = body.role.trim();
-  if (typeof body.password === "string" && body.password)
+  }
+  if (typeof body.password === "string" && body.password) {
+    if (body.password.length < 8)
+      return json({ error: "password must be at least 8 characters" }, 400);
     updates.password_hash = await bcrypt.hash(body.password, 8);
+  }
 
   if (Object.keys(updates).length === 0)
     return json({ error: "no valid fields to update" }, 400);
@@ -53,6 +63,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
 
 export const DELETE: APIRoute = async ({ params, locals }) => {
   const { id } = params;
+  if (!id || !UUID_RE.test(id)) return json({ error: "invalid id" }, 400);
 
   if (locals.admin?.id === id)
     return json({ error: "cannot delete your own account" }, 403);

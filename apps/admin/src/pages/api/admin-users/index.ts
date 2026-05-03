@@ -40,6 +40,9 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (!email || !password)
     return json({ error: "email and password are required" }, 400);
+  if (password.length < 8)
+    return json({ error: "password must be at least 8 characters" }, 400);
+  if (!["admin"].includes(role)) return json({ error: "invalid role" }, 400);
 
   const password_hash = await bcrypt.hash(password, 8);
   const { data, error } = await getClient()
