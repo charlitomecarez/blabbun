@@ -1,6 +1,7 @@
+import type { JWTPayload } from "jose";
 import { jwtVerify, SignJWT } from "jose";
 
-export interface AdminPayload {
+export interface AdminPayload extends JWTPayload {
   sub: string;
   email: string;
   role: string;

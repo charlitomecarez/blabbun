@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps" viewBox="0 0 300 300">
+
+  <!-- BIMI-compliant SVG — Tiny PS profile, no external refs, no scripts -->
+
+  <!-- White circular background (email clients clip BIMI to a circle) -->
+  <circle cx="150" cy="150" r="150" fill="#fdf9f4"/>
+
+  <!-- ── BUN BODY ─────────────────────────────────────────────────── -->
+  <path d="
+    M 150 42
+    C 104 42 68 64 58 90
+    C 44 108 36 126 36 148
+    C 36 204 86 258 150 258
+    C 214 258 264 204 264 148
+    C 264 126 256 108 242 90
+    C 232 64 196 42 150 42 Z
+  " fill="#E8923B" stroke="#2A1206" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- ── PLEAT LINES (top of bun) ───────────────────────────────── -->
+  <path d="M 137 60 Q 150 45 163 60"
+        fill="none" stroke="#2A1206" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 120 76 Q 150 58 180 76"
+        fill="none" stroke="#2A1206" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 104 92 Q 150 70 196 92"
+        fill="none" stroke="#2A1206" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- ── LEFT EYE (winking — two arcs forming a closed eye) ────── -->
+  <path d="M 87 150 Q 101 135 115 150"
+        fill="none" stroke="#2A1206" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M 89 154 Q 101 165 113 154"
+        fill="none" stroke="#2A1206" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- ── RIGHT EYE (open, round, with shine) ───────────────────── -->
+  <circle cx="186" cy="147" r="19" fill="#2A1206"/>
+  <circle cx="193" cy="140" r="6.5" fill="white"/>
+
+  <!-- ── MOUTH (open and happy) ─────────────────────────────────── -->
+  <!-- Dark mouth shape -->
+  <path d="M 108 192 Q 150 234 192 192 Q 192 214 150 234 Q 108 214 108 192 Z"
+        fill="#2A1206"/>
+  <!-- White teeth strip -->
+  <path d="M 113 196 Q 150 222 187 196 Q 187 207 150 210 Q 113 207 113 196 Z"
+        fill="white"/>
+  <!-- Tongue -->
+  <ellipse cx="150" cy="220" rx="21" ry="12" fill="#D0503A"/>
+
+  <!-- ── SMALL DUMPLING (bottom-right of bun) ──────────────────── -->
+  <circle cx="240" cy="234" r="38" fill="white" stroke="#2A1206" stroke-width="6"/>
+
+</svg>

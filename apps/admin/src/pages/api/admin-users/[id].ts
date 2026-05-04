@@ -27,9 +27,16 @@ function json(data: unknown, status = 200) {
 export const PATCH: APIRoute = async ({ params, request }) => {
   const { id } = params;
   if (!id || !UUID_RE.test(id)) return json({ error: "invalid id" }, 400);
-  const body = await request.json().catch(() => ({}));
+  const body = (await request.json().catch(() => ({}))) as Record<
+    string,
+    unknown
+  >;
 
-  const updates: Record<string, string> = {};
+  const updates: Partial<{
+    email: string;
+    role: string;
+    password_hash: string;
+  }> = {};
   if (typeof body.email === "string" && body.email.trim())
     updates.email = body.email.trim().toLowerCase();
   if (typeof body.role === "string" && body.role.trim()) {

@@ -22,7 +22,10 @@ function json(data: unknown, status = 200) {
 
 export const PUT: APIRoute = async ({ params, request }) => {
   const slug = decodeURIComponent(params.slug!);
-  const body = await request.json().catch(() => ({}));
+  const body = (await request.json().catch(() => ({}))) as Record<
+    string,
+    unknown
+  >;
   const count = typeof body.count === "number" ? body.count : 0;
 
   const supabase = getClient();
