@@ -60,7 +60,7 @@ function newPostEmailHtml(post: {
             <td style="padding-top:24px;border-top:1px solid #e0d4c0">
               <p style="font-size:0.7rem;color:#c5b8a8;margin:0;line-height:1.7">
                 you're on the <a href="https://blabbun.com" style="color:#c4832a;text-decoration:none">blab bun</a> mailing list.
-                didn't mean to subscribe? just ignore this.
+                done reading? <a href="https://blabbun.com/unsubscribe" style="color:#c4832a;text-decoration:none">unsubscribe</a>.
               </p>
             </td>
           </tr>
@@ -115,6 +115,16 @@ export const POST: APIRoute = async ({ request }) => {
     date: postDate,
   });
 
+  const postUrl = `https://blabbun.com/${slug}`;
+  const textBody = `${title}
+
+${description ?? ""}
+
+read it → ${postUrl}
+
+---
+you're on the blab bun mailing list. done reading? https://blabbun.com/unsubscribe`;
+
   const BATCH = 100;
   let sent = 0;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -128,6 +138,11 @@ export const POST: APIRoute = async ({ request }) => {
         to,
         subject: `new post: ${title}`,
         html,
+        text: textBody,
+        headers: {
+          "List-Unsubscribe":
+            "<mailto:noreply@email.blabbun.com?subject=unsubscribe>",
+        },
       }))
     );
     if (sendError) return json({ error: sendError.message, sent }, 500);
