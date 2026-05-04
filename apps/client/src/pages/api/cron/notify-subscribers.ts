@@ -2,7 +2,12 @@ import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 
 import { getRuntimeEnv, getSupabaseClient, jsonResponse } from "@/lib/api";
-import { getResendClient, newPostEmailHtml } from "@/lib/emails";
+import {
+  getResendClient,
+  newPostEmailHtml,
+  newPostEmailText,
+} from "@/lib/emails";
+import { unsubscribeUrl } from "@/lib/unsubscribe";
 
 export const prerender = false;
 
@@ -58,23 +63,29 @@ export const GET: APIRoute = async ({ request, locals }) => {
     day: "numeric",
   });
 
+  const postMeta = {
+    title: post.data.title,
+    slug: post.id,
+    description: post.data.description,
+    date,
+    image: post.data.image,
+  };
+
   // Each subscriber gets a personalized email with their own unsubscribe link
-  const messages = subscribers.map((sub) => ({
-    from: "Blab Bun <noreply@email.blabbun.com>",
-    to: sub.email,
-    subject: post.data.title,
-    html: newPostEmailHtml(
-      {
-        title: post.data.title,
-        slug: post.id,
-        description: post.data.description,
-        date,
-        image: post.data.image,
+  const messages = subscribers.map((sub) => {
+    const unsubUrl = unsubscribeUrl(sub.email, unsubscribeSecret);
+    return {
+      from: "Blab Bun <noreply@email.blabbun.com>",
+      to: sub.email,
+      subject: post.data.title,
+      html: newPostEmailHtml(postMeta, sub.email, unsubscribeSecret),
+      text: newPostEmailText(postMeta, sub.email, unsubscribeSecret),
+      headers: {
+        "List-Unsubscribe": `<${unsubUrl}>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
       },
-      sub.email,
-      unsubscribeSecret
-    ),
-  }));
+    };
+  });
 
   for (let i = 0; i < messages.length; i += 100) {
     await resend.batch.send(messages.slice(i, i + 100));
