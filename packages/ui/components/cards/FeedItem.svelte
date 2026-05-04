@@ -1,6 +1,8 @@
 <script lang="ts">
   import { tagClass } from "@blabbun/utils";
 
+  import BookmarkButton from "../post/BookmarkButton.svelte";
+
   interface Props {
     author?: string;
     date?: string;
@@ -19,7 +21,7 @@
     title,
     excerpt = "",
     tag = "EDITORIAL",
-    readTime = "5 min read",
+    readTime = "",
     imageUrl = "",
     href = "#",
     claps,
@@ -70,13 +72,18 @@
 
   <!-- Meta row -->
   <div class="feed-meta-bottom">
-    <span class="feed-stat">{readTime}</span>
+    {#if readTime}
+      <span class="feed-stat">{readTime}</span>
+    {/if}
     {#if claps !== undefined && claps > 0}
       <span class="feed-stat">👏 {claps}</span>
     {/if}
     {#if commentCount !== undefined}
       <span class="feed-stat">💬 {commentCount}</span>
     {/if}
+    <span style="margin-left:auto">
+      <BookmarkButton slug={href.replace(/^\//, "")} />
+    </span>
   </div>
 </article>
 

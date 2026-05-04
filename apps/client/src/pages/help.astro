@@ -1,9 +1,12 @@
 ---
+import IssueForm from "@/components/help/IssueForm.svelte";
 import Layout from "@/layouts/Layout.astro";
 ---
 
-<Layout title="help" description="Help for Blab Bun.">
-  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-8">
+<Layout title="help" description="Report an issue on Blab Bun.">
+  <main
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-8"
+  >
     <div class="animate-[fadeIn_0.2s_ease]">
       <a
         href="/"
@@ -12,26 +15,16 @@ import Layout from "@/layouts/Layout.astro";
         ← back
       </a>
 
-      <h1 class="mt-5 mb-6 text-[1.05rem] font-semibold">help</h1>
+      <h1 class="mt-5 mb-1.5 text-[1.05rem] font-semibold">report an issue</h1>
 
-      <div
-        class="max-w-[540px] text-[0.82rem] leading-[1.9] text-[var(--muted)]"
+      <p
+        class="mb-8 max-w-[480px] text-[0.8rem] leading-[1.85] text-[var(--muted)]"
       >
-        <p class="mb-3.5">
-          got a question? something broken? something you disagree with and want
-          to talk about?
-        </p>
+        spotted something broken, confusing, or just off? fill this out and i'll
+        get to it. attach a screenshot if it helps.
+      </p>
 
-        <p class="mb-3.5">
-          leave an anonymous comment on any post — it's the best way to reach
-          me. i read all of them.
-        </p>
-
-        <p>
-          if it's something bigger, you can probably find me on the internet
-          somewhere. i'm not hard to locate if you actually look.
-        </p>
-      </div>
+      <IssueForm client:load />
     </div>
   </main>
 </Layout>

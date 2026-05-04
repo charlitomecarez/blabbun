@@ -446,7 +446,7 @@ const { data: subscribers } = await supabase
         form.reset();
         location.reload();
       } else {
-        const j = await res.json();
+        const j = (await res.json()) as { error?: string };
         alert(j.error ?? "failed");
       }
     });
@@ -469,7 +469,7 @@ const { data: subscribers } = await supabase
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, slug, description }),
       });
-      const j = await res.json();
+      const j = (await res.json()) as { error?: string; sent?: number };
       result.style.display = "block";
       if (res.ok) {
         result.style.color = "var(--muted)";

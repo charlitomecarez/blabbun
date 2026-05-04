@@ -424,7 +424,7 @@ const total = ((claps ?? []) as PostClapRow[]).reduce(
         form.reset();
         location.reload();
       } else {
-        const j = await res.json();
+        const j = (await res.json()) as { error?: string };
         alert(j.error ?? "failed");
       }
     });
