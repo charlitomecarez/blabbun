@@ -1,7 +1,11 @@
 import type { APIRoute } from "astro";
 
 import { getRuntimeEnv, getSupabaseClient, jsonResponse } from "@/lib/api";
-import { getResendClient, welcomeEmailHtml } from "@/lib/emails";
+import {
+  getResendClient,
+  welcomeEmailHtml,
+  welcomeEmailText,
+} from "@/lib/emails";
 
 export const prerender = false;
 
@@ -62,15 +66,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
         return { email, status: "error", error: error.message };
       }
 
-      // Fire-and-forget — don't block the response on email delivery
-      resend.emails
-        .send({
-          from: "Blab Bun <noreply@blabbun.com>",
+      try {
+        await resend.emails.send({
+          from: "Blab Bun <hello@email.blabbun.com>",
+          replyTo: "hello@blabbun.com",
           to: email,
           subject: "you're in.",
           html: welcomeEmailHtml(email, unsubscribeSecret),
-        })
-        .catch(console.error);
+          text: welcomeEmailText(email, unsubscribeSecret),
+        });
+      } catch (err) {
+        console.error("resend welcome email failed:", err);
+      }
 
       return { email, status: "subscribed" };
     })

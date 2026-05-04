@@ -105,6 +105,30 @@ export type Database = {
         };
         Relationships: [];
       };
+      admin_users: {
+        Row: {
+          id: string;
+          email: string;
+          password_hash: string;
+          role: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          password_hash: string;
+          role?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          password_hash?: string;
+          role?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
@@ -119,3 +143,4 @@ export type ClapVoteRow = Database["public"]["Tables"]["clap_votes"]["Row"];
 export type SubscriberRow = Database["public"]["Tables"]["subscribers"]["Row"];
 export type PostNotificationRow =
   Database["public"]["Tables"]["post_notifications"]["Row"];
+export type AdminUserRow = Database["public"]["Tables"]["admin_users"]["Row"];

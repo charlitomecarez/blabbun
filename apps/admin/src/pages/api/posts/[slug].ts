@@ -1,31 +1,26 @@
-import { existsSync, readFileSync, unlinkSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
+
+import { deletePostFile, getPostFile } from "../../../lib/github";
 
 export const prerender = false;
 
-// [slug].ts is at apps/admin/src/pages/api/posts/ — 5 levels up reaches apps/
-const POSTS_DIR = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../../../../client/src/content/posts"
-);
-
-function filePath(slug: string) {
-  return join(POSTS_DIR, `${slug}.mdx`);
+function getToken() {
+  const runtimeEnv = env as unknown as Record<string, string | undefined>;
+  return runtimeEnv.GITHUB_TOKEN ?? import.meta.env.GITHUB_TOKEN ?? "";
 }
 
-export const GET: APIRoute = ({ params }) => {
-  const path = filePath(params.slug!);
-  if (!existsSync(path)) {
+export const GET: APIRoute = async ({ params }) => {
+  const slug = params.slug!;
+  const file = await getPostFile(getToken(), slug);
+
+  if (!file) {
     return new Response(JSON.stringify({ error: "not found" }), {
       status: 404,
     });
   }
-  const raw = readFileSync(path, "utf-8");
 
-  // Parse frontmatter
+  const raw = file.content;
   const fm = raw.match(/^---\n([\s\S]*?)\n---/);
   const body = fm ? raw.slice(fm[0].length).trim() : raw;
   const meta: Record<string, string> = {};
@@ -52,7 +47,7 @@ export const GET: APIRoute = ({ params }) => {
 
   return new Response(
     JSON.stringify({
-      slug: params.slug,
+      slug,
       title: meta.title ?? "",
       description: meta.description ?? "",
       pubDate: meta.pubDate ?? "",
@@ -67,13 +62,24 @@ export const GET: APIRoute = ({ params }) => {
   );
 };
 
-export const DELETE: APIRoute = ({ params }) => {
-  const path = filePath(params.slug!);
-  if (!existsSync(path)) {
+export const DELETE: APIRoute = async ({ params }) => {
+  const slug = params.slug!;
+  const token = getToken();
+  const file = await getPostFile(token, slug);
+
+  if (!file) {
     return new Response(JSON.stringify({ error: "not found" }), {
       status: 404,
     });
   }
-  unlinkSync(path);
+
+  try {
+    await deletePostFile(token, slug, file.sha);
+  } catch (err) {
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
+      status: 500,
+    });
+  }
+
   return new Response(JSON.stringify({ ok: true }), { status: 200 });
 };

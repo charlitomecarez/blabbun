@@ -196,6 +196,48 @@ body.dark .tag-default {
   color: #a09080;
 }
 
+/* ─── Post body images ────────────────────────────────────────────────────── */
+.post-content img {
+  width: 100%;
+  height: auto;
+  border-radius: 3px;
+  display: block;
+  margin: 2rem auto;
+}
+
+/* MDX wraps lone images in <p> — make that <p> behave like a figure */
+.post-content p:has(> img:only-child) {
+  margin: 0;
+  line-height: 0;
+}
+
+/* Alt text rendered as caption below image */
+.post-content p:has(> img:only-child) img + em,
+.post-content figcaption {
+  display: block;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--muted2);
+  margin-top: 8px;
+  font-style: normal;
+  line-height: 1.5;
+}
+
+/* Mobile: full-bleed images break out of px-8 padding */
+@media (max-width: 640px) {
+  .post-content img {
+    margin-left: -2rem;
+    margin-right: -2rem;
+    width: calc(100% + 4rem);
+    border-radius: 0;
+    max-width: none;
+  }
+  .post-content p:has(> img:only-child) {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
 /* ─── Comment components (extracted from Svelte scoped styles to avoid JS-bundled CSS) ── */
 .comment-item {
   padding: 14px 0;

@@ -47,7 +47,10 @@ const postItems = tagPosts.map((post) => ({
 const label = tagToLabel(tag);
 ---
 
-<Layout title={label} description={`All posts about ${label} on Blab Bun.`}>
+<Layout
+  title={label}
+  description={`${postItems.length} post${postItems.length === 1 ? "" : "s"} about ${label} on blabbun — unfiltered takes and honest writing.`}
+>
   <main
     style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
   >

@@ -1,0 +1,15 @@
+name: Notify Subscribers
+
+on:
+  schedule:
+    - cron: "0 1 * * *" # 9:00 AM PHT daily
+  workflow_dispatch: # manual trigger from GitHub UI
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send subscriber notifications
+        run: |
+          curl -sf -X GET "https://blabbun.com/api/cron/notify-subscribers" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

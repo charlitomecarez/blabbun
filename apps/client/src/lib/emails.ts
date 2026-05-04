@@ -16,6 +16,23 @@ function esc(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
+export function welcomeEmailText(
+  email: string,
+  unsubscribeSecret: string
+): string {
+  const unsubUrl = unsubscribeUrl(email, unsubscribeSecret);
+  return `you're in.
+
+no schedule. no issues.
+
+just an email when something new drops — could be tomorrow. could be never.
+
+read the archive → https://blabbun.com
+
+---
+you subscribed at blabbun.com. changed your mind? ${unsubUrl}`;
+}
+
 export function welcomeEmailHtml(
   email: string,
   unsubscribeSecret: string
@@ -30,6 +47,8 @@ export function welcomeEmailHtml(
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body style="margin:0;padding:0;background:#fdf9f4;font-family:'IBM Plex Mono',monospace;color:#231e17">
+  <!-- Preheader: visible in inbox preview, hidden in email body -->
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all">you're now on the blab bun list. no noise, just new posts.&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌</div>
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#fdf9f4;padding:48px 20px">
     <tr>
       <td align="center">
@@ -56,6 +75,9 @@ export function welcomeEmailHtml(
           </tr>
           <tr>
             <td style="padding-top:24px;border-top:1px solid #e0d4c0">
+              <p style="font-size:0.7rem;color:#c5b8a8;margin:0 0 8px;line-height:1.7">
+                📌 <strong style="color:#9c8b78">using gmail?</strong> drag this email to your <strong style="color:#9c8b78">Primary</strong> tab so you don't miss new posts. you only have to do it once.
+              </p>
               <p style="font-size:0.7rem;color:#c5b8a8;margin:0;line-height:1.7">
                 you subscribed at <a href="https://blabbun.com" style="color:#c4832a;text-decoration:none">blabbun.com</a>.
                 changed your mind? <a href="${unsubUrl}" style="color:#c4832a;text-decoration:none">unsubscribe</a>.

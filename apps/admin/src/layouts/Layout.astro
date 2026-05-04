@@ -14,6 +14,7 @@ const nav = [
   { label: "comments", href: "/comments" },
   { label: "subscribers", href: "/subscribers" },
   { label: "post claps", href: "/claps" },
+  { label: "admin users", href: "/admin-users" },
 ];
 ---
 
@@ -97,8 +98,10 @@ const nav = [
         }
       </nav>
 
-      <!-- Theme toggle at bottom -->
-      <div style="margin-top:auto;padding:0 10px">
+      <!-- Theme toggle + logout at bottom -->
+      <div
+        style="margin-top:auto;padding:0 10px;display:flex;flex-direction:column;gap:6px"
+      >
         <button
           id="theme-btn"
           style="
@@ -109,11 +112,24 @@ const nav = [
         >
           ◑ toggle theme
         </button>
+        <button
+          id="logout-btn"
+          style="
+            width:100%;background:none;border:1px solid var(--border);border-radius:3px;
+            padding:6px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;
+            font-family:inherit;letter-spacing:0.04em;text-align:left;
+            transition:border-color 0.1s,color 0.1s;
+          "
+          onmouseenter="this.style.borderColor='#e05c5c';this.style.color='#e05c5c'"
+          onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+        >
+          ← log out
+        </button>
       </div>
     </aside>
 
     <!-- Main -->
-    <main style="flex:1;padding:32px 40px;max-width:900px;overflow-y:auto">
+    <main style="flex:1;min-width:0;padding:32px 40px;overflow-y:auto">
       <div
         style="margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--divider)"
       >
@@ -131,6 +147,12 @@ const nav = [
         document.body.className = next;
         localStorage.setItem("bb-theme", next);
       });
+      document
+        .getElementById("logout-btn")
+        ?.addEventListener("click", async () => {
+          await fetch("/api/auth/logout", { method: "POST" });
+          window.location.href = "/login";
+        });
     </script>
   </body>
 </html>

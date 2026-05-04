@@ -131,7 +131,7 @@
         {#if post.image}
           <img
             src={post.image}
-            alt=""
+            alt={post.title}
             style="width:44px;height:30px;border-radius:2px;object-fit:cover;flex-shrink:0;opacity:0.85"
           />
         {/if}
