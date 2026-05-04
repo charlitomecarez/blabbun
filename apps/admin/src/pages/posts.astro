@@ -234,11 +234,24 @@ const today = new Date().toISOString().split("T")[0];
         </div>
 
         <div style="grid-column:1/-1">
-          <label
-            for="f-content"
-            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
-            >body (MDX)</label
+          <div
+            style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"
           >
+            <label
+              for="f-content"
+              style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em"
+              >body (MDX)</label
+            >
+            <button
+              type="button"
+              onclick="insertImageSnippet()"
+              style="padding:2px 8px;font-size:0.62rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);cursor:pointer;letter-spacing:0.04em"
+              onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+              onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+              title="Insert a <figure> image snippet at cursor position"
+              >+ image</button
+            >
+          </div>
           <textarea
             id="f-content"
             name="content"
@@ -246,6 +259,23 @@ const today = new Date().toISOString().split("T")[0];
             placeholder="Write your post in Markdown / MDX..."
             style="width:100%;padding:8px 10px;font-size:0.75rem;font-family:'IBM Plex Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;resize:vertical;box-sizing:border-box;line-height:1.6"
           ></textarea>
+          <div
+            style="margin-top:6px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:0.68rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace;line-height:1.8"
+          >
+            <span style="color:var(--muted);letter-spacing:0.04em"
+              >image snippet</span
+            ><br />
+            &lt;figure&gt;<br />
+            &nbsp;&nbsp;&lt;img src="<span style="color:var(--accent)"
+              >image-url</span
+            >" alt="<span style="color:var(--accent)">description</span>" /&gt;<br
+            />
+            &nbsp;&nbsp;&lt;figcaption&gt;photo by &lt;a href="<span
+              style="color:var(--accent)">source-url</span
+            >"&gt;<span style="color:var(--accent)">Source Name</span
+            >&lt;/a&gt;&lt;/figcaption&gt;<br />
+            &lt;/figure&gt;
+          </div>
         </div>
 
         <div style="grid-column:1/-1;display:flex;gap:8px">
@@ -587,5 +617,24 @@ const today = new Date().toISOString().split("T")[0];
   );
   updatePreview();
 
-  Object.assign(window, { editPost, deletePost, addTag, resetForm });
+  function insertImageSnippet() {
+    const textarea = $("f-content") as HTMLTextAreaElement;
+    if (!textarea) return;
+    const snippet = `\n<figure>\n  <img src="image-url" alt="description" />\n  <figcaption>photo by <a href="source-url">Source Name</a></figcaption>\n</figure>\n`;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    textarea.value =
+      textarea.value.slice(0, start) + snippet + textarea.value.slice(end);
+    textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
+    textarea.focus();
+    updatePreview();
+  }
+
+  Object.assign(window, {
+    editPost,
+    deletePost,
+    addTag,
+    resetForm,
+    insertImageSnippet,
+  });
 </script>
