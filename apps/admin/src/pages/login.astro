@@ -1,0 +1,136 @@
+---
+import { env } from "cloudflare:workers";
+
+import { verifyToken } from "@/lib/auth";
+
+const runtimeEnv = env as unknown as Record<string, string | undefined>;
+const jwtSecret =
+  runtimeEnv.JWT_SECRET ?? (import.meta.env.JWT_SECRET as string | undefined);
+const token = Astro.cookies.get("bb_admin_token")?.value;
+
+if (token && jwtSecret) {
+  try {
+    await verifyToken(token, jwtSecret);
+    return Astro.redirect("/");
+  } catch {
+    // invalid token — fall through to show login
+  }
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>login — blabbun admin</title>
+    <link rel="icon" type="image/png" href="/blabbun.png" />
+    <script is:inline>
+      document.documentElement.classList.add(
+        localStorage.getItem("bb-theme") === "dark" ? "dark-init" : ""
+      );
+    </script>
+  </head>
+  <body
+    class="light"
+    style="min-height:100vh;display:flex;align-items:center;justify-content:center"
+  >
+    <script is:inline>
+      document.body.className = localStorage.getItem("bb-theme") || "light";
+    </script>
+
+    <div style="width:100%;max-width:340px;padding:0 16px">
+      <!-- Logo -->
+      <div style="text-align:center;margin-bottom:32px">
+        <img
+          src="/blabbun.png"
+          alt="blab bun"
+          width="32"
+          height="32"
+          style="width:32px;height:32px;object-fit:contain;margin-bottom:12px"
+        />
+        <div style="font-size:0.82rem;font-weight:600;color:var(--text)">
+          admin<span style="color:var(--accent)">.</span>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form id="login-form" style="display:flex;flex-direction:column;gap:10px">
+        <input
+          id="email"
+          type="email"
+          name="email"
+          placeholder="email"
+          required
+          autocomplete="email"
+          style="padding:9px 12px;font-size:0.82rem;font-family:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;width:100%;box-sizing:border-box"
+        />
+        <input
+          id="password"
+          type="password"
+          name="password"
+          placeholder="password"
+          required
+          autocomplete="current-password"
+          style="padding:9px 12px;font-size:0.82rem;font-family:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;width:100%;box-sizing:border-box"
+        />
+
+        <div
+          id="error-msg"
+          style="display:none;font-size:0.72rem;color:#e05c5c;padding:6px 10px;background:rgba(224,92,92,0.08);border-radius:3px;border:1px solid rgba(224,92,92,0.2)"
+        >
+        </div>
+
+        <button
+          id="submit-btn"
+          type="submit"
+          style="padding:9px;font-size:0.8rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer;font-weight:500;transition:opacity 0.15s"
+        >
+          sign in
+        </button>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById("login-form") as HTMLFormElement;
+      const errorMsg = document.getElementById("error-msg") as HTMLElement;
+      const submitBtn = document.getElementById(
+        "submit-btn"
+      ) as HTMLButtonElement;
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorMsg.style.display = "none";
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = "0.6";
+        submitBtn.textContent = "signing in…";
+
+        const email = (document.getElementById("email") as HTMLInputElement)
+          .value;
+        const password = (
+          document.getElementById("password") as HTMLInputElement
+        ).value;
+
+        try {
+          const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (res.ok) {
+            window.location.href = "/";
+          } else {
+            const data = await res.json();
+            errorMsg.textContent = data.error ?? "login failed";
+            errorMsg.style.display = "block";
+          }
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.style.opacity = "1";
+          submitBtn.textContent = "sign in";
+        }
+      });
+    </script>
+  </body>
+</html>

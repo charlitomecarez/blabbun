@@ -1,0 +1,337 @@
+---
+import { createSupabaseClient, type AdminUserRow } from "@blabbun/db";
+import { env } from "cloudflare:workers";
+
+import Layout from "../layouts/Layout.astro";
+
+const runtimeEnv = env as unknown as Record<string, string | undefined>;
+const supabase = createSupabaseClient(
+  runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+  runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+const { data: admins } = await supabase
+  .from("admin_users")
+  .select("id, email, role, created_at")
+  .order("created_at", { ascending: true });
+
+const currentAdminId = Astro.locals.admin?.id ?? "";
+---
+
+<Layout title="admin users">
+  <!-- Create form -->
+  <div
+    style="border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:24px;background:var(--bg2)"
+  >
+    <div
+      style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px"
+    >
+      new admin
+    </div>
+    <form id="create-form" style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input
+          name="email"
+          type="email"
+          placeholder="email"
+          required
+          style="flex:1;min-width:160px;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+        />
+        <input
+          name="password"
+          type="password"
+          placeholder="password"
+          required
+          style="flex:1;min-width:140px;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+        />
+        <select
+          name="role"
+          style="padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+        >
+          <option value="admin">admin</option>
+        </select>
+      </div>
+      <div style="display:flex;justify-content:flex-end">
+        <button
+          type="submit"
+          style="padding:6px 14px;font-size:0.75rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer"
+          >add admin</button
+        >
+      </div>
+    </form>
+  </div>
+
+  <!-- Count -->
+  <span style="font-size:0.72rem;color:var(--muted)">
+    {admins?.length ?? 0} admin{(admins?.length ?? 0) !== 1 ? "s" : ""}
+  </span>
+
+  {
+    !admins?.length ? (
+      <p style="font-size:0.8rem;color:var(--muted);padding:32px 0;border-top:1px solid var(--divider);margin-top:12px">
+        no admins found.
+      </p>
+    ) : (
+      <div
+        id="admin-list"
+        data-current-id={currentAdminId}
+        style="margin-top:12px;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:4px;overflow:hidden"
+      >
+        {(admins as AdminUserRow[]).map((a) => (
+          <div
+            data-id={a.id}
+            style="padding:14px 16px;border-bottom:1px solid var(--divider);background:var(--bg)"
+          >
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+              <div class="display-mode" style="min-width:0;flex:1">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                  <span style="font-size:0.8rem;font-weight:500;color:var(--text)">
+                    {a.email}
+                  </span>
+                  <span style="font-size:0.64rem;padding:2px 7px;border-radius:2px;background:var(--accent-soft);color:var(--accent);font-weight:500;letter-spacing:0.04em">
+                    {a.role}
+                  </span>
+                  {a.id === currentAdminId && (
+                    <span style="font-size:0.64rem;color:var(--muted2)">
+                      (you)
+                    </span>
+                  )}
+                </div>
+                <div style="font-size:0.66rem;color:var(--muted2);margin-top:3px">
+                  added{" "}
+                  {new Date(a.created_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </div>
+              </div>
+
+              <div
+                class="edit-mode"
+                style="display:none;flex:1;min-width:200px;flex-direction:column;gap:6px"
+              >
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <input
+                    class="edit-email"
+                    type="email"
+                    value={a.email}
+                    style="flex:1;min-width:140px;padding:5px 8px;font-size:0.76rem;font-family:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+                  />
+                  <select
+                    class="edit-role"
+                    style="padding:5px 8px;font-size:0.76rem;font-family:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+                  >
+                    <option value="admin" selected={a.role === "admin"}>
+                      admin
+                    </option>
+                  </select>
+                </div>
+                <div style="display:flex;gap:6px">
+                  <button
+                    class="save-edit-btn"
+                    onclick={`saveAdmin('${a.id}', this)`}
+                    style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer"
+                  >
+                    save
+                  </button>
+                  <button
+                    onclick={`cancelEdit('${a.id}')`}
+                    style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer"
+                  >
+                    cancel
+                  </button>
+                </div>
+              </div>
+
+              <div
+                class="pw-mode"
+                style="display:none;flex:1;min-width:200px;flex-direction:column;gap:6px"
+              >
+                <input
+                  class="pw-input"
+                  type="password"
+                  placeholder="new password"
+                  style="flex:1;padding:5px 8px;font-size:0.76rem;font-family:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+                />
+                <div style="display:flex;gap:6px">
+                  <button
+                    class="save-pw-btn"
+                    onclick={`savePassword('${a.id}', this)`}
+                    style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer"
+                  >
+                    save password
+                  </button>
+                  <button
+                    onclick={`cancelPw('${a.id}')`}
+                    style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer"
+                  >
+                    cancel
+                  </button>
+                </div>
+              </div>
+
+              <div
+                class="action-btns"
+                style="display:flex;gap:6px;flex-shrink:0"
+              >
+                <button
+                  onclick={`startEdit('${a.id}')`}
+                  style="background:none;border:1px solid var(--border);border-radius:3px;padding:4px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;transition:border-color 0.1s,color 0.1s"
+                  onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+                  onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                >
+                  edit
+                </button>
+                <button
+                  onclick={`startPw('${a.id}')`}
+                  style="background:none;border:1px solid var(--border);border-radius:3px;padding:4px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;transition:border-color 0.1s,color 0.1s"
+                  onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+                  onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                >
+                  pw
+                </button>
+                {a.id !== currentAdminId && (
+                  <button
+                    onclick={`deleteAdmin('${a.id}')`}
+                    style="background:none;border:1px solid var(--border);border-radius:3px;padding:4px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit;transition:border-color 0.1s,color 0.1s"
+                    onmouseenter="this.style.borderColor='#e05c5c';this.style.color='#e05c5c'"
+                    onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                  >
+                    delete
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+</Layout>
+
+<script>
+  function getRow(id: string) {
+    return document.querySelector<HTMLElement>(`[data-id="${id}"]`);
+  }
+
+  function showMode(id: string, mode: "display" | "edit" | "pw") {
+    const row = getRow(id);
+    if (!row) return;
+    (row.querySelector(".display-mode") as HTMLElement).style.display =
+      mode === "display" ? "block" : "none";
+    (row.querySelector(".edit-mode") as HTMLElement).style.display =
+      mode === "edit" ? "flex" : "none";
+    (row.querySelector(".pw-mode") as HTMLElement).style.display =
+      mode === "pw" ? "flex" : "none";
+    (row.querySelector(".action-btns") as HTMLElement).style.display =
+      mode === "display" ? "flex" : "none";
+  }
+
+  function startEdit(id: string) {
+    showMode(id, "edit");
+  }
+  function cancelEdit(id: string) {
+    showMode(id, "display");
+  }
+  function startPw(id: string) {
+    showMode(id, "pw");
+  }
+  function cancelPw(id: string) {
+    showMode(id, "display");
+  }
+
+  async function saveAdmin(id: string, btn: HTMLButtonElement) {
+    const row = getRow(id);
+    const email = row
+      ?.querySelector<HTMLInputElement>(".edit-email")
+      ?.value.trim();
+    const role = row?.querySelector<HTMLSelectElement>(".edit-role")?.value;
+    if (!email) return;
+
+    btn.textContent = "saving…";
+    btn.disabled = true;
+
+    const res = await fetch(`/api/admin-users/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, role }),
+    });
+
+    if (res.ok) {
+      location.reload();
+    } else {
+      const data = await res.json();
+      alert(data.error ?? "failed to save");
+      btn.textContent = "save";
+      btn.disabled = false;
+    }
+  }
+
+  async function savePassword(id: string, btn: HTMLButtonElement) {
+    const row = getRow(id);
+    const password = row?.querySelector<HTMLInputElement>(".pw-input")?.value;
+    if (!password) return;
+
+    btn.textContent = "saving…";
+    btn.disabled = true;
+
+    const res = await fetch(`/api/admin-users/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    });
+
+    if (res.ok) {
+      cancelPw(id);
+      alert("password updated");
+    } else {
+      const data = await res.json();
+      alert(data.error ?? "failed to save");
+      btn.textContent = "save password";
+      btn.disabled = false;
+    }
+  }
+
+  async function deleteAdmin(id: string) {
+    if (!confirm("delete this admin?")) return;
+    const res = await fetch(`/api/admin-users/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      getRow(id)?.remove();
+    } else {
+      const data = await res.json();
+      alert(data.error ?? "failed to delete");
+    }
+  }
+
+  document
+    .getElementById("create-form")
+    ?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const data = Object.fromEntries(new FormData(form));
+      const res = await fetch("/api/admin-users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        form.reset();
+        location.reload();
+      } else {
+        const j = await res.json();
+        alert(j.error ?? "failed to create");
+      }
+    });
+
+  Object.assign(window, {
+    startEdit,
+    cancelEdit,
+    startPw,
+    cancelPw,
+    saveAdmin,
+    savePassword,
+    deleteAdmin,
+  });
+</script>
