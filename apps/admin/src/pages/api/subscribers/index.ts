@@ -21,7 +21,7 @@ function json(data: unknown, status = 200) {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  const { email } = await request.json();
+  const { email } = (await request.json()) as { email?: string };
   if (!email?.trim()) return json({ error: "email is required" }, 400);
 
   const supabase = getClient();

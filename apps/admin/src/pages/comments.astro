@@ -435,7 +435,7 @@ const { data: comments } = await supabase
         form.reset();
         location.reload();
       } else {
-        const j = await res.json();
+        const j = (await res.json()) as { error?: string };
         alert(j.error ?? "failed");
       }
     });

@@ -21,7 +21,10 @@ function json(data: unknown, status = 200) {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  const { post_slug, count } = await request.json();
+  const { post_slug, count } = (await request.json()) as {
+    post_slug?: string;
+    count?: number;
+  };
   if (!post_slug?.trim()) return json({ error: "post_slug is required" }, 400);
 
   const supabase = getClient();

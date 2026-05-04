@@ -1,5 +1,5 @@
 ---
-import { createSupabaseClient, type AdminUserRow } from "@blabbun/db";
+import { type AdminUserRow, createSupabaseClient } from "@blabbun/db";
 import { env } from "cloudflare:workers";
 
 import Layout from "../layouts/Layout.astro";
@@ -247,7 +247,8 @@ const currentAdminId = Astro.locals.admin?.id ?? "";
     const email = row
       ?.querySelector<HTMLInputElement>(".edit-email")
       ?.value.trim();
-    const role = row?.querySelector<HTMLSelectElement>(".edit-role")?.value;
+    const role = (row?.querySelector(".edit-role") as HTMLSelectElement | null)
+      ?.value;
     if (!email) return;
 
     btn.textContent = "saving…";
@@ -262,7 +263,7 @@ const currentAdminId = Astro.locals.admin?.id ?? "";
     if (res.ok) {
       location.reload();
     } else {
-      const data = await res.json();
+      const data = (await res.json()) as { error?: string };
       alert(data.error ?? "failed to save");
       btn.textContent = "save";
       btn.disabled = false;
@@ -287,7 +288,7 @@ const currentAdminId = Astro.locals.admin?.id ?? "";
       cancelPw(id);
       alert("password updated");
     } else {
-      const data = await res.json();
+      const data = (await res.json()) as { error?: string };
       alert(data.error ?? "failed to save");
       btn.textContent = "save password";
       btn.disabled = false;
@@ -300,7 +301,7 @@ const currentAdminId = Astro.locals.admin?.id ?? "";
     if (res.ok) {
       getRow(id)?.remove();
     } else {
-      const data = await res.json();
+      const data = (await res.json()) as { error?: string };
       alert(data.error ?? "failed to delete");
     }
   }
@@ -320,7 +321,7 @@ const currentAdminId = Astro.locals.admin?.id ?? "";
         form.reset();
         location.reload();
       } else {
-        const j = await res.json();
+        const j = (await res.json()) as { error?: string };
         alert(j.error ?? "failed to create");
       }
     });

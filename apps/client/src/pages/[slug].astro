@@ -80,7 +80,7 @@ const jsonLd = {
   <ReadingProgress client:idle />
 
   <main
-    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-8"
   >
     <!-- Post header (matches PostDetailView) -->
     <PostHero
@@ -103,7 +103,8 @@ const jsonLd = {
             loading="eager"
             fetchpriority="high"
             decoding="async"
-            style="width:100%;border-radius:3px;object-fit:cover;max-height:280px"
+            class="post-hero-img"
+            style="width:100%;border-radius:6px;object-fit:cover;display:block"
           />
           {post.data.imageSource && (
             <p style="font-size:0.62rem;text-align:right;margin-top:4px;color:var(--muted2)">
@@ -196,6 +197,20 @@ const jsonLd = {
   />
 
   <style>
+    /* ─── Hero image ───────────────────────────────────────────── */
+    .post-hero-img {
+      max-height: 280px;
+    }
+    @media (max-width: 640px) {
+      .post-hero-img {
+        max-height: 200px;
+        border-radius: 4px;
+        width: calc(100% - 16px);
+        margin-left: 8px;
+        margin-right: 8px;
+      }
+    }
+
     /* ─── Related posts hover ──────────────────────────────────── */
     .rel-row {
       padding: 14px 0;

@@ -15,7 +15,10 @@ function json(data: unknown, status = 200) {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  const body = await request.json().catch(() => null);
+  const body = (await request.json().catch(() => null)) as Record<
+    string,
+    unknown
+  > | null;
   const email =
     typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
   const password = typeof body?.password === "string" ? body.password : "";

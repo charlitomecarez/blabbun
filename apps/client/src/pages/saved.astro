@@ -1,4 +1,5 @@
 ---
+import SavedFeed from "@/components/saved/SavedFeed.svelte";
 import Layout from "@/layouts/Layout.astro";
 ---
 
@@ -6,9 +7,10 @@ import Layout from "@/layouts/Layout.astro";
   title="Saved Posts"
   description="Your bookmarked posts on Blab Bun — read them later, whenever."
 >
-  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-8">
+  <main
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-8"
+  >
     <div class="animate-[fadeIn_0.2s_ease]">
-      <!-- back -->
       <a
         href="/"
         class="mb-7 inline-block text-[0.76rem] text-[var(--accent)] no-underline"
@@ -16,90 +18,9 @@ import Layout from "@/layouts/Layout.astro";
         ← back
       </a>
 
-      <!-- header -->
-      <h1 class="mt-5 mb-1.5 text-[1.05rem] font-semibold">saved</h1>
+      <h1 class="mt-5 mb-6 text-[1.05rem] font-semibold">saved</h1>
 
-      <div id="saved-count" class="mb-6 text-[0.72rem] text-[var(--muted)]">
-        0 posts bookmarked
-      </div>
-
-      <!-- empty state -->
-      <div
-        id="saved-empty"
-        class="border-t border-[var(--divider)] py-10 text-[0.8rem] text-[var(--muted)]"
-      >
-        nothing saved yet. hit the 🔖 on any post to save it for later.
-      </div>
-
-      <!-- saved list -->
-      <div id="saved-list" class="hidden pl-5"></div>
+      <SavedFeed client:load />
     </div>
   </main>
 </Layout>
-
-<script>
-  const countEl = document.getElementById("saved-count")!;
-  const emptyEl = document.getElementById("saved-empty")!;
-  const listEl = document.getElementById("saved-list")!;
-
-  const slugs = Object.keys(localStorage)
-    .filter(
-      (k) => k.startsWith("bb-bookmark-") && localStorage.getItem(k) === "1"
-    )
-    .map((k) => k.replace("bb-bookmark-", ""));
-
-  countEl.textContent = `${slugs.length} post${slugs.length !== 1 ? "s" : ""} bookmarked`;
-
-  async function render() {
-    if (slugs.length === 0) return;
-
-    // Fetch titles from the search index
-    const titleMap: Record<string, string> = {};
-    try {
-      const res = await fetch("/search.json");
-      if (res.ok) {
-        const posts: { href: string; title: string }[] = await res.json();
-        for (const p of posts) {
-          const slug = p.href.replace(/^\//, "");
-          titleMap[slug] = p.title;
-        }
-      }
-    } catch {}
-
-    emptyEl.style.display = "none";
-    listEl.style.display = "block";
-
-    slugs.forEach((slug) => {
-      const title = titleMap[slug] ?? slug;
-      const item = document.createElement("div");
-      item.style.cssText =
-        "padding:14px 0;border-bottom:1px solid var(--divider);cursor:pointer;position:relative";
-      item.innerHTML = `
-        <a href="/${slug}"
-          style="display:block;font-size:0.93rem;font-weight:500;line-height:1.5;color:var(--text);text-decoration:none;text-wrap:pretty;transition:color 0.15s"
-          onmouseenter="this.style.color='var(--accent)'"
-          onmouseleave="this.style.color='var(--text)'"
-        >${title}</a>
-        <button onclick="event.stopPropagation();localStorage.removeItem('bb-bookmark-${slug}');this.closest('div').remove();updateCount()"
-          style="background:none;border:none;cursor:pointer;font-size:0.68rem;color:var(--muted2);padding:0;margin-top:4px;font-family:inherit"
-        >remove</button>
-      `;
-      listEl.appendChild(item);
-    });
-  }
-
-  render();
-
-  function updateCount() {
-    const remaining = Object.keys(localStorage).filter(
-      (k) => k.startsWith("bb-bookmark-") && localStorage.getItem(k) === "1"
-    ).length;
-    countEl.textContent = `${remaining} post${remaining !== 1 ? "s" : ""} bookmarked`;
-    if (remaining === 0) {
-      emptyEl.style.display = "block";
-      listEl.style.display = "none";
-    }
-    window.dispatchEvent(new Event("storage"));
-  }
-  (window as Window & { updateCount?: () => void }).updateCount = updateCount;
-</script>
