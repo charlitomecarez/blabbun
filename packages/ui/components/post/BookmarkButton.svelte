@@ -35,7 +35,7 @@
     title={saved ? "Bookmarked" : "Bookmark"}
     class:saved
   >
-    🔖
+    🔖{#if saved}<span class="bookmark-label">saved</span>{/if}
   </button>
 {/if}
 
@@ -44,13 +44,27 @@
     background: none;
     border: none;
     cursor: pointer;
-    padding: 0;
+    padding: 2px 6px;
     font-family: inherit;
-    font-size: 1.1rem;
-    transition: color 0.15s;
+    font-size: 1rem;
+    transition:
+      color 0.15s,
+      background 0.15s;
     color: var(--muted);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1;
   }
   .bookmark-btn.saved {
     color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .bookmark-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 </style>

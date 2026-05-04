@@ -123,7 +123,7 @@ if (token && jwtSecret) {
           if (res.ok) {
             window.location.href = "/";
           } else {
-            const data = await res.json();
+            const data = (await res.json()) as { error?: string };
             errorMsg.textContent = data.error ?? "login failed";
             errorMsg.style.display = "block";
           }

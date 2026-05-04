@@ -21,7 +21,12 @@ function json(data: unknown, status = 200) {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  const { post_slug, body, anon_name, parent_id } = await request.json();
+  const { post_slug, body, anon_name, parent_id } = (await request.json()) as {
+    post_slug?: string;
+    body?: string;
+    anon_name?: string;
+    parent_id?: string;
+  };
   if (!post_slug?.trim() || !body?.trim())
     return json({ error: "post_slug and body are required" }, 400);
 

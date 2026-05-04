@@ -92,6 +92,79 @@ export function welcomeEmailHtml(
 </html>`;
 }
 
+export function issueReportEmailHtml(report: {
+  title: string;
+  description: string;
+  url?: string | null;
+  reporterEmail?: string | null;
+  imageCount?: number;
+}): string {
+  const { title, description, url, reporterEmail, imageCount = 0 } = report;
+  const urlRow = url
+    ? `<tr><td style="padding:0 0 14px"><span style="font-size:0.68rem;color:#9c8b78;letter-spacing:0.06em;text-transform:uppercase">page</span><br><a href="${esc(url)}" style="font-size:0.82rem;color:#c4832a;text-decoration:none">${esc(url)}</a></td></tr>`
+    : "";
+  const fromRow = reporterEmail
+    ? `<tr><td style="padding:0 0 14px"><span style="font-size:0.68rem;color:#9c8b78;letter-spacing:0.06em;text-transform:uppercase">from</span><br><span style="font-size:0.82rem;color:#231e17">${esc(reporterEmail)}</span></td></tr>`
+    : "";
+  const attachNote =
+    imageCount > 0
+      ? `<p style="font-size:0.72rem;color:#9c8b78;margin:20px 0 0">📎 ${imageCount} image${imageCount !== 1 ? "s" : ""} attached</p>`
+      : "";
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[issue] ${esc(title)}</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body style="margin:0;padding:0;background:#fdf9f4;font-family:'IBM Plex Mono',monospace;color:#231e17">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#fdf9f4;padding:48px 20px">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#f5ede0;border:1px solid #e0d4c0;border-radius:4px;padding:36px">
+          <tr>
+            <td style="padding-bottom:24px;border-bottom:1px solid #e0d4c0">
+              <a href="https://blabbun.com" style="text-decoration:none">
+                <img src="${LOGO_SRC}" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;border-radius:3px;margin-right:8px" />
+                <span style="font-size:0.95rem;font-weight:500;color:#c4832a;letter-spacing:0.04em;vertical-align:middle">blab bun</span>
+              </a>
+              <span style="font-size:0.72rem;color:#c5b8a8;margin-left:10px">issue report</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 0 0">
+              <h1 style="font-size:1.05rem;font-weight:500;color:#231e17;margin:0 0 24px;line-height:1.4">${esc(title)}</h1>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                ${urlRow}
+                ${fromRow}
+                <tr>
+                  <td style="padding:0 0 8px">
+                    <span style="font-size:0.68rem;color:#9c8b78;letter-spacing:0.06em;text-transform:uppercase">description</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0 0 24px;border-bottom:1px solid #e0d4c0">
+                    <p style="font-size:0.83rem;color:#231e17;line-height:1.8;margin:0;white-space:pre-wrap">${esc(description)}</p>
+                  </td>
+                </tr>
+              </table>
+              ${attachNote}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-top:24px">
+              <p style="font-size:0.7rem;color:#c5b8a8;margin:0">submitted via <a href="https://blabbun.com/help" style="color:#c4832a;text-decoration:none">blabbun.com/help</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
 export function newPostEmailHtml(
   post: {
     title: string;

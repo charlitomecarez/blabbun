@@ -31,9 +31,10 @@
   <!-- ← back [esc] -->
   <a
     href={backHref}
+    class="back-link"
     style="
       color:var(--accent);font-size:0.76rem;font-family:inherit;
-      padding:0;margin-bottom:28px;
+      padding:0;
       display:inline-flex;align-items:center;gap:12px;
       text-decoration:none;
     "
@@ -55,9 +56,10 @@
 
   <!-- Title -->
   <h1
+    class="post-title"
     style="
       font-size:1.28rem;font-weight:600;line-height:1.4;
-      margin-bottom:30px;text-wrap:pretty;max-width:560px;
+      text-wrap:pretty;max-width:560px;
       color:var(--text);
     "
   >
@@ -73,5 +75,23 @@
     letter-spacing: 0.04em;
     font-weight: 500;
     white-space: nowrap;
+  }
+
+  .back-link {
+    margin-bottom: 28px;
+  }
+
+  .post-title {
+    margin-bottom: 30px;
+  }
+
+  @media (max-width: 640px) {
+    .back-link {
+      margin-bottom: 16px;
+    }
+    .post-title {
+      font-size: 1.1rem;
+      margin-bottom: 18px;
+    }
   }
 </style>
