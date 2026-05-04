@@ -175,6 +175,25 @@ export function issueReportEmailHtml(report: {
 </html>`;
 }
 
+export function newPostEmailText(
+  post: { title: string; slug: string; description: string; date: string },
+  email: string,
+  unsubscribeSecret: string
+): string {
+  const url = `https://blabbun.com/${post.slug}`;
+  const unsubUrl = unsubscribeUrl(email, unsubscribeSecret);
+  return `${post.title}
+
+${post.date}
+
+${post.description}
+
+read it → ${url}
+
+---
+you're on the blab bun mailing list. done reading? ${unsubUrl}`;
+}
+
 export function newPostEmailHtml(
   post: {
     title: string;
