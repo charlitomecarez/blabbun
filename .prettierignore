@@ -8,3 +8,5 @@ apps/*/.astro/
 apps/*/.vercel/
 apps/*/test-results/
 docs/superpowers/
+apps/client/playwright-report
+apps/admin/playwright-report

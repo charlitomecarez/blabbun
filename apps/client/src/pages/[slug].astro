@@ -54,14 +54,17 @@ const jsonLd = {
   description: post.data.description,
   url: postUrl,
   datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  keywords: post.data.tags?.join(", "),
   author: {
     "@type": "Person",
-    name: "Blab Bun",
+    name: "blabbun",
     url: `${Astro.site ?? "https://blabbun.com"}/about`,
   },
   publisher: {
     "@type": "Organization",
-    name: "Blab Bun",
+    name: "blabbun",
+    alternateName: "Blab Bun",
     url: Astro.site ?? "https://blabbun.com",
   },
   ...(post.data.image ? { image: post.data.image } : {}),
@@ -72,6 +75,7 @@ const jsonLd = {
   title={post.data.title}
   description={post.data.description}
   ogImage={post.data.image}
+  ogType="article"
 >
   <ReadingProgress client:idle />
 

@@ -36,3 +36,6 @@ apps/*/node_modules/
 
 # super powers claude plugin folder
 .superpowers
+
+# git worktrees
+.worktrees/
