@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { join, toLower, trim } from "lodash-es";
-
   interface NavLink {
     label: string;
     href: string;
@@ -16,6 +14,7 @@
 
   interface Props {
     links?: NavLink[];
+    postCount?: number;
   }
 
   const {
@@ -24,6 +23,7 @@
       { label: "topics", href: "/topics" },
       { label: "about", href: "/about" },
     ],
+    postCount = 0,
   }: Props = $props();
 
   let isDark = $state(
@@ -40,11 +40,11 @@
   let mobileQuery = $state("");
 
   const mobileFiltered = $derived.by(() => {
-    const q = toLower(trim(mobileQuery));
+    const q = mobileQuery.trim().toLowerCase();
     if (!q) return [];
     return mobilePosts
       .filter((p) => {
-        const hay = toLower(join([p.title, p.description, ...p.tags], " "));
+        const hay = [p.title, p.description, ...p.tags].join(" ").toLowerCase();
         return hay.includes(q);
       })
       .slice(0, 5);
@@ -154,12 +154,13 @@
     </a>
 
     <!-- Nav links (desktop) -->
-    <nav style="gap:16px;align-items:center;flex:1" class="hidden md:flex">
+    <nav style="gap:18px;align-items:center;flex:1" class="hidden md:flex">
       {#each links as link}
         <a
           href={link.href}
+          class={link.active ? "scribble-underline" : ""}
           style="
-            background:none;border:none;font-size:0.7rem;
+            background:none;border:none;font-size:0.74rem;
             font-family:inherit;cursor:pointer;letter-spacing:0.03em;
             text-decoration:none;
             color:{link.active ? 'var(--accent)' : 'var(--muted)'};
@@ -177,7 +178,7 @@
       class="hidden md:flex"
     >
       <!-- Inline search bar -->
-      <div style="position:relative;flex:1;max-width:200px">
+      <div style="position:relative;flex:1;max-width:240px">
         <span
           style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.85rem;pointer-events:none"
           >⌕</span
@@ -192,7 +193,7 @@
           style="
             width:100%;background:var(--input-bg);
             border:1px solid var(--border);border-radius:3px;
-            padding:6px 24px 6px 26px;font-size:0.74rem;
+            padding:6px 28px 6px 28px;font-size:0.74rem;
             font-family:inherit;color:var(--text);outline:none;
           "
         />

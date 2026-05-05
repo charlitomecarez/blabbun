@@ -52,7 +52,7 @@
   <div class="feed-placeholder">loading…</div>
 {:else if savedPosts.length === 0}
   <div class="feed-empty">
-    nothing saved yet. hit the 🔖 on any post to save it for later.
+    nothing saved yet. hit the 🏷 on any post to save it for later.
   </div>
 {:else}
   <div class="feed-count">
@@ -83,7 +83,7 @@
   .feed-count {
     font-size: 0.72rem;
     color: var(--muted);
-    margin-bottom: 4px;
+    margin-bottom: 24px;
   }
 
   .feed-list {

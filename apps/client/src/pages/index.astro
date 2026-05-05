@@ -5,7 +5,10 @@ import { readTime } from "@blabbun/utils";
 import { getCollection } from "astro:content";
 
 import HomeFeed from "@/components/home/HomeFeed.svelte";
+import MascotHero from "@/components/home/MascotHero.svelte";
 import NewsletterBar from "@/components/home/NewsletterBar.svelte";
+import ScribbleDivider from "@/components/home/ScribbleDivider.svelte";
+import Ticker from "@/components/home/Ticker.svelte";
 import Layout from "@/layouts/Layout.astro";
 import { getRuntimeEnv, getSupabaseClient } from "@/lib/api";
 import { fetchPostStats } from "@/lib/stats";
@@ -50,21 +53,58 @@ const allTags = [
 ---
 
 <Layout>
-  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4">
-    <h1 class="sr-only">Blab Bun</h1>
-    <!-- subtitle -->
-    <div
-      class="mb-6 animate-[fadeIn_0.2s_ease] border-b border-[var(--divider)] py-3 pb-5 sm:py-8"
+  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-8">
+    <!-- Hero section -->
+    <section
+      style="padding: 24px 0 0; position: relative;"
+      aria-label="Site introduction"
     >
-      <div class="text-[0.72rem] leading-[1.7] text-[var(--muted)]">
-        unfiltered takes &amp; half-baked thoughts — probably should've kept to
-        myself
+      <div
+        style="display:flex; align-items:flex-start; gap:24px; margin-bottom:8px; flex-wrap:wrap;"
+      >
+        <MascotHero client:load />
+        <div style="flex:1; min-width:240px; padding-top:4px;">
+          <h1
+            class="serif"
+            style="font-size:2.1rem; font-weight:600; line-height:1.05; margin-bottom:8px; text-wrap:balance; letter-spacing:-0.02em;"
+          >
+            unfiltered takes &amp;<br />
+            <span class="scribble-underline" style="font-style:italic"
+              >half-baked thoughts</span
+            >
+          </h1>
+          <p
+            style="font-size:0.78rem; color:var(--muted); line-height:1.7; margin-top:14px;"
+          >
+            probably should've kept to myself. but here we are.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <Ticker client:idle />
+
+    <!-- "latest blab" label + fresh badge wrapper -->
+    <div style="position:relative; margin-bottom:8px; margin-top:8px;">
+      <span
+        class="handwritten"
+        style="position:absolute; top:-14px; right:12px; background:var(--accent2); color:#fff; font-size:1.1rem; padding:4px 14px; border-radius:14px; transform:rotate(6deg); animation:wiggle 3s ease-in-out infinite; box-shadow:2px 2px 0 var(--text); z-index:5;"
+        aria-hidden="true"
+      >
+        fresh out the oven!
+      </span>
+      <div
+        class="handwritten"
+        style="font-size:1.4rem; color:var(--accent); margin-bottom:4px; transform:rotate(-1deg); display:inline-block;"
+      >
+        latest blab ↓
       </div>
     </div>
 
     <HomeFeed feedItems={feedItems} allTags={allTags} client:idle />
 
-    <!-- newsletter -->
+    <ScribbleDivider client:idle />
+
     <NewsletterBar client:visible />
   </main>
 </Layout>

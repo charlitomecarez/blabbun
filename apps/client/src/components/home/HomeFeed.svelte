@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { FeedItem } from "@blabbun/ui/components/cards";
-
   import InfiniteScroll from "@/components/InfiniteScroll.svelte";
+  import PostCard from "@/components/home/PostCard.svelte";
 
   interface FeedItemData {
     date: string;
@@ -41,41 +40,81 @@
 </script>
 
 <!-- Tag filter -->
-<div
+<nav
   id="tag-filters"
-  style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"
+  aria-label="Filter posts by tag"
+  class="tag-filter-wrap flex flex-wrap gap-x-4 gap-y-1"
 >
+  <span class="handwritten filter-label" aria-hidden="true">filter:</span>
   <button
     data-tag="all"
     onclick={() => (activeTag = "all")}
-    style="background:none;border:none;padding:3px 0;font-size:0.7rem;font-family:inherit;cursor:pointer;letter-spacing:0.03em;font-weight:{activeTag ===
-    'all'
-      ? '500'
-      : '400'};color:{activeTag === 'all' ? 'var(--accent)' : 'var(--muted)'}"
-    >all</button
+    aria-pressed={activeTag === "all"}
+    class="tag-btn"
+    class:tag-btn--active={activeTag === "all"}
   >
+    all
+  </button>
   {#each allTags as t}
     <button
       data-tag={t}
       onclick={() => (activeTag = t)}
-      style="background:none;border:none;padding:3px 0;font-size:0.7rem;font-family:inherit;cursor:pointer;letter-spacing:0.03em;font-weight:{activeTag ===
-      t
-        ? '500'
-        : '400'};color:{activeTag === t ? 'var(--accent)' : 'var(--muted)'}"
-      >/ {t.toLowerCase()}</button
+      aria-pressed={activeTag === t}
+      class="tag-btn"
+      class:tag-btn--active={activeTag === t}
     >
+      / {t.toLowerCase()}
+    </button>
   {/each}
-</div>
+</nav>
 
 <!-- Post list -->
-<div
-  id="post-list"
-  style="padding-left:20px;padding-right:20px;animation:fadeIn 0.2s ease"
->
-  {#each visible as item}
-    <div data-tag={item.tag}>
-      <FeedItem {...item} />
-    </div>
+<div id="post-list" class="animate-[fadeIn_0.2s_ease] px-5">
+  {#each visible as item, i}
+    <PostCard {...item} index={i} />
   {/each}
   <InfiniteScroll {hasMore} onLoadMore={() => (visibleCount += 10)} />
 </div>
+
+<style>
+  .tag-filter-wrap {
+    border-top: 1px solid var(--divider);
+    padding-top: 18px;
+    margin-top: 20px;
+    margin-bottom: 4px;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-size: 1rem;
+    color: var(--muted);
+    margin-right: 4px;
+    line-height: 1;
+    align-self: center;
+  }
+
+  .tag-btn {
+    background: none;
+    border: none;
+    padding: 3px 0;
+    font-size: 0.7rem;
+    font-family: inherit;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    font-weight: 400;
+    color: var(--muted);
+    transition: color 0.12s;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .tag-btn:hover {
+    color: var(--accent);
+  }
+
+  .tag-btn--active {
+    color: var(--accent);
+    font-weight: 500;
+  }
+</style>

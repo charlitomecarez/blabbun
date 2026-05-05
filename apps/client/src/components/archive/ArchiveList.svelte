@@ -245,7 +245,7 @@
       font-size: 0.64rem;
     }
     .archive-badge {
-      font-size: 0.64rem;
+      font-size: 0.6rem;
     }
     .archive-stats {
       font-size: 0.6rem;
@@ -288,10 +288,10 @@
     color: var(--accent);
   }
 
-  /* ─── Badge base ──────────────────────────────────────────── */
+  /* ─── Badge base (small variant, matches basis Tag small={true}) */
   .archive-badge {
-    font-size: 0.68rem;
-    padding: 2px 8px;
+    font-size: 0.64rem;
+    padding: 1px 6px;
     border-radius: 2px;
     letter-spacing: 0.04em;
     font-weight: 500;

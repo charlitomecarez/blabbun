@@ -10,15 +10,16 @@ import Layout from "@/layouts/Layout.astro";
   <main
     class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-8"
   >
-    <div class="animate-[fadeIn_0.2s_ease]">
+    <div style="animation:fadeIn 0.2s ease">
       <a
         href="/"
-        class="mb-7 inline-block text-[0.76rem] text-[var(--accent)] no-underline"
+        style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
+               text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
       >
-        ← back
+        ← back to the blabs
       </a>
 
-      <h1 class="mt-5 mb-6 text-[1.05rem] font-semibold">saved</h1>
+      <h1 style="font-size:1.05rem;font-weight:600;margin-bottom:6px">saved</h1>
 
       <SavedFeed client:load />
     </div>

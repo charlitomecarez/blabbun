@@ -7,6 +7,7 @@
   let info = $state("");
   let submitting = $state(false);
   let cooldownMs = $state(0);
+  let done = $state(false);
 
   $effect(() => {
     tick();
@@ -78,11 +79,13 @@
             : `${subscribed} addresses added.`;
         if (already > 0) info += ` (${already} already subscribed)`;
         email = "";
+        done = true;
         localStorage.setItem(STORAGE_KEY, String(Date.now()));
         tick();
       } else if (already > 0) {
         info =
           already === 1 ? "already subscribed." : "all already subscribed.";
+        done = true;
       } else {
         throw new Error("something went wrong");
       }
@@ -94,68 +97,110 @@
   }
 </script>
 
-<div class="newsletter-card">
-  <div class="newsletter-title">get new posts in your inbox</div>
-  <div class="newsletter-sub">
-    no schedule. no issues. just an email when something new drops. separate
-    multiple addresses with a comma.
-  </div>
-  {#if err}
-    <div class="form-error">! {err}</div>
+<aside aria-label="Newsletter signup" class="newsletter-wrap">
+  <!-- Tape strip -->
+  <div class="tape" style="top:-9px; left:40%; transform:rotate(-3deg);"></div>
+
+  <!-- "no spam, promise!" annotation -->
+  <span class="no-spam handwritten" aria-hidden="true">no spam, promise!</span>
+
+  {#if done}
+    <!-- Done state -->
+    <h2 class="newsletter-title serif" style="font-style:italic;">
+      you're in. ✶
+    </h2>
+    <p class="newsletter-sub">
+      i'll send the next one when i have something worth saying. could be
+      tomorrow. could be never.
+    </p>
+  {:else}
+    <!-- Default state -->
+    <h2 class="newsletter-title serif" style="font-style:italic;">
+      get new posts in your inbox
+    </h2>
+    <p class="newsletter-sub">
+      no schedule. no newsletter-newsletter. just an email when something new
+      drops. separate multiple addresses with a comma.
+    </p>
+
+    {#if err}
+      <p class="form-error" role="alert">! {err}</p>
+    {/if}
+    {#if info}
+      <p class="form-info" role="status">{info}</p>
+    {/if}
+
+    <form class="newsletter-form" onsubmit={submit} novalidate>
+      <label for="nl-email" class="sr-only">Email address</label>
+      <input
+        id="nl-email"
+        bind:value={email}
+        class="email-input"
+        placeholder="your@email.com, friend@email.com"
+        type="text"
+        autocomplete="email"
+      />
+      <button
+        type="submit"
+        class="subscribe-btn"
+        disabled={submitting || cooldownMs > 0}
+        aria-disabled={submitting || cooldownMs > 0}
+      >
+        {#if submitting}
+          …
+        {:else if cooldownMs > 0}
+          {cooldownLabel(cooldownMs)}
+        {:else}
+          subscribe
+        {/if}
+      </button>
+    </form>
   {/if}
-  {#if info}
-    <div class="form-info">{info}</div>
-  {/if}
-  <form class="newsletter-form" onsubmit={submit}>
-    <input
-      bind:value={email}
-      class="email-input"
-      placeholder="your@email.com, friend@email.com"
-      type="text"
-      autocomplete="email"
-    />
-    <button
-      type="submit"
-      class="subscribe-btn"
-      disabled={submitting || cooldownMs > 0}
-    >
-      {#if submitting}
-        …
-      {:else if cooldownMs > 0}
-        {cooldownLabel(cooldownMs)}
-      {:else}
-        subscribe
-      {/if}
-    </button>
-  </form>
-</div>
+</aside>
 
 <style>
-  .newsletter-card {
+  .newsletter-wrap {
     background: var(--bg2);
-    border: 1px solid var(--border);
+    border: 1.5px solid var(--text);
     border-radius: 4px;
-    padding: 26px 28px;
-    margin: 40px 0;
+    padding: 30px 28px;
+    margin: 40px 4px;
+    position: relative;
+    transform: rotate(-0.4deg);
+    box-shadow: 4px 4px 0 var(--text);
+    overflow: visible;
+  }
+
+  .no-spam {
+    position: absolute;
+    top: -22px;
+    right: -12px;
+    color: var(--accent2);
+    font-size: 1.3rem;
+    transform: rotate(8deg);
+    display: inline-block;
+    pointer-events: none;
+    white-space: nowrap;
   }
 
   .newsletter-title {
-    font-size: 0.85rem;
+    font-size: 1.4rem;
     font-weight: 500;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     color: var(--text);
+    line-height: 1.2;
   }
 
   .newsletter-sub {
     font-size: 0.74rem;
     color: var(--muted);
     margin-bottom: 16px;
-    line-height: 1.6;
+    line-height: 1.65;
   }
 
   .form-error {
     font-size: 0.7rem;
-    color: var(--accent);
+    color: var(--accent2);
     margin-bottom: 8px;
   }
 
@@ -182,6 +227,11 @@
     font-family: inherit;
     color: var(--text);
     outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .email-input:focus {
+    border-color: var(--accent);
   }
 
   .subscribe-btn {
@@ -195,6 +245,7 @@
     cursor: pointer;
     white-space: nowrap;
     transition: opacity 0.15s;
+    min-height: 44px;
   }
 
   .subscribe-btn:disabled {
