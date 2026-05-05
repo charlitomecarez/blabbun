@@ -260,6 +260,13 @@ const today = new Date().toISOString().split("T")[0];
             style="width:100%;padding:8px 10px;font-size:0.75rem;font-family:'IBM Plex Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;resize:vertical;box-sizing:border-box;line-height:1.6"
           ></textarea>
           <div
+            style="display:flex;gap:10px;margin-top:5px;font-size:0.65rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace"
+          >
+            <span id="wc-words">0 words</span>
+            <span style="color:var(--border)">·</span>
+            <span id="wc-read">0 min read</span>
+          </div>
+          <div
             style="margin-top:6px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:0.68rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace;line-height:1.8"
           >
             <span style="color:var(--muted);letter-spacing:0.04em"
@@ -563,12 +570,25 @@ const today = new Date().toISOString().split("T")[0];
       }
     });
 
+  function updateWordCount(content: string) {
+    const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+    const mins = Math.max(1, Math.round(words / 200));
+    const wordsEl = document.getElementById("wc-words");
+    const readEl = document.getElementById("wc-read");
+    if (wordsEl)
+      wordsEl.textContent = `${words.toLocaleString()} word${words !== 1 ? "s" : ""}`;
+    if (readEl)
+      readEl.textContent = words === 0 ? "0 min read" : `${mins} min read`;
+  }
+
   function updatePreview() {
     const title = ($("f-title") as HTMLInputElement)?.value ?? "";
     const description = ($("f-description") as HTMLInputElement)?.value ?? "";
     const pubDate = ($("f-pubDate") as HTMLInputElement)?.value ?? "";
     const image = ($("f-image") as HTMLInputElement)?.value ?? "";
     const content = ($("f-content") as HTMLTextAreaElement)?.value ?? "";
+
+    updateWordCount(content);
 
     const isEmpty = !title && !description && !content;
 

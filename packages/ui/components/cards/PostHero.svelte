@@ -57,11 +57,7 @@
   <!-- Title -->
   <h1
     class="post-title"
-    style="
-      font-size:1.28rem;font-weight:600;line-height:1.4;
-      text-wrap:pretty;max-width:560px;
-      color:var(--text);
-    "
+    style="font-weight:600;line-height:1.4;text-wrap:pretty;max-width:560px;color:var(--text)"
   >
     {title}
   </h1>
@@ -82,6 +78,7 @@
   }
 
   .post-title {
+    font-size: 1.28rem;
     margin-bottom: 30px;
   }
 
@@ -90,7 +87,8 @@
       margin-bottom: 16px;
     }
     .post-title {
-      font-size: 1.1rem;
+      font-size: 1rem;
+      line-height: 1.45;
       margin-bottom: 18px;
     }
   }
