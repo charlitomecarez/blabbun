@@ -79,7 +79,7 @@ const postCount = allPosts.length;
     <!-- Prevent theme flash: set body class before paint -->
     <script is:inline>
       (function () {
-        const t = localStorage.getItem("bb-theme") || "light";
+        const t = localStorage.getItem("bb-theme") || "dark";
         document.documentElement.setAttribute("data-theme-loading", t);
       })();
     </script>
@@ -198,11 +198,11 @@ const postCount = allPosts.length;
     />
   </head>
   <body
-    class="light"
+    class="dark"
     style="min-height:100vh;display:flex;flex-direction:column"
   >
     <script is:inline>
-      document.body.className = localStorage.getItem("bb-theme") || "light";
+      document.body.className = localStorage.getItem("bb-theme") || "dark";
     </script>
     <Navbar client:load links={navLinks} postCount={postCount} />
     <SearchDropdown client:idle />
