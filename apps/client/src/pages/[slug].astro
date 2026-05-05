@@ -40,6 +40,7 @@ const relatedPosts = relatedSlice.map((p) => ({
   excerpt: p.data.description,
   tag: (p.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
   href: `/${p.id}`,
+  readTime: readTime(p.body ?? ""),
   date: p.data.pubDate.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -128,7 +129,7 @@ const jsonLd = {
     }
 
     <!-- Article body — matches design's content paragraphs -->
-    <div style="border-top:1px solid var(--divider);padding-top:26px">
+    <div style="padding-top:4px">
       <div
         class="prose prose-p:font-mono prose-p:text-[0.88rem] prose-p:leading-[1.9] prose-p:mb-5 prose-p:text-[var(--muted)] prose-p:text-wrap-pretty prose-headings:font-mono prose-headings:font-semibold prose-headings:text-[var(--text)] prose-h2:text-[1.1rem] prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-[0.95rem] prose-h3:mt-7 prose-h3:mb-3 prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:underline prose-strong:text-[var(--text)] prose-strong:font-semibold prose-ul:pl-6 prose-ol:pl-6 prose-li:text-[0.88rem] prose-li:text-[var(--muted)] prose-li:leading-[1.9] prose-li:my-1 prose-code:font-mono prose-code:text-[var(--text)] prose-code:bg-[var(--bg2)] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.82em] prose-pre:bg-[var(--bg2)] prose-pre:text-[var(--text)] prose-pre:rounded prose-pre:overflow-x-auto prose-pre:text-[0.82em] prose-blockquote:border-l-2 prose-blockquote:border-[var(--accent)] prose-blockquote:bg-[var(--bg2)] prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-[var(--muted)] prose-blockquote:not-italic prose-hr:border-[var(--divider)] prose-hr:my-8 prose-img:rounded prose-img:w-full prose-img:my-8 prose-img:block prose-figure:my-8 prose-figcaption:text-center prose-figcaption:text-[0.7rem] prose-figcaption:text-[var(--muted2)] prose-figcaption:mt-[-20px] prose-figcaption:mb-2 post-content max-w-none"
       >
@@ -136,12 +137,24 @@ const jsonLd = {
       </div>
     </div>
 
+    <!-- End of blab marker -->
+    <div
+      style="text-align:center;margin:48px 0 8px;font-family:'Caveat',cursive;font-size:1.6rem;color:var(--accent);letter-spacing:0.4em"
+    >
+      ✶ · ✶
+    </div>
+    <div
+      style="text-align:center;font-family:'Caveat',cursive;font-size:1.2rem;color:var(--muted);margin-bottom:8px"
+    >
+      end of blab.
+    </div>
+
     <!-- Reactions -->
-    <ReactionBar client:visible postSlug={post.id} />
+    <ReactionBar client:visible slug={post.id} />
 
     <!-- Actions: ClapButton + SharePanel + 🔖 (margin-left:auto) — exact PostDetailView layout -->
     <div
-      style="display:flex;align-items:center;gap:14px;margin-top:28px;padding-top:24px;border-top:1px solid var(--divider);flex-wrap:wrap"
+      style="display:flex;align-items:center;gap:14px;margin-top:28px;padding-top:24px;border-top:1px dashed var(--border);flex-wrap:wrap"
     >
       <ClapShare
         client:visible
@@ -155,13 +168,38 @@ const jsonLd = {
       </ClapShare>
     </div>
 
+    <!-- WHAT NOW card — "still here? read this next →" -->
+    {
+      relatedPosts.length > 0 && (
+        <div class="what-now-card">
+          <div class="tape" style="top:-9px;left:40%;transform:rotate(-3deg)" />
+          <a
+            href={relatedPosts[0].href}
+            class="what-now-link"
+            aria-label={relatedPosts[0].title}
+          >
+            <span />
+          </a>
+          <div style="font-family:'Caveat',cursive;font-size:1.2rem;color:var(--accent);margin-bottom:6px">
+            still here? read this next →
+          </div>
+          <div style="font-family:'Fraunces',serif;font-style:italic;font-size:1.4rem;font-weight:500;line-height:1.25;color:var(--text);text-wrap:pretty">
+            {relatedPosts[0].title}
+          </div>
+          <div style="font-size:0.74rem;color:var(--muted);margin-top:8px">
+            {relatedPosts[0].date} · {relatedPosts[0].readTime}
+          </div>
+        </div>
+      )
+    }
+
     <!-- Comments -->
     <Comments client:visible postSlug={post.id} />
 
     <!-- Related posts -->
     {
       relatedPosts.length > 0 && (
-        <div style="margin-top:48px;padding-top:24px;border-top:1px solid var(--divider)">
+        <div style="margin-top:48px;padding-top:32px;border-top:1px solid var(--divider)">
           <div style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:20px;text-transform:uppercase">
             more from blab bun
           </div>
@@ -209,6 +247,27 @@ const jsonLd = {
         margin-left: 8px;
         margin-right: 8px;
       }
+    }
+
+    /* ─── WHAT NOW card ───────────────────────────────────────── */
+    .what-now-card {
+      margin-top: 40px;
+      background: var(--bg2);
+      border: 1.5px solid var(--text);
+      padding: 24px 26px;
+      transform: rotate(-0.5deg);
+      box-shadow: 4px 4px 0 var(--text);
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.15s;
+    }
+    .what-now-card:hover {
+      transform: rotate(-0.5deg) translate(-2px, -2px);
+    }
+    .what-now-link {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
     }
 
     /* ─── Related posts hover ──────────────────────────────────── */
