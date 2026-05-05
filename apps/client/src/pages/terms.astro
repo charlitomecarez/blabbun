@@ -3,98 +3,117 @@ import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout title="terms" description="Terms, privacy, and help for Blab Bun.">
-  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-8 py-10">
-    <div class="animate-[fadeIn_0.2s_ease]">
+  <main
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-10"
+  >
+    <div style="animation:fadeIn 0.2s ease">
       <!-- back -->
       <a
         href="/"
-        class="mb-7 inline-block text-[0.76rem] text-[var(--accent)] no-underline"
+        style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
+               text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
       >
-        ← back
+        ← back to the blabs
       </a>
 
-      <!-- title -->
-      <h1 class="mt-5 mb-6 text-[1.05rem] font-semibold">terms</h1>
-
-      <!-- intro -->
+      <!-- title row: "terms" + "(the boring page)" inline -->
       <div
-        class="max-w-[540px] space-y-3.5 text-[0.82rem] leading-[1.9] text-[var(--muted)]"
+        style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px"
       >
-        <p>
-          this is a personal blog. i write what i think, when i think it,
-          sometimes before i&apos;ve fully thought it through. expect rough
-          edges, occasional bad takes, and the kind of posts that felt smarter
-          at 11pm.
-        </p>
-
-        <p>
-          by being here you agree to take everything with a grain of salt. none
-          of this is legal, medical, financial, or life advice. it&apos;s just
-          me talking.
-        </p>
-
-        <p>
-          if something i wrote bothered you, made you think, or made you open a
-          new tab to argue with me — leave a comment. that&apos;s kind of the
-          whole point.
-        </p>
+        <h1
+          style="font-family:'Fraunces',serif;font-size:2.4rem;font-weight:600;letter-spacing:-0.02em"
+        >
+          terms
+        </h1>
+        <span
+          style="font-family:'Caveat',cursive;font-size:1.2rem;color:var(--accent);
+                     transform:rotate(-3deg);display:inline-block"
+        >
+          (the boring page)
+        </span>
       </div>
 
-      <!-- sections -->
-      <div
-        class="mt-8 flex max-w-[540px] flex-col gap-6 border-t border-[var(--divider)] pt-6"
+      <!-- scribble underline -->
+      <svg
+        width="180"
+        height="14"
+        viewBox="0 0 180 14"
+        style="margin-bottom:28px;display:block"
       >
-        <!-- privacy -->
-        <div>
-          <div
-            class="mb-2 text-[0.65rem] tracking-[0.07em] text-[var(--muted)] uppercase"
-          >
-            privacy
-          </div>
+        <path
+          d="M2 8 Q 30 2, 60 8 T 120 8 T 178 7"
+          stroke="var(--accent)"
+          stroke-width="2"
+          fill="none"
+          stroke-linecap="round"></path>
+      </svg>
 
-          <div
-            class="space-y-2 text-[0.82rem] leading-[1.9] text-[var(--muted)]"
-          >
-            <p>
-              i'm not out here collecting your life story. there *is* basic
-              analytics (cloudflare type beat) but it's just general traffic
-              stats — not “who you are, where you live, what you ate for lunch”
-              level tracking.
+      <!-- content -->
+      <div
+        style="font-size:0.9rem;color:var(--text);line-height:1.95;max-width:580px"
+      >
+        <p style="margin-bottom:14px">
+          this is a personal blog. i write what i think. that means sometimes
+          i'm wrong, sometimes i'm sloppy, and occasionally i write something at
+          11pm that probably needed one more edit.
+        </p>
+        <p style="margin-bottom:14px">
+          by reading this you agree to take everything here with at least a
+          small grain of salt. none of this is legal, medical, financial, or
+          professional advice of any kind.
+        </p>
+        <p style="margin-bottom:28px">
+          if something i wrote genuinely bothered you, you're welcome to leave
+          an anonymous comment. i read all of them.
+        </p>
+
+        <!-- sections -->
+        <div
+          style="border-top:1px solid var(--divider);padding-top:24px;
+                    display:flex;flex-direction:column;gap:16px"
+        >
+          <!-- privacy -->
+          <div>
+            <div
+              style="font-size:0.65rem;letter-spacing:0.07em;text-transform:uppercase;
+                        margin-bottom:8px;color:var(--muted)"
+            >
+              privacy
+            </div>
+            <p style="margin-bottom:8px">
+              i don't collect your data. i don't have analytics. i can't see who
+              you are or where you're from.
             </p>
-
-            <p>
+            <p style="margin-bottom:8px">
               if you subscribe to the newsletter, i get your email address and
-              that's it. i'm not selling it, sharing it, or doing anything weird
-              with it. you'll just get the occasional post when i remember to
-              send one.
+              nothing else. i won't sell it, share it, or use it for anything
+              other than sending you the occasional post.
+            </p>
+            <p>
+              comments are anonymous and stored locally in your browser. they're
+              yours.
             </p>
           </div>
-        </div>
 
-        <!-- help -->
-        <div class="border-t border-[var(--divider)] pt-4">
-          <div
-            class="mb-2 text-[0.65rem] tracking-[0.07em] text-[var(--muted)] uppercase"
-          >
-            help
-          </div>
-
-          <div
-            class="space-y-2 text-[0.82rem] leading-[1.9] text-[var(--muted)]"
-          >
-            <p>
+          <!-- help -->
+          <div style="border-top:1px solid var(--divider);padding-top:16px">
+            <div
+              style="font-size:0.65rem;letter-spacing:0.07em;text-transform:uppercase;
+                        margin-bottom:8px;color:var(--muted)"
+            >
+              help
+            </div>
+            <p style="margin-bottom:8px">
               got a question? something broken? something you disagree with and
               want to talk about?
             </p>
-            <p>
+            <p style="margin-bottom:8px">
               leave an anonymous comment on any post — it's the best way to
               reach me. i read all of them.
             </p>
             <p>
               if it's something bigger — a bug, something broken, a suggestion —
-              <a
-                href="/help"
-                class="text-[var(--accent)] no-underline hover:underline"
+              <a href="/help" style="color:var(--accent);text-decoration:none"
                 >report it here</a
               >. you can attach screenshots too.
             </p>
@@ -103,4 +122,12 @@ import Layout from "@/layouts/Layout.astro";
       </div>
     </div>
   </main>
+
+  <style>
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.75rem !important;
+      }
+    }
+  </style>
 </Layout>
