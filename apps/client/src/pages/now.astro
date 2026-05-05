@@ -4,29 +4,33 @@ import Layout from "@/layouts/Layout.astro";
 const items = [
   {
     section: "reading",
+    icon: "📖",
     entries: [
-      "a book i started months ago and now we’re just in a situationship",
+      "a book i started months ago and now we're just in a situationship",
       "articles explaining why everything is bad and somehow still getting worse",
       "ancient blog posts from people who escaped the internet and are probably happier than me",
     ],
   },
   {
     section: "thinking about",
+    icon: "💭",
     entries: [
       "if having fewer opinions would bring me peace or just make me boring as hell",
-      "how group chats are slowly dying and everyone is pretending it’s normal",
+      "how group chats are slowly dying and everyone is pretending it's normal",
       "why finishing things feels like a personality trait now instead of just… doing it",
     ],
   },
   {
     section: "current mood",
+    icon: "🌤",
     entries: [
       "tired but like… spiritually productive tired",
-      "vaguely annoyed at something i haven’t figured out yet (future post loading...)",
+      "vaguely annoyed at something i haven't figured out yet (future post loading...)",
     ],
   },
   {
     section: "lately",
+    icon: "✶",
     entries: [
       "writing more than usual which is either growth or advanced procrastination",
       "drinking concerning amounts of coffee and calling it character development",
@@ -34,58 +38,102 @@ const items = [
     ],
   },
 ];
+
+const rotations = [-0.6, 0.8, -0.4, 0.5];
 ---
 
 <Layout
   title="Now — Blab Bun"
   description="What the blabbun writer is reading, thinking about, and doing right now — a living snapshot, updated periodically."
 >
-  <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-8 py-10">
-    <div class="animate-[fadeIn_0.2s_ease]">
+  <main
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-10"
+  >
+    <div style="animation:fadeIn 0.2s ease">
       <!-- back -->
       <a
         href="/"
-        class="mb-8 inline-block text-[0.76rem] text-[var(--accent)] no-underline"
+        style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
+               text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
       >
-        ← back
+        ← back to the blabs
       </a>
 
-      <!-- header -->
-      <div class="mt-5 mb-8">
-        <h1 class="mb-1.5 text-[1.1rem] font-semibold text-[var(--text)]">
-          now
+      <!-- header row: /now + "a snapshot, basically" inline -->
+      <div
+        style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px"
+      >
+        <h1
+          style="font-family:'Fraunces',serif;font-size:2.6rem;font-weight:600;letter-spacing:-0.03em"
+        >
+          /now
         </h1>
-
-        <div class="text-[0.7rem] text-[var(--muted)]">
-          a snapshot of what's going on — updated Apr 2026 ·{" "}
-          <a
-            href="https://nownownow.com/about"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-[var(--accent)] no-underline"
-          >
-            what is a /now page?
-          </a>
-        </div>
+        <span
+          style="font-family:'Caveat',cursive;font-size:1.3rem;color:var(--accent);
+                     transform:rotate(-3deg);display:inline-block"
+        >
+          a snapshot, basically
+        </span>
       </div>
 
-      <!-- sections -->
-      <div class="flex max-w-[560px] flex-col gap-9">
+      <!-- subtitle -->
+      <div
+        style="font-size:0.78rem;color:var(--muted);margin-bottom:36px;line-height:1.7"
+      >
+        what's going on right this second — updated Apr 2026 ·{" "}
+        <a
+          href="https://nownownow.com/about"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="color:var(--accent);text-decoration:none"
+        >
+          what is a /now page?
+        </a>
+      </div>
+
+      <!-- sections as sticky-note cards -->
+      <div style="display:flex;flex-direction:column;gap:28px;max-width:620px">
         {
-          items.map(({ section, entries }) => (
-            <div>
-              <div class="mb-3.5 border-b border-[var(--divider)] pb-2 text-[0.65rem] tracking-[0.08em] text-[var(--muted)] uppercase">
-                {section}
+          items.map(({ section, icon, entries }, i) => (
+            <div
+              style={`background:var(--bg2);border:1.5px solid var(--text);
+                       padding:22px 26px;transform:rotate(${rotations[i]}deg);
+                       box-shadow:4px 4px 0 var(--text);position:relative`}
+            >
+              <div
+                class="tape"
+                style="top:-10px;left:30px;transform:rotate(-4deg)"
+              />
+
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                <span style="font-size:1.4rem">{icon}</span>
+                <span
+                  style="font-family:'Fraunces',serif;font-style:italic;font-size:1.4rem;
+                           font-weight:500;color:var(--text)"
+                >
+                  {section}
+                </span>
+                <svg width="60" height="10" viewBox="0 0 60 10" style="flex:1">
+                  <path
+                    d="M2 5 Q 15 1, 30 5 T 58 5"
+                    stroke="var(--accent)"
+                    stroke-width="1.5"
+                    fill="none"
+                    stroke-linecap="round"
+                  />
+                </svg>
               </div>
 
-              <div class="flex flex-col gap-2.5">
+              <div style="display:flex;flex-direction:column;gap:10px">
                 {entries.map((entry) => (
-                  <div class="flex items-start gap-3">
-                    <span class="mt-[2px] flex-shrink-0 text-[0.8rem] text-[var(--accent)]">
+                  <div style="display:flex;gap:12px;align-items:flex-start">
+                    <span
+                      style="font-family:'Caveat',cursive;color:var(--accent);font-size:1.2rem;
+                               line-height:1;margin-top:4px;flex-shrink:0"
+                    >
                       —
                     </span>
-
-                    <p class="text-[0.84rem] leading-[1.7] text-[var(--muted)]">
+                    <p style="font-size:0.88rem;line-height:1.7;color:var(--text);text-wrap:pretty">
                       {entry}
                     </p>
                   </div>
@@ -98,19 +146,20 @@ const items = [
 
       <!-- footer -->
       <div
-        class="mt-12 border-t border-[var(--divider)] pt-6 text-[0.68rem] text-[var(--muted)]"
+        style="margin-top:48px;padding-top:24px;border-top:1px dashed var(--border);
+                  font-family:'Caveat',cursive;font-size:1.05rem;color:var(--muted)"
       >
-        inspired by{" "}
-        <a
-          href="https://nownownow.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-[var(--accent)] no-underline"
-        >
-          nownownow.com
-        </a>
-        {" "}— the /now page movement
+        inspired by <span style="color:var(--accent)">nownownow.com</span> — the /now
+        page movement ✶
       </div>
     </div>
   </main>
+
+  <style>
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.9rem !important;
+      }
+    }
+  </style>
 </Layout>

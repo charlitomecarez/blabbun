@@ -32,19 +32,19 @@ const { pathname } = Astro.url;
 const navLinks = [
   { label: "home", href: "/", active: pathname === "/" },
   {
-    label: "posts",
+    label: "all posts",
     href: "/archive",
     active: pathname === "/archive" || pathname.startsWith("/topics"),
   },
-  // { label: "about", href: "/about", active: pathname === "/about" },
 ];
 
-// Word count for footer
+// Word count for footer + post count for nav
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 const totalWords = allPosts.reduce(
   (a, p) => a + (p.body?.trim().split(/\s+/).length ?? 0),
   0
 );
+const postCount = allPosts.length;
 ---
 
 <!doctype html>
@@ -204,7 +204,7 @@ const totalWords = allPosts.reduce(
     <script is:inline>
       document.body.className = localStorage.getItem("bb-theme") || "light";
     </script>
-    <Navbar client:load links={navLinks} />
+    <Navbar client:load links={navLinks} postCount={postCount} />
     <SearchDropdown client:idle />
     <ScrollToTop client:idle />
     <div style="flex:1">

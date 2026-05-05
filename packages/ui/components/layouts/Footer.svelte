@@ -3,49 +3,41 @@
 </script>
 
 <footer
-  class="mx-auto mt-auto flex w-full max-w-[680px] flex-wrap items-center justify-between gap-3 border-t border-[var(--divider)] px-8 py-5"
+  style="max-width:680px;width:100%;margin:auto auto 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--divider);padding:22px 32px"
 >
   <!-- left -->
   <div>
-    <span class="text-[0.68rem] text-[var(--muted)]">
-      blab bun — writings since whenever
-    </span>
-
+    <span style="font-size:0.68rem;color:var(--muted)"
+      >blab bun — writings since whenever</span
+    >
     {#if wordCount > 0}
-      <div class="mt-[2px] text-[0.62rem] text-[var(--muted2)]">
+      <div style="font-size:0.62rem;color:var(--muted2);margin-top:2px">
         {wordCount.toLocaleString()} words blabbed so far
       </div>
     {/if}
   </div>
 
   <!-- right links -->
-  <div class="flex items-center gap-4">
+  <div style="display:flex;gap:16px;align-items:center">
     <a
       href="/about"
-      class="text-[0.68rem] text-[var(--muted)] underline decoration-[var(--border)]"
+      style="font-size:0.68rem;color:var(--muted);text-decoration:underline;text-decoration-color:var(--border)"
+      >about</a
     >
-      about
-    </a>
-
     <a
       href="/now"
-      class="text-[0.68rem] text-[var(--muted)] underline decoration-[var(--border)]"
+      style="font-size:0.68rem;color:var(--muted);text-decoration:underline;text-decoration-color:var(--border)"
+      >/now</a
     >
-      /now
-    </a>
-
     <a
       href="/terms"
-      class="text-[0.68rem] text-[var(--muted)] underline decoration-[var(--border)]"
+      style="font-size:0.68rem;color:var(--muted);text-decoration:underline;text-decoration-color:var(--border)"
+      >terms</a
     >
-      terms
-    </a>
-
     <a
       href="/rss.xml"
-      class="rounded-[2px] border border-[var(--accent)] px-[6px] py-[1px] text-[0.64rem] tracking-[0.04em] text-[var(--accent)] no-underline"
+      style="font-size:0.64rem;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:2px;padding:1px 6px;letter-spacing:0.04em"
+      >RSS</a
     >
-      RSS
-    </a>
   </div>
 </footer>
