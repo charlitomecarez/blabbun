@@ -2,8 +2,8 @@ import { Resend } from "resend";
 
 import { unsubscribeUrl } from "@/lib/unsubscribe";
 
-const LOGO_SRC = "https://blabbun.com/blabbun-email.png";
-const LOGO_SRC_FULL = "https://blabbun.com/blabbun.png";
+const LOGO_SRC = "https://blabbun.com/blabbun-logo.webp";
+const LOGO_SRC_FULL = "https://blabbun.com/blabbun-logo.webp";
 
 // BIMI sender avatar — add this DNS TXT record to show the blab bun logo
 // next to the sender name in Apple Mail, Outlook, and (with VMC) Gmail:
@@ -55,7 +55,7 @@ export function welcomeEmailHtml(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="dark">
   <title>you're in.</title>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&display=swap" rel="stylesheet">
 </head>
 <body style="margin:0;padding:0;background:#16120e;font-family:'IBM Plex Mono',monospace;color:#e6ddd1">
   <!-- Preheader: visible in inbox preview, hidden in email body -->
@@ -74,7 +74,7 @@ export function welcomeEmailHtml(
           </tr>
           <tr>
             <td style="padding:32px 0 28px">
-              <h1 style="font-size:1.1rem;font-weight:500;color:#e6ddd1;margin:0 0 14px;line-height:1.4">you're in.</h1>
+              <h1 style="font-size:1.4rem;font-family:'Fraunces',Georgia,serif;font-weight:400;font-style:italic;color:#e6ddd1;margin:0 0 14px;line-height:1.2">you're in.</h1>
               <p style="font-size:0.82rem;color:#7a6e60;line-height:1.75;margin:0 0 8px">
                 no schedule. no issues.
               </p>
@@ -128,7 +128,7 @@ export function issueReportEmailHtml(report: {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="dark">
   <title>[issue] ${esc(title)}</title>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&display=swap" rel="stylesheet">
 </head>
 <body style="margin:0;padding:0;background:#16120e;font-family:'IBM Plex Mono',monospace;color:#e6ddd1">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#16120e;padding:48px 20px">
@@ -146,7 +146,7 @@ export function issueReportEmailHtml(report: {
           </tr>
           <tr>
             <td style="padding:32px 0 0">
-              <h1 style="font-size:1.05rem;font-weight:500;color:#e6ddd1;margin:0 0 24px;line-height:1.4">${esc(title)}</h1>
+              <h1 style="font-size:1.3rem;font-family:'Fraunces',Georgia,serif;font-weight:400;color:#e6ddd1;margin:0 0 24px;line-height:1.3">${esc(title)}</h1>
               <table width="100%" cellpadding="0" cellspacing="0">
                 ${urlRow}
                 ${fromRow}
@@ -212,7 +212,7 @@ export function newPostEmailHtml(
   const imageRow = post.image
     ? `<tr>
             <td style="padding:0;margin:0;line-height:0">
-              <img src="${esc(post.image)}" alt="" width="560" style="display:block;width:100%;max-width:560px;height:220px;object-fit:cover;border-bottom:1px solid #e0d4c0" />
+              <img src="${esc(post.image)}" alt="" width="560" style="display:block;width:100%;max-width:560px;height:220px;object-fit:cover;border-bottom:1px solid #2c241c" />
             </td>
           </tr>`
     : "";
@@ -223,7 +223,7 @@ export function newPostEmailHtml(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="dark">
   <title>${esc(post.title)}</title>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&display=swap" rel="stylesheet">
 </head>
 <body style="margin:0;padding:0;background:#16120e;font-family:'IBM Plex Mono',monospace;color:#e6ddd1">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#16120e;padding:48px 20px">
@@ -243,7 +243,7 @@ export function newPostEmailHtml(
           <tr>
             <td style="padding:32px 36px 28px">
               <div style="font-size:0.68rem;color:#7a6e60;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px">${esc(post.date)}</div>
-              <h1 style="font-size:1.2rem;font-weight:500;color:#e6ddd1;margin:0 0 16px;line-height:1.4">
+              <h1 style="font-size:1.5rem;font-family:'Fraunces',Georgia,serif;font-weight:400;color:#e6ddd1;margin:0 0 16px;line-height:1.2;letter-spacing:-0.02em">
                 <a href="${url}" style="color:#e6ddd1;text-decoration:none">${esc(post.title)}</a>
               </h1>
               <p style="font-size:0.83rem;color:#7a6e60;line-height:1.75;margin:0 0 28px">${esc(post.description)}</p>
