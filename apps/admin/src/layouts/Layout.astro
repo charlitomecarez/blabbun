@@ -42,54 +42,38 @@ const nav = [
       document.body.className = localStorage.getItem("bb-theme") || "light";
     </script>
 
-    <!-- Sidebar -->
-    <aside
-      style="
-        width:200px;flex-shrink:0;
-        border-right:1px solid var(--divider);
-        background:var(--bg2);
-        padding:24px 0;
-        display:flex;flex-direction:column;
-        position:sticky;top:0;height:100vh;overflow-y:auto;
-      "
-    >
-      <!-- Logo -->
-      <a
-        href="/"
-        style="
-          display:flex;align-items:center;gap:8px;
-          padding:0 20px;margin-bottom:28px;
-          text-decoration:none;
-        "
-      >
-        <img
-          src="/blabbun.png"
-          alt="blab bun"
-          width="22"
-          height="22"
-          style="width:22px;height:22px;object-fit:contain"
-        />
-        <span style="font-size:0.82rem;font-weight:600;color:var(--text)">
-          admin<span style="color:var(--accent)">.</span>
-        </span>
-      </a>
+    <!-- Sidebar (desktop) / Top nav (mobile) -->
+    <aside id="admin-sidebar">
+      <!-- Logo row -->
+      <div class="sidebar-logo-row">
+        <a href="/" class="sidebar-logo">
+          <img
+            src="/blabbun.png"
+            alt="blab bun"
+            width="22"
+            height="22"
+            style="width:22px;height:22px;object-fit:contain"
+          />
+          <span style="font-size:0.82rem;font-weight:600;color:var(--text)">
+            admin<span style="color:var(--accent)">.</span>
+          </span>
+        </a>
+        <!-- Mobile actions (theme + logout) shown inline on mobile -->
+        <div class="sidebar-mobile-actions">
+          <button id="theme-btn-mobile" class="sidebar-action-btn">◑</button>
+          <button id="logout-btn-mobile" class="sidebar-action-btn">←</button>
+        </div>
+      </div>
 
       <!-- Nav -->
-      <nav style="display:flex;flex-direction:column;gap:2px;padding:0 10px">
+      <nav id="admin-nav">
         {
           nav.map((link) => {
             const active = pathname === link.href;
             return (
               <a
                 href={link.href}
-                style={`
-                font-size:0.72rem;padding:7px 10px;border-radius:3px;
-                text-decoration:none;letter-spacing:0.02em;
-                color:${active ? "var(--accent)" : "var(--muted)"};
-                background:${active ? "var(--accent-soft)" : "transparent"};
-                font-weight:${active ? "500" : "400"};
-                transition:background 0.1s,color 0.1s;
-              `}
+                class={`nav-link ${active ? "nav-link-active" : ""}`}
               >
                 {link.label}
               </a>
@@ -98,38 +82,17 @@ const nav = [
         }
       </nav>
 
-      <!-- Theme toggle + logout at bottom -->
-      <div
-        style="margin-top:auto;padding:0 10px;display:flex;flex-direction:column;gap:6px"
-      >
-        <button
-          id="theme-btn"
-          style="
-            width:100%;background:none;border:1px solid var(--border);border-radius:3px;
-            padding:6px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;
-            font-family:inherit;letter-spacing:0.04em;text-align:left;
-          "
-        >
-          ◑ toggle theme
-        </button>
-        <button
-          id="logout-btn"
-          style="
-            width:100%;background:none;border:1px solid var(--border);border-radius:3px;
-            padding:6px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;
-            font-family:inherit;letter-spacing:0.04em;text-align:left;
-            transition:border-color 0.1s,color 0.1s;
-          "
-          onmouseenter="this.style.borderColor='#e05c5c';this.style.color='#e05c5c'"
-          onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
-        >
+      <!-- Theme toggle + logout (desktop only) -->
+      <div class="sidebar-bottom">
+        <button id="theme-btn" class="sidebar-util-btn">◑ toggle theme</button>
+        <button id="logout-btn" class="sidebar-util-btn sidebar-logout-btn">
           ← log out
         </button>
       </div>
     </aside>
 
     <!-- Main -->
-    <main style="flex:1;min-width:0;padding:32px 40px;overflow-y:auto">
+    <main id="admin-main">
       <div
         style="margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--divider)"
       >
@@ -141,18 +104,179 @@ const nav = [
     </main>
 
     <script is:inline>
-      document.getElementById("theme-btn").addEventListener("click", () => {
+      function toggleTheme() {
         const isDark = document.body.classList.contains("dark");
         const next = isDark ? "light" : "dark";
         document.body.className = next;
         localStorage.setItem("bb-theme", next);
-      });
+      }
+      async function logout() {
+        await fetch("/api/auth/logout", { method: "POST" });
+        window.location.href = "/login";
+      }
       document
-        .getElementById("logout-btn")
-        ?.addEventListener("click", async () => {
-          await fetch("/api/auth/logout", { method: "POST" });
-          window.location.href = "/login";
-        });
+        .getElementById("theme-btn")
+        ?.addEventListener("click", toggleTheme);
+      document
+        .getElementById("theme-btn-mobile")
+        ?.addEventListener("click", toggleTheme);
+      document.getElementById("logout-btn")?.addEventListener("click", logout);
+      document
+        .getElementById("logout-btn-mobile")
+        ?.addEventListener("click", logout);
     </script>
+
+    <style>
+      /* ─── Sidebar base (desktop) ─────────────────────────────── */
+      #admin-sidebar {
+        width: 200px;
+        flex-shrink: 0;
+        border-right: 1px solid var(--divider);
+        background: var(--bg2);
+        padding: 24px 0;
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+      }
+      .sidebar-logo-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        margin-bottom: 28px;
+      }
+      .sidebar-logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+      }
+      .sidebar-mobile-actions {
+        display: none;
+        gap: 6px;
+      }
+      .sidebar-action-btn {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 5px 9px;
+        font-size: 0.78rem;
+        color: var(--muted);
+        cursor: pointer;
+        font-family: inherit;
+      }
+      #admin-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 0 10px;
+      }
+      .nav-link {
+        font-size: 0.72rem;
+        padding: 7px 10px;
+        border-radius: 3px;
+        text-decoration: none;
+        letter-spacing: 0.02em;
+        color: var(--muted);
+        background: transparent;
+        font-weight: 400;
+        transition:
+          background 0.1s,
+          color 0.1s;
+      }
+      .nav-link-active {
+        color: var(--accent);
+        background: var(--accent-soft);
+        font-weight: 500;
+      }
+      .sidebar-bottom {
+        margin-top: auto;
+        padding: 0 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .sidebar-util-btn {
+        width: 100%;
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 6px 10px;
+        font-size: 0.68rem;
+        color: var(--muted);
+        cursor: pointer;
+        font-family: inherit;
+        letter-spacing: 0.04em;
+        text-align: left;
+        transition:
+          border-color 0.1s,
+          color 0.1s;
+      }
+      .sidebar-logout-btn:hover {
+        border-color: #e05c5c;
+        color: #e05c5c;
+      }
+      #admin-main {
+        flex: 1;
+        min-width: 0;
+        padding: 32px 40px;
+        overflow-y: auto;
+      }
+
+      /* ─── Mobile (<768px) ────────────────────────────────────── */
+      @media (max-width: 768px) {
+        body {
+          flex-direction: column !important;
+        }
+        #admin-sidebar {
+          width: 100%;
+          height: auto;
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          flex-direction: column;
+          padding: 12px 0 0;
+          border-right: none;
+          border-bottom: 1px solid var(--divider);
+        }
+        .sidebar-logo-row {
+          padding: 0 16px;
+          margin-bottom: 10px;
+        }
+        .sidebar-mobile-actions {
+          display: flex;
+        }
+        .sidebar-bottom {
+          display: none;
+        }
+        #admin-nav {
+          flex-direction: row;
+          overflow-x: auto;
+          padding: 0 16px 12px;
+          gap: 4px;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+        #admin-nav::-webkit-scrollbar {
+          display: none;
+        }
+        .nav-link {
+          white-space: nowrap;
+          padding: 5px 10px;
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          font-size: 0.68rem;
+        }
+        .nav-link-active {
+          border-color: var(--accent);
+        }
+        #admin-main {
+          padding: 20px 16px;
+        }
+      }
+    </style>
   </body>
 </html>

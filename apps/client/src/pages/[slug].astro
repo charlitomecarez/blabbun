@@ -32,8 +32,21 @@ const tag = (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase();
 const postUrl = `${Astro.site ?? "https://blabbun.com"}/${post.id}`;
 const hasImage = !!post.data.image;
 
+const postTags = new Set((post.data.tags ?? []).map((t) => t.toUpperCase()));
+
 const otherPosts = allPosts.filter((p) => p.id !== post.id);
-const relatedSlice = shuffle(otherPosts).slice(0, 3);
+
+// Score by shared tags, shuffle within each tier so ties vary
+const scored = shuffle(otherPosts)
+  .map((p) => {
+    const sharedTags = (p.data.tags ?? []).filter((t) =>
+      postTags.has(t.toUpperCase())
+    ).length;
+    return { post: p, sharedTags };
+  })
+  .sort((a, b) => b.sharedTags - a.sharedTags);
+
+const relatedSlice = scored.slice(0, 3).map((s) => s.post);
 
 const relatedPosts = relatedSlice.map((p) => ({
   title: p.data.title,
@@ -81,7 +94,7 @@ const jsonLd = {
   <ReadingProgress client:idle />
 
   <main
-    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-8"
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 pt-10 pb-6 sm:px-8 sm:py-8"
   >
     <!-- Post header (matches PostDetailView) -->
     <PostHero

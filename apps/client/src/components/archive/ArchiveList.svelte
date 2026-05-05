@@ -233,11 +233,9 @@
     .archive-list {
       padding-left: 0;
     }
-    /* Break out of <main> px-8 (2rem) on both sides, add internal padding */
+    /* Container is now px-4 (1rem) — no breakout needed */
     .archive-row {
-      margin-left: -2rem;
-      margin-right: -2rem;
-      padding: 13px 1.25rem;
+      padding: 13px 0;
     }
     .archive-meta {
       gap: 6px;

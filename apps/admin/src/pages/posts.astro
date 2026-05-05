@@ -57,11 +57,21 @@ const today = new Date().toISOString().split("T")[0];
 ---
 
 <Layout title="posts">
-  <div style="display:flex;gap:24px;align-items:flex-start;margin-bottom:24px">
-    <!-- Editor form -->
-    <div
-      style="flex:1;min-width:0;border:1px solid var(--border);border-radius:4px;padding:20px;background:var(--bg2)"
+  <!-- Mobile tab toggle -->
+  <div class="mobile-tabs">
+    <button
+      class="mobile-tab mobile-tab-active"
+      id="tab-editor"
+      onclick="switchTab('editor')">editor</button
     >
+    <button class="mobile-tab" id="tab-preview" onclick="switchTab('preview')"
+      >preview</button
+    >
+  </div>
+
+  <div class="editor-layout">
+    <!-- Editor form -->
+    <div class="editor-form-panel" id="panel-editor">
       <div
         id="form-label"
         style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px"
@@ -73,10 +83,7 @@ const today = new Date().toISOString().split("T")[0];
         style="display:none;font-size:0.75rem;color:#c0392b;margin-bottom:10px"
       >
       </div>
-      <form
-        id="post-form"
-        style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px"
-      >
+      <form id="post-form" class="post-form-grid">
         <input type="hidden" id="f-overwrite" name="overwrite" value="false" />
 
         <div>
@@ -234,11 +241,24 @@ const today = new Date().toISOString().split("T")[0];
         </div>
 
         <div style="grid-column:1/-1">
-          <label
-            for="f-content"
-            style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:4px"
-            >body (MDX)</label
+          <div
+            style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"
           >
+            <label
+              for="f-content"
+              style="font-size:0.68rem;color:var(--muted);letter-spacing:0.04em"
+              >body (MDX)</label
+            >
+            <button
+              type="button"
+              onclick="insertImageSnippet()"
+              style="padding:2px 8px;font-size:0.62rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);cursor:pointer;letter-spacing:0.04em"
+              onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+              onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+              title="Insert a <figure> image snippet at cursor position"
+              >+ image</button
+            >
+          </div>
           <textarea
             id="f-content"
             name="content"
@@ -246,6 +266,30 @@ const today = new Date().toISOString().split("T")[0];
             placeholder="Write your post in Markdown / MDX..."
             style="width:100%;padding:8px 10px;font-size:0.75rem;font-family:'IBM Plex Mono',monospace;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;resize:vertical;box-sizing:border-box;line-height:1.6"
           ></textarea>
+          <div
+            style="display:flex;gap:10px;margin-top:5px;font-size:0.65rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace"
+          >
+            <span id="wc-words">0 words</span>
+            <span style="color:var(--border)">·</span>
+            <span id="wc-read">0 min read</span>
+          </div>
+          <div
+            style="margin-top:6px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:0.68rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace;line-height:1.8"
+          >
+            <span style="color:var(--muted);letter-spacing:0.04em"
+              >image snippet</span
+            ><br />
+            &lt;figure&gt;<br />
+            &nbsp;&nbsp;&lt;img src="<span style="color:var(--accent)"
+              >image-url</span
+            >" alt="<span style="color:var(--accent)">description</span>" /&gt;<br
+            />
+            &nbsp;&nbsp;&lt;figcaption&gt;photo by &lt;a href="<span
+              style="color:var(--accent)">source-url</span
+            >"&gt;<span style="color:var(--accent)">Source Name</span
+            >&lt;/a&gt;&lt;/figcaption&gt;<br />
+            &lt;/figure&gt;
+          </div>
         </div>
 
         <div style="grid-column:1/-1;display:flex;gap:8px">
@@ -266,10 +310,7 @@ const today = new Date().toISOString().split("T")[0];
     </div><!-- end form -->
 
     <!-- Live preview panel -->
-    <div
-      id="post-preview"
-      style="flex:1;min-width:0;position:sticky;top:24px;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--bg2)"
-    >
+    <div id="post-preview" class="editor-preview-panel" data-panel="preview">
       <div
         id="preview-empty"
         style="padding:48px 24px;text-align:center;color:var(--muted);font-size:0.75rem"
@@ -533,12 +574,25 @@ const today = new Date().toISOString().split("T")[0];
       }
     });
 
+  function updateWordCount(content: string) {
+    const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+    const mins = Math.max(1, Math.round(words / 200));
+    const wordsEl = document.getElementById("wc-words");
+    const readEl = document.getElementById("wc-read");
+    if (wordsEl)
+      wordsEl.textContent = `${words.toLocaleString()} word${words !== 1 ? "s" : ""}`;
+    if (readEl)
+      readEl.textContent = words === 0 ? "0 min read" : `${mins} min read`;
+  }
+
   function updatePreview() {
     const title = ($("f-title") as HTMLInputElement)?.value ?? "";
     const description = ($("f-description") as HTMLInputElement)?.value ?? "";
     const pubDate = ($("f-pubDate") as HTMLInputElement)?.value ?? "";
     const image = ($("f-image") as HTMLInputElement)?.value ?? "";
     const content = ($("f-content") as HTMLTextAreaElement)?.value ?? "";
+
+    updateWordCount(content);
 
     const isEmpty = !title && !description && !content;
 
@@ -587,5 +641,148 @@ const today = new Date().toISOString().split("T")[0];
   );
   updatePreview();
 
-  Object.assign(window, { editPost, deletePost, addTag, resetForm });
+  function insertImageSnippet() {
+    const textarea = $("f-content") as HTMLTextAreaElement;
+    if (!textarea) return;
+    const snippet = `\n<figure>\n  <img src="image-url" alt="description" />\n  <figcaption>photo by <a href="source-url">Source Name</a></figcaption>\n</figure>\n`;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    textarea.value =
+      textarea.value.slice(0, start) + snippet + textarea.value.slice(end);
+    textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
+    textarea.focus();
+    updatePreview();
+  }
+
+  function switchTab(tab: "editor" | "preview") {
+    const editorPanel = document.getElementById("panel-editor");
+    const previewPanel = document.getElementById("post-preview");
+    const tabEditor = document.getElementById("tab-editor");
+    const tabPreview = document.getElementById("tab-preview");
+    if (!editorPanel || !previewPanel || !tabEditor || !tabPreview) return;
+
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) return;
+
+    if (tab === "editor") {
+      editorPanel.style.display = "block";
+      previewPanel.style.display = "none";
+      tabEditor.classList.add("mobile-tab-active");
+      tabPreview.classList.remove("mobile-tab-active");
+    } else {
+      editorPanel.style.display = "none";
+      previewPanel.style.display = "block";
+      tabEditor.classList.remove("mobile-tab-active");
+      tabPreview.classList.add("mobile-tab-active");
+    }
+  }
+
+  // Reset panels to correct state on resize
+  window.addEventListener("resize", () => {
+    const editorPanel = document.getElementById("panel-editor");
+    const previewPanel = document.getElementById("post-preview");
+    if (!editorPanel || !previewPanel) return;
+    if (window.innerWidth > 768) {
+      editorPanel.style.display = "";
+      previewPanel.style.display = "";
+    }
+  });
+
+  Object.assign(window, {
+    editPost,
+    deletePost,
+    addTag,
+    resetForm,
+    insertImageSnippet,
+    switchTab,
+  });
 </script>
+
+<style>
+  /* ─── Editor layout ──────────────────────────────────────── */
+  .editor-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+  .editor-form-panel {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    background: var(--bg2);
+  }
+  .editor-preview-panel {
+    flex: 1;
+    min-width: 0;
+    position: sticky;
+    top: 24px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--bg2);
+  }
+
+  /* ─── Form grid ──────────────────────────────────────────── */
+  .post-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
+  }
+
+  /* ─── Mobile tabs ────────────────────────────────────────── */
+  .mobile-tabs {
+    display: none;
+  }
+
+  /* ─── Mobile (<768px) ────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .mobile-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+    .mobile-tab {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.68rem;
+      font-family: inherit;
+      color: var(--muted);
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition:
+        border-color 0.1s,
+        color 0.1s;
+    }
+    .mobile-tab-active {
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .editor-layout {
+      flex-direction: column;
+    }
+    .editor-form-panel {
+      padding: 16px;
+      width: 100%;
+    }
+    .editor-preview-panel {
+      display: none; /* shown via switchTab() */
+      width: 100%;
+      position: static;
+    }
+    .post-form-grid {
+      grid-template-columns: 1fr;
+    }
+    .post-form-grid > [style*="grid-column:1/-1"],
+    .post-form-grid > [style*="grid-column: 1 / -1"] {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
