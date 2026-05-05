@@ -62,6 +62,7 @@
 
 {#if mounted}
   <div class="reaction-bar">
+    <span class="react-label">react ↓</span>
     {#each REACTIONS as r}
       {@const active = mine === r.label}
       <button
@@ -72,6 +73,7 @@
         class:active
       >
         <span>{r.emoji}</span>
+        <span class="reaction-text">{r.label}</span>
         {#if counts[r.label] > 0}
           <span class="reaction-count">{counts[r.label]}</span>
         {/if}
@@ -85,32 +87,56 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    padding: 16px 0;
-    border-top: 1px solid var(--divider);
-    border-bottom: 1px solid var(--divider);
-    margin: 28px 0;
+    align-items: center;
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px dashed var(--border);
+    position: relative;
+  }
+
+  .react-label {
+    font-family: "Caveat", cursive;
+    font-size: 1.05rem;
+    color: var(--muted);
+    align-self: center;
+    margin-right: 4px;
   }
 
   .reaction-pill {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 5px 10px;
+    padding: 5px 12px;
     border-radius: 20px;
-    border-width: 1px;
+    border-width: 1.5px;
     border-style: solid;
+    border-color: var(--border);
+    background: var(--bg2);
     font-family: inherit;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
+    color: var(--muted);
     cursor: pointer;
     transition: all 0.15s;
+    transform: scale(1);
+  }
+
+  .reaction-text {
+    font-size: 0.72rem;
   }
 
   .reaction-count {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
+    opacity: 0.8;
   }
 
   .reaction-pill.active {
     background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: scale(1.08) rotate(-2deg);
+  }
+
+  .reaction-pill:hover:not(.active) {
     border-color: var(--accent);
     color: var(--accent);
   }
