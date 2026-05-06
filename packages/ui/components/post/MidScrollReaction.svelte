@@ -25,7 +25,7 @@
   let dismissed = $state(false);
   let mounted = $state(false);
 
-  $effect(() => {
+  onMount(() => {
     const alreadyReacted = !!localStorage.getItem(`bb-reaction-mine-${slug}`);
     const done = !!localStorage.getItem(DONE_KEY);
     if (alreadyReacted || done) {
@@ -41,13 +41,18 @@
       const total =
         (el.scrollHeight || document.body.scrollHeight) - el.clientHeight;
       const pct = total > 0 ? (scrolled / total) * 100 : 0;
-      if (pct >= 50) visible = true;
+      if (pct >= 50) {
+        visible = true;
+        window.removeEventListener("scroll", onScroll);
+      }
     }
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   });
 
+  // Does not support undo — unlike ReactionBar, mid-scroll picks are one-way.
+  // bb-reaction-mine-{slug} will remain set even if ReactionBar later shows 0.
   function react(label: string) {
     const current = parseInt(
       localStorage.getItem(reactionStorageKey(label)) ?? "0",
