@@ -181,11 +181,8 @@
       class="hidden md:flex"
     >
       <!-- Inline search bar -->
-      <div style="position:relative;flex:1;max-width:240px">
-        <span
-          style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.85rem;pointer-events:none"
-          >⌕</span
-        >
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
         <input
           value={search}
           oninput={handleDesktopSearch}
@@ -193,18 +190,10 @@
           placeholder="search..."
           type="search"
           aria-label="Search posts"
-          style="
-            width:100%;background:var(--input-bg);
-            border:1px solid var(--border);border-radius:3px;
-            padding:6px 28px 6px 28px;font-size:0.74rem;
-            font-family:inherit;color:var(--text);outline:none;
-          "
+          class="search-input"
         />
         {#if !search}
-          <span
-            style="position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:0.6rem;color:var(--muted2);pointer-events:none"
-            >/</span
-          >
+          <span class="kbd-hint">/</span>
         {/if}
       </div>
 
@@ -455,5 +444,66 @@
   /* dark mode — warmer amber stroke */
   :global(body.dark) .nav-link::after {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6' preserveAspectRatio='none'><path d='M0 4 Q 12 1, 25 4 T 50 4 T 75 4 T 100 4' stroke='%23D4A040' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+  }
+
+  /* ── Search ── */
+  .search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-wrap .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 0.85rem;
+    pointer-events: none;
+    transition: color 0.15s;
+  }
+  .search-wrap:focus-within .search-icon {
+    color: var(--accent);
+  }
+  .search-input {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 28px 5px 28px;
+    font-size: 0.74rem;
+    font-family: inherit;
+    color: var(--text);
+    width: 160px;
+    outline: none;
+    transition:
+      width 0.25s ease,
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  .search-input:focus {
+    width: 220px;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .search-input::placeholder {
+    color: var(--muted2);
+  }
+  .kbd-hint {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.58rem;
+    color: var(--muted2);
+    pointer-events: none;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0 4px;
+    line-height: 1.6;
+    transition: opacity 0.15s;
+  }
+  .search-wrap:focus-within .kbd-hint {
+    opacity: 0;
   }
 </style>
