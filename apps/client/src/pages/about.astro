@@ -173,6 +173,31 @@ const totalWords = posts.reduce(
             </div>
           ))
         }
+        <!-- changelog card -->
+        <a
+          href="/changelog"
+          style="min-width:200px;flex:1 1 200px;background:var(--bg2);
+                 border:1.5px solid var(--text);padding:14px 16px;
+                 transform:rotate(1deg);box-shadow:3px 3px 0 var(--text);
+                 position:relative;text-decoration:none;display:block;
+                 transition:transform 0.15s;"
+          onmouseenter="this.style.transform='rotate(1deg) translate(-2px,-2px)'"
+          onmouseleave="this.style.transform='rotate(1deg)'"
+        >
+          <div
+            class="tape"
+            style="top:-9px;left:20px;width:40px;height:14px;transform:rotate(-5deg);opacity:0.6"
+          >
+          </div>
+          <div
+            style="font-family:'Caveat',cursive;font-size:0.95rem;color:var(--accent);margin-bottom:4px"
+          >
+            changelog →
+          </div>
+          <div style="font-size:0.84rem;color:var(--text);line-height:1.5">
+            v1.2.0 · May 2026
+          </div>
+        </a>
       </div>
     </div>
   </main>

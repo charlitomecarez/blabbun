@@ -63,7 +63,9 @@
       <FeedItem
         title={post.title}
         excerpt={post.description}
-        tag={(post.tags[0] ?? "editorial").toUpperCase()}
+        tags={(post.tags.length ? post.tags : ["editorial"]).map((t) =>
+          t.toUpperCase()
+        )}
         imageUrl={post.image ?? ""}
         href={post.href}
       />

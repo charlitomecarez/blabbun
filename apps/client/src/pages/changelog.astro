@@ -1,0 +1,164 @@
+---
+import { changelog } from "@/data/changelog";
+import Layout from "@/layouts/Layout.astro";
+
+const rotations = [-0.6, 0.8, -0.4, 0.5, -0.7, 0.6, -0.3, 0.9];
+
+function badgeClass(type: string): string {
+  if (type === "feat") return "tag-lifestuff";
+  if (type === "fix") return "tag-rants";
+  return "tag-halfbaked";
+}
+---
+
+<Layout
+  title="Changelog"
+  description="A living record of what changed in Blab Bun — versions, fixes, and new features."
+>
+  <main
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-10"
+  >
+    <div style="animation:fadeIn 0.2s ease">
+      <!-- back -->
+      <a
+        href="/"
+        style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
+               text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
+      >
+        ← back to the blabs
+      </a>
+
+      <!-- header row -->
+      <div
+        style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px"
+      >
+        <h1
+          style="font-family:'Fraunces',serif;font-size:2.6rem;font-weight:600;letter-spacing:-0.03em"
+        >
+          /changelog
+        </h1>
+        <span
+          style="font-family:'Caveat',cursive;font-size:1.3rem;color:var(--accent);
+                     transform:rotate(-3deg);display:inline-block"
+        >
+          what changed &amp; when
+        </span>
+      </div>
+
+      <!-- subtitle -->
+      <div
+        style="font-size:0.78rem;color:var(--muted);margin-bottom:36px;line-height:1.7"
+      >
+        a living record of what broke, what got fixed, and what actually
+        shipped.
+      </div>
+
+      <!-- version cards -->
+      <div style="display:flex;flex-direction:column;gap:28px;max-width:620px">
+        {
+          changelog.map((entry, i) => (
+            <div
+              style={`background:var(--bg2);border:1.5px solid var(--text);
+                       padding:22px 26px;transform:rotate(${rotations[i % rotations.length]}deg);
+                       box-shadow:4px 4px 0 var(--text);position:relative`}
+            >
+              <div
+                class="tape"
+                style="top:-10px;left:30px;transform:rotate(-4deg)"
+              />
+
+              {i === 0 && (
+                <span
+                  class="handwritten"
+                  style="position:absolute;top:-12px;right:20px;
+                             background:var(--accent);color:#fff;font-size:1rem;
+                             padding:3px 12px;border-radius:12px;transform:rotate(4deg);
+                             box-shadow:2px 2px 0 var(--text);white-space:nowrap"
+                >
+                  ✦ current
+                </span>
+              )}
+
+              <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+                <span
+                  style="font-family:'Fraunces',serif;font-style:italic;font-size:1.4rem;
+                             font-weight:500;color:var(--text)"
+                >
+                  {entry.version}
+                </span>
+                <span style="font-family:'Caveat',cursive;font-size:1rem;color:var(--muted)">
+                  {entry.date}
+                </span>
+                {entry.label && (
+                  <span style="font-family:'Caveat',cursive;font-size:1rem;color:var(--accent)">
+                    — {entry.label}
+                  </span>
+                )}
+              </div>
+
+              <svg
+                width="100%"
+                height="10"
+                viewBox="0 0 300 10"
+                preserveAspectRatio="none"
+                style="margin-bottom:14px;display:block"
+                aria-hidden="true"
+              >
+                <path
+                  d="M0 5 Q 40 1, 80 5 T 160 5 T 240 5 T 300 5"
+                  stroke="var(--accent)"
+                  stroke-width="1.5"
+                  fill="none"
+                  stroke-linecap="round"
+                />
+              </svg>
+
+              <div style="display:flex;flex-direction:column;gap:8px">
+                {entry.changes.map((change) => (
+                  <div style="display:flex;gap:10px;align-items:flex-start">
+                    <span
+                      class={badgeClass(change.type)}
+                      style="font-size:0.62rem;padding:2px 7px;border-radius:2px;
+                                 letter-spacing:0.04em;font-weight:500;white-space:nowrap;
+                                 flex-shrink:0;margin-top:2px"
+                    >
+                      {change.type}
+                    </span>
+                    <span style="font-size:0.88rem;color:var(--text);line-height:1.6">
+                      {change.description}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      <!-- footer note -->
+      <div
+        style="margin-top:48px;padding-top:24px;border-top:1px dashed var(--border);
+                  font-family:'Caveat',cursive;font-size:1.05rem;color:var(--muted)"
+      >
+        more history lives in the{" "}
+        <a
+          href="https://github.com/charlitomecarez/blabbun/commits/main"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="color:var(--accent);text-decoration:none"
+        >
+          git log
+        </a>{" "}
+        ✶
+      </div>
+    </div>
+  </main>
+
+  <style>
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.9rem !important;
+      }
+    }
+  </style>
+</Layout>

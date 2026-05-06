@@ -218,7 +218,22 @@
           font-family:inherit;
         "
       >
-        🔖
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+          style="flex-shrink:0"
+        >
+          <path
+            d="M5 3h14a1 1 0 0 1 1 1v17l-8-4-8 4V4a1 1 0 0 1 1-1z"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
         {#if bookmarkCount > 0}
           <span
             style="font-size:0.55rem;background:var(--accent);color:#fff;border-radius:8px;padding:0 4px;line-height:1.7;margin-left:1px"
@@ -362,7 +377,22 @@
           onclick={() => (mobileOpen = false)}
           style="font-size:0.82rem;padding:9px 6px;text-decoration:none;color:var(--muted);font-family:inherit"
         >
-          🔖 saved
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+            style="flex-shrink:0;display:inline-block;vertical-align:middle;margin-right:4px"
+          >
+            <path
+              d="M5 3h14a1 1 0 0 1 1 1v17l-8-4-8 4V4a1 1 0 0 1 1-1z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>saved
           {#if bookmarkCount > 0}
             <span
               style="font-size:0.55rem;background:var(--accent);color:#fff;border-radius:8px;padding:0 4px;line-height:1.7;margin-left:4px"

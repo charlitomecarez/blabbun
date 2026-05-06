@@ -272,6 +272,13 @@ const today = new Date().toISOString().split("T")[0];
             <span id="wc-words">0 words</span>
             <span style="color:var(--border)">·</span>
             <span id="wc-read">0 min read</span>
+            <span style="color:var(--border)">·</span>
+            <span style="color:var(--muted2)"
+              >blank line = new paragraph — avoid <code
+                style="font-family:inherit;background:var(--bg2);padding:1px 4px;border-radius:2px"
+                >&lt;br/&gt;</code
+              > between paragraphs</span
+            >
           </div>
           <div
             style="margin-top:6px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:0.68rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace;line-height:1.8"
@@ -309,7 +316,7 @@ const today = new Date().toISOString().split("T")[0];
       </form>
     </div><!-- end form -->
 
-    <!-- Live preview panel -->
+    <!-- Live preview panel — mirrors [slug].astro + PostHero layout -->
     <div id="post-preview" class="editor-preview-panel" data-panel="preview">
       <div
         id="preview-empty"
@@ -317,49 +324,63 @@ const today = new Date().toISOString().split("T")[0];
       >
         start typing to preview
       </div>
-      <div id="preview-content" style="display:none">
-        <div id="preview-image-wrap" style="display:none">
+      <div id="preview-content" style="display:none;padding:20px 24px">
+        <!-- back link (decorative) -->
+        <span
+          style="font-family:'Caveat',cursive;font-size:1.1rem;color:var(--accent);display:inline-block;margin-bottom:20px"
+          >← back to the blabs</span
+        >
+
+        <!-- Date + tags + read time row -->
+        <div
+          style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap"
+        >
+          <span
+            id="preview-date"
+            style="font-family:'Caveat',cursive;font-size:0.95rem;color:var(--muted)"
+          ></span>
+          <div id="preview-tags" style="display:flex;gap:6px;flex-wrap:wrap">
+          </div>
+          <span
+            id="preview-readtime"
+            style="font-size:0.68rem;color:var(--muted2)"></span>
+        </div>
+
+        <!-- Title (Fraunces serif — matches PostHero) -->
+        <h1
+          id="preview-title"
+          style="font-family:'Fraunces',serif;font-size:2rem;font-weight:600;line-height:1.08;text-wrap:balance;max-width:100%;letter-spacing:-0.02em;color:var(--text);margin-bottom:18px"
+        >
+        </h1>
+
+        <!-- Scribble underline SVG -->
+        <svg
+          width="220"
+          height="14"
+          viewBox="0 0 220 14"
+          style="margin-bottom:24px;display:block"
+          aria-hidden="true"
+        >
+          <path
+            d="M2 8 Q 40 2, 80 8 T 160 8 T 218 7"
+            stroke="var(--accent)"
+            stroke-width="2"
+            fill="none"
+            stroke-linecap="round"></path>
+        </svg>
+
+        <!-- Optional hero image (below header, matching [slug].astro) -->
+        <div id="preview-image-wrap" style="display:none;margin-bottom:24px">
           <img
             id="preview-image"
             src=""
             alt=""
-            style="width:100%;height:200px;object-fit:cover;display:block;border-bottom:1px solid var(--border)"
+            style="width:100%;max-height:280px;object-fit:cover;border-radius:6px;display:block"
           />
         </div>
-        <div style="padding:20px 24px">
-          <div
-            style="display:flex;align-items:center;gap:8px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)"
-          >
-            <span
-              style="font-size:0.9rem;font-weight:500;color:#c4832a;letter-spacing:0.04em;font-family:'IBM Plex Mono',monospace"
-              >blab bun</span
-            >
-            <span
-              style="font-size:0.62rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase"
-              >preview</span
-            >
-          </div>
-          <div
-            id="preview-date"
-            style="font-size:0.65rem;color:var(--muted2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px"
-          >
-          </div>
-          <div
-            id="preview-title"
-            style="font-size:1.1rem;font-weight:500;color:var(--text);margin-bottom:10px;line-height:1.4;font-family:'IBM Plex Mono',monospace"
-          >
-          </div>
-          <div
-            id="preview-description"
-            style="font-size:0.8rem;color:var(--muted);line-height:1.7;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)"
-          >
-          </div>
-          <div
-            id="preview-body"
-            style="font-size:0.82rem;color:var(--text);line-height:1.8;overflow-wrap:break-word"
-          >
-          </div>
-        </div>
+
+        <!-- Body (prose-styled to match [slug].astro) -->
+        <div id="preview-body" class="preview-prose"></div>
       </div>
     </div>
   </div><!-- end flex wrapper -->
@@ -585,16 +606,29 @@ const today = new Date().toISOString().split("T")[0];
       readEl.textContent = words === 0 ? "0 min read" : `${mins} min read`;
   }
 
+  const TAG_CLASS_MAP: Record<string, string> = {
+    RANTS: "tag-rants",
+    TAKES: "tag-takes",
+    "HALF-BAKED IDEAS": "tag-halfbaked",
+    "LIFE STUFF": "tag-lifestuff",
+    CULTURE: "tag-culture",
+    EDITORIAL: "tag-editorial",
+    TECHNICAL: "tag-technical",
+  };
+  function tagClass(tag: string): string {
+    return TAG_CLASS_MAP[tag.toUpperCase()] ?? "tag-default";
+  }
+
   function updatePreview() {
     const title = ($("f-title") as HTMLInputElement)?.value ?? "";
-    const description = ($("f-description") as HTMLInputElement)?.value ?? "";
     const pubDate = ($("f-pubDate") as HTMLInputElement)?.value ?? "";
     const image = ($("f-image") as HTMLInputElement)?.value ?? "";
     const content = ($("f-content") as HTMLTextAreaElement)?.value ?? "";
+    const tagsRaw = ($("f-tags") as HTMLInputElement)?.value ?? "";
 
     updateWordCount(content);
 
-    const isEmpty = !title && !description && !content;
+    const isEmpty = !title && !content;
 
     const emptyEl = document.getElementById("preview-empty");
     const contentEl = document.getElementById("preview-content");
@@ -602,6 +636,7 @@ const today = new Date().toISOString().split("T")[0];
     if (contentEl) contentEl.style.display = isEmpty ? "none" : "block";
     if (isEmpty) return;
 
+    // Image (after title block)
     const imageWrap = document.getElementById("preview-image-wrap");
     const imageEl = document.getElementById(
       "preview-image"
@@ -611,33 +646,71 @@ const today = new Date().toISOString().split("T")[0];
       imageEl.src = image;
     }
 
+    // Date — short month format matching PostHero
     const dateEl = document.getElementById("preview-date");
     if (dateEl) {
       dateEl.textContent = pubDate
         ? new Date(pubDate + "T00:00:00").toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
+            month: "short",
             day: "numeric",
+            year: "numeric",
           })
         : "—";
     }
 
+    // Tags — colored badges matching PostHero
+    const tagList = tagsRaw
+      .split(",")
+      .map((t) => t.trim().toUpperCase())
+      .filter(Boolean);
+    const tagsEl = document.getElementById("preview-tags");
+    if (tagsEl) {
+      tagsEl.innerHTML = tagList
+        .map(
+          (t) =>
+            `<span class="${tagClass(t)}" style="font-size:0.68rem;padding:2px 8px;border-radius:2px;letter-spacing:0.04em;font-weight:500;white-space:nowrap">${t}</span>`
+        )
+        .join("");
+    }
+
+    // Read time
+    const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+    const mins = Math.max(1, Math.round(words / 200));
+    const readtimeEl = document.getElementById("preview-readtime");
+    if (readtimeEl)
+      readtimeEl.textContent = words > 0 ? `${mins} min read` : "";
+
+    // Title (Fraunces serif)
     const titleEl = document.getElementById("preview-title");
     if (titleEl) titleEl.textContent = title || "untitled";
 
-    const descEl = document.getElementById("preview-description");
-    if (descEl) descEl.textContent = description;
-
+    // Body — post-process to make <br/> gaps match the client exactly.
+    // In MDX + Tailwind Typography, a standalone <br/> between paragraphs
+    // creates a full extra line-height of space on top of the paragraph
+    // margin-bottom. marked renders it as a near-invisible browser line-break,
+    // causing writers to add more <br/> tags than needed.
     const bodyEl = document.getElementById("preview-body");
-    if (bodyEl)
-      bodyEl.innerHTML = DOMPurify.sanitize(
-        marked.parse(content, { async: false }) as string
+    if (bodyEl) {
+      let html = marked.parse(content, { async: false }) as string;
+      // Case 1: marked wraps standalone <br/> in its own <p>: </p><p><br/></p><p>
+      html = html.replace(
+        /<\/p>\s*<p>\s*<br\s*\/?>\s*<\/p>\s*<p/gi,
+        '</p><div class="preview-br-spacer"></div><p'
       );
+      // Case 2: bare <br/> between paragraphs: </p><br/><p>
+      html = html.replace(
+        /<\/p>\s*<br\s*\/?>\s*<p/gi,
+        '</p><div class="preview-br-spacer"></div><p'
+      );
+      bodyEl.innerHTML = DOMPurify.sanitize(html, {
+        ADD_TAGS: ["div"],
+        ADD_ATTR: ["class"],
+      });
+    }
   }
 
-  ["f-title", "f-description", "f-pubDate", "f-image", "f-content"].forEach(
-    (id) =>
-      document.getElementById(id)?.addEventListener("input", updatePreview)
+  ["f-title", "f-pubDate", "f-image", "f-tags", "f-content"].forEach((id) =>
+    document.getElementById(id)?.addEventListener("input", updatePreview)
   );
   updatePreview();
 
@@ -699,6 +772,103 @@ const today = new Date().toISOString().split("T")[0];
 </script>
 
 <style>
+  /* ─── Preview prose — mirrors [slug].astro Tailwind prose config ── */
+  .preview-prose {
+    font-size: 0.94rem;
+    line-height: 1.9;
+    color: var(--muted);
+    overflow-wrap: break-word;
+  }
+  .preview-prose p {
+    margin-bottom: 1.25rem;
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.9;
+    text-wrap: pretty;
+  }
+  .preview-prose h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-family: "IBM Plex Mono", monospace;
+  }
+  .preview-prose h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 1.75rem;
+    margin-bottom: 0.75rem;
+    font-family: "IBM Plex Mono", monospace;
+  }
+  .preview-prose a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .preview-prose a:hover {
+    text-decoration: underline;
+  }
+  .preview-prose strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .preview-prose ul,
+  .preview-prose ol {
+    padding-left: 1.5rem;
+  }
+  .preview-prose li {
+    font-size: 0.94rem;
+    color: var(--muted);
+    line-height: 1.9;
+    margin: 0.25rem 0;
+  }
+  .preview-prose code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.82em;
+    background: var(--bg2);
+    color: var(--text);
+    padding: 0.125rem 0.25rem;
+    border-radius: 3px;
+  }
+  .preview-prose pre {
+    background: var(--bg2);
+    color: var(--text);
+    border-radius: 3px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.82em;
+    margin-bottom: 1.25rem;
+  }
+  .preview-prose pre code {
+    background: none;
+    padding: 0;
+  }
+  .preview-prose blockquote {
+    border-left: 2px solid var(--accent);
+    background: var(--bg2);
+    padding: 0.25rem 1rem;
+    color: var(--muted);
+    margin: 1.5rem 0;
+  }
+  .preview-prose hr {
+    border: none;
+    border-top: 1px solid var(--divider);
+    margin: 2rem 0;
+  }
+  .preview-prose img {
+    width: 100%;
+    border-radius: 3px;
+    display: block;
+    margin: 2rem 0;
+  }
+
+  /* <br/> spacer — makes standalone <br/> between paragraphs show the
+     same gap as the client (paragraph margin + one line height) */
+  .preview-br-spacer {
+    height: 1.9em; /* 1.9 × font-size matches line-height:1.9 in prose */
+  }
+
   /* ─── Editor layout ──────────────────────────────────────── */
   .editor-layout {
     display: flex;
