@@ -131,6 +131,7 @@
     <!-- Logo -->
     <a
       href="/"
+      class="logo-link"
       style="
         background:none;border:none;cursor:pointer;padding:0;
         font-family:inherit;
@@ -144,9 +145,11 @@
         width="28"
         height="28"
         fetchpriority="high"
+        class="logo-img"
         style="width:28px;height:28px;object-fit:contain;flex-shrink:0"
       />
       <span
+        class="logo-text"
         style="font-size:0.95rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)"
       >
         blab bun<span style="color:var(--accent)">.</span>
@@ -405,3 +408,20 @@
     </div>
   {/if}
 </header>
+
+<style>
+  /* ── Logo ── */
+  .logo-link .logo-img {
+    transition: transform 0.2s ease;
+    transform-origin: center bottom;
+  }
+  .logo-link:hover .logo-img {
+    transform: rotate(8deg) scale(1.08);
+  }
+  .logo-link .logo-text {
+    transition: color 0.15s;
+  }
+  .logo-link:hover .logo-text {
+    color: var(--accent);
+  }
+</style>
