@@ -2,6 +2,7 @@
 import { PostHero } from "@blabbun/ui/components/cards";
 import {
   BookmarkButton,
+  MidScrollReaction,
   ReactionBar,
   ReadingDots,
   ReadingProgress,
@@ -152,6 +153,7 @@ const jsonLd = {
       >
         <Content />
       </div>
+      <MidScrollReaction client:load slug={post.id} />
     </div>
 
     <!-- End of blab marker -->

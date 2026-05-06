@@ -24,3 +24,52 @@ test.describe("ReadingDots", () => {
     await expect(page.locator(".reading-dots .dot.active")).toHaveCount(1);
   });
 });
+
+// ─── MidScrollReaction ────────────────────────────────────────
+test.describe("MidScrollReaction", () => {
+  test("is not visible on initial load", async ({ page }) => {
+    await page.goto(POST);
+    await expect(page.getByTestId("mid-scroll-reaction")).not.toBeVisible();
+  });
+
+  test("appears after scrolling past 50%", async ({ page }) => {
+    await page.goto(POST);
+    await page.evaluate(() => {
+      const el = document.documentElement;
+      window.scrollTo({ top: el.scrollHeight });
+    });
+    await expect(page.getByTestId("mid-scroll-reaction")).toBeVisible({
+      timeout: 2000,
+    });
+  });
+
+  test("dismisses when × is clicked", async ({ page }) => {
+    await page.goto(POST);
+    await page.evaluate(() =>
+      window.scrollTo({ top: document.documentElement.scrollHeight })
+    );
+    const prompt = page.getByTestId("mid-scroll-reaction");
+    await expect(prompt).toBeVisible({ timeout: 2000 });
+    await prompt
+      .getByRole("button", { name: "Dismiss reaction prompt" })
+      .click();
+    await expect(prompt).not.toBeVisible();
+  });
+
+  test("dismisses and saves to localStorage when emoji picked", async ({
+    page,
+  }) => {
+    await page.goto(POST);
+    await page.evaluate(() =>
+      window.scrollTo({ top: document.documentElement.scrollHeight })
+    );
+    const prompt = page.getByTestId("mid-scroll-reaction");
+    await expect(prompt).toBeVisible({ timeout: 2000 });
+    await prompt.getByRole("button", { name: "React with fire" }).click();
+    await expect(prompt).not.toBeVisible();
+    const stored = await page.evaluate(() =>
+      localStorage.getItem("bb-reaction-mine-welcome-to-blab-bun")
+    );
+    expect(stored).toBe("fire");
+  });
+});
