@@ -161,7 +161,7 @@
       {#each links as link}
         <a
           href={link.href}
-          class={link.active ? "scribble-underline" : ""}
+          class="nav-link {link.active ? 'nav-link--active' : ''}"
           style="
             background:none;border:none;font-size:0.74rem;
             font-family:inherit;cursor:pointer;letter-spacing:0.03em;
@@ -423,5 +423,37 @@
   }
   .logo-link:hover .logo-text {
     color: var(--accent);
+  }
+
+  /* ── Nav links ── */
+  .nav-link {
+    position: relative;
+    padding-bottom: 3px;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6' preserveAspectRatio='none'><path d='M0 4 Q 12 1, 25 4 T 50 4 T 75 4 T 100 4' stroke='%23C4832A' stroke-width='2' fill='none' stroke-linecap='round'/></svg>")
+      no-repeat;
+    background-size: 100% 100%;
+    opacity: 0;
+    transform: scaleX(0.6);
+    transform-origin: left;
+    transition:
+      opacity 0.2s ease,
+      transform 0.22s ease;
+  }
+  .nav-link:hover::after,
+  .nav-link.nav-link--active::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  /* dark mode — warmer amber stroke */
+  :global(body.dark) .nav-link::after {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6' preserveAspectRatio='none'><path d='M0 4 Q 12 1, 25 4 T 50 4 T 75 4 T 100 4' stroke='%23D4A040' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
   }
 </style>
