@@ -1,12 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
 
-  interface Props {
-    slug: string;
-  }
-
-  const { slug }: Props = $props();
-
   interface Section {
     title: string;
     el: HTMLElement;
@@ -41,7 +35,19 @@
     );
 
     for (const s of sections) observer.observe(s.el);
-    return () => observer.disconnect();
+
+    function onScroll() {
+      if (!sections.length) return;
+      if (window.scrollY < sections[0].el.offsetTop - 100) {
+        activeIndex = 0;
+      }
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
   });
 
   function scrollToSection(el: HTMLElement) {
