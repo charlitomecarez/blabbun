@@ -110,4 +110,12 @@
     white-space: nowrap;
     flex-shrink: 0;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.checkpoint-divider) {
+      transition: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
 </style>
