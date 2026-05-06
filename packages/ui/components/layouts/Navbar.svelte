@@ -198,18 +198,7 @@
       </div>
 
       <!-- Saved / bookmarks -->
-      <a
-        href="/saved"
-        title="saved posts"
-        style="
-          background:none;border:1px solid var(--border);border-radius:3px;
-          padding:5px 8px;font-size:0.72rem;cursor:pointer;
-          color:var(--muted);
-          display:flex;align-items:center;gap:4px;
-          text-decoration:none;white-space:nowrap;position:relative;
-          font-family:inherit;
-        "
-      >
+      <a href="/saved" title="saved posts" class="saved-btn">
         <svg
           width="13"
           height="13"
@@ -239,13 +228,9 @@
       <button
         onclick={toggleTheme}
         aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-        style="
-          background:none;border:1px solid var(--border);border-radius:3px;
-          padding:5px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;
-          font-family:inherit;letter-spacing:0.04em;white-space:nowrap;
-        "
+        class="theme-btn"
       >
-        {isDark ? "☀" : "◑"}
+        {isDark ? "☀ light mode" : "◑ dark mode"}
       </button>
     </div>
 
@@ -257,11 +242,8 @@
       <button
         onclick={toggleTheme}
         aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-        style="
-          background:none;border:1px solid var(--border);border-radius:3px;
-          padding:5px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;
-          font-family:inherit;
-        "
+        class="theme-btn"
+        style="font-size:0.82rem"
       >
         {isDark ? "☀" : "◑"}
       </button>
@@ -505,5 +487,49 @@
   }
   .search-wrap:focus-within .kbd-hint {
     opacity: 0;
+  }
+
+  /* ── Saved button ── */
+  .saved-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 0.68rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    white-space: nowrap;
+    font-family: inherit;
+    transition:
+      border-color 0.15s,
+      color 0.15s;
+  }
+  .saved-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── Theme toggle ── */
+  .theme-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-family: "Caveat", cursive;
+    font-size: 0.92rem;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    transition:
+      border-color 0.15s,
+      color 0.15s;
+  }
+  .theme-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
   }
 </style>
