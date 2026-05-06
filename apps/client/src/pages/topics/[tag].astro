@@ -39,7 +39,7 @@ const postItems = tagPosts.map((post) => ({
     month: "long",
     year: "numeric",
   }),
-  tag: (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
+  tags: (post.data.tags ?? ["EDITORIAL"]).map((t) => t.toUpperCase()),
   href: `/${post.id}`,
   imageUrl: post.data.image,
 }));
@@ -52,15 +52,15 @@ const label = tagToLabel(tag);
   description={`${postItems.length} post${postItems.length === 1 ? "" : "s"} about ${label} on blabbun — unfiltered takes and honest writing.`}
 >
   <main
-    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-8"
   >
-    <div style="padding-top:48px;padding-bottom:24px">
+    <div style="margin-bottom:22px">
       <a
         href="/topics"
         style="
           display:inline-flex;align-items:center;gap:5px;
           font-size:0.68rem;font-weight:600;color:var(--muted2);
-          text-decoration:none;transition:color 0.15s;margin-bottom:20px;
+          text-decoration:none;transition:color 0.15s;margin-bottom:14px;
         "
         onmouseenter="this.style.color='var(--accent)'"
         onmouseleave="this.style.color='var(--muted2)'"
@@ -82,7 +82,7 @@ const label = tagToLabel(tag);
         topics
       </a>
 
-      <div style="margin-bottom:10px">
+      <div style="margin-bottom:8px">
         <span
           style="
             font-size:0.65rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
@@ -94,10 +94,8 @@ const label = tagToLabel(tag);
         </span>
       </div>
 
-      <h1
-        style="font-size:1.6rem;font-weight:700;letter-spacing:-0.03em;color:var(--text);margin-bottom:6px"
-      >
-        {label}<span style="color:var(--accent)">.</span>
+      <h1 style="font-size:1.05rem;font-weight:600;margin-bottom:4px">
+        {label}
       </h1>
       <p style="font-size:0.72rem;color:var(--muted2)">
         {postItems.length}

@@ -23,7 +23,7 @@
     padding: 0;
   }
   html {
-    font-size: 15px;
+    font-size: 16px;
   }
   body {
     font-family: "IBM Plex Mono", monospace;
@@ -44,7 +44,7 @@ body.light {
   --bg: #fdf9f4;
   --bg2: #f5ede0;
   --bg3: #ede0ce;
-  --text: #231e17;
+  --text: #6b4a35;
   --muted: #9c8b78;
   --muted2: #c5b8a8;
   --accent: #c4832a;
@@ -65,7 +65,7 @@ body.dark {
   --bg: #16120e;
   --bg2: #1f1a14;
   --bg3: #261f17;
-  --text: #e6ddd1;
+  --text: #f0e0c8;
   --muted: #7a6e60;
   --muted2: #4a4038;
   --accent: #d4a040;
