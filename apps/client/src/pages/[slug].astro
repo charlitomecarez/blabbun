@@ -12,6 +12,7 @@ import { shuffle } from "lodash-es";
 import ClapShare from "@/components/post/ClapShare.svelte";
 import Comments from "@/components/post/Comments.svelte";
 import FloatingNewsletter from "@/components/post/FloatingNewsletter.svelte";
+import WelcomeConfetti from "@/components/post/WelcomeConfetti.svelte";
 import Layout from "@/layouts/Layout.astro";
 
 export async function getStaticPaths() {
@@ -28,7 +29,7 @@ if (!post) return new Response(null, { status: 404 });
 const { Content } = await render(post);
 
 const postReadTime = readTime(post.body ?? "");
-const tag = (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase();
+const tags = (post.data.tags ?? ["EDITORIAL"]).map((t) => t.toUpperCase());
 const postUrl = `${Astro.site ?? "https://blabbun.com"}/${post.id}`;
 const hasImage = !!post.data.image;
 
@@ -51,7 +52,7 @@ const relatedSlice = scored.slice(0, 3).map((s) => s.post);
 const relatedPosts = relatedSlice.map((p) => ({
   title: p.data.title,
   excerpt: p.data.description,
-  tag: (p.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
+  tags: (p.data.tags ?? ["EDITORIAL"]).map((t) => t.toUpperCase()),
   href: `/${p.id}`,
   readTime: readTime(p.body ?? ""),
   date: p.data.pubDate.toLocaleDateString("en-US", {
@@ -92,6 +93,7 @@ const jsonLd = {
   ogType="article"
 >
   <ReadingProgress client:idle />
+  {slug === "welcome-to-blab-bun" && <WelcomeConfetti client:load />}
 
   <main
     class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 pt-10 pb-6 sm:px-8 sm:py-8"
@@ -99,7 +101,7 @@ const jsonLd = {
     <!-- Post header (matches PostDetailView) -->
     <PostHero
       title={post.data.title}
-      tag={tag}
+      tags={tags}
       readTime={postReadTime}
       pubDate={post.data.pubDate}
       backHref="/"
@@ -144,7 +146,7 @@ const jsonLd = {
     <!-- Article body — matches design's content paragraphs -->
     <div style="padding-top:4px">
       <div
-        class="prose prose-p:font-mono prose-p:text-[0.88rem] prose-p:leading-[1.9] prose-p:mb-5 prose-p:text-[var(--muted)] prose-p:text-wrap-pretty prose-headings:font-mono prose-headings:font-semibold prose-headings:text-[var(--text)] prose-h2:text-[1.1rem] prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-[0.95rem] prose-h3:mt-7 prose-h3:mb-3 prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:underline prose-strong:text-[var(--text)] prose-strong:font-semibold prose-ul:pl-6 prose-ol:pl-6 prose-li:text-[0.88rem] prose-li:text-[var(--muted)] prose-li:leading-[1.9] prose-li:my-1 prose-code:font-mono prose-code:text-[var(--text)] prose-code:bg-[var(--bg2)] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.82em] prose-pre:bg-[var(--bg2)] prose-pre:text-[var(--text)] prose-pre:rounded prose-pre:overflow-x-auto prose-pre:text-[0.82em] prose-blockquote:border-l-2 prose-blockquote:border-[var(--accent)] prose-blockquote:bg-[var(--bg2)] prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-[var(--muted)] prose-blockquote:not-italic prose-hr:border-[var(--divider)] prose-hr:my-8 prose-img:rounded prose-img:w-full prose-img:my-8 prose-img:block prose-figure:my-8 prose-figcaption:text-center prose-figcaption:text-[0.7rem] prose-figcaption:text-[var(--muted2)] prose-figcaption:mt-[-20px] prose-figcaption:mb-2 post-content max-w-none"
+        class="prose prose-p:font-mono prose-p:text-[0.94rem] prose-p:leading-[1.9] prose-p:mb-5 prose-p:text-[var(--muted)] prose-p:text-wrap-pretty prose-headings:font-mono prose-headings:font-semibold prose-headings:text-[var(--text)] prose-h2:text-[1.1rem] prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-[0.95rem] prose-h3:mt-7 prose-h3:mb-3 prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:underline prose-strong:text-[var(--text)] prose-strong:font-semibold prose-ul:pl-6 prose-ol:pl-6 prose-li:text-[0.94rem] prose-li:text-[var(--muted)] prose-li:leading-[1.9] prose-li:my-1 prose-code:font-mono prose-code:text-[var(--text)] prose-code:bg-[var(--bg2)] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.82em] prose-pre:bg-[var(--bg2)] prose-pre:text-[var(--text)] prose-pre:rounded prose-pre:overflow-x-auto prose-pre:text-[0.82em] prose-blockquote:border-l-2 prose-blockquote:border-[var(--accent)] prose-blockquote:bg-[var(--bg2)] prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-[var(--muted)] prose-blockquote:not-italic prose-hr:border-[var(--divider)] prose-hr:my-8 prose-img:rounded prose-img:w-full prose-img:my-8 prose-img:block prose-figure:my-8 prose-figcaption:text-center prose-figcaption:text-[0.7rem] prose-figcaption:text-[var(--muted2)] prose-figcaption:mt-[-20px] prose-figcaption:mb-2 post-content max-w-none"
       >
         <Content />
       </div>
@@ -229,7 +231,9 @@ const jsonLd = {
                   <span style="font-size:0.65rem;color:var(--muted)">
                     {p.date}
                   </span>
-                  <span class={`rel-badge ${tagClass(p.tag)}`}>{p.tag}</span>
+                  {p.tags.map((t) => (
+                    <span class={`rel-badge ${tagClass(t)}`}>{t}</span>
+                  ))}
                 </div>
 
                 <div class="rel-title">{p.title}</div>

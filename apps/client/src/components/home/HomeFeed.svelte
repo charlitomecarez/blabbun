@@ -7,7 +7,7 @@
     date: string;
     title: string;
     excerpt?: string;
-    tag: string;
+    tags: string[];
     readTime?: string;
     imageUrl?: string;
     href: string;
@@ -28,7 +28,7 @@
   const filtered = $derived(
     activeTag === "all"
       ? feedItems
-      : feedItems.filter((item) => item.tag === activeTag)
+      : feedItems.filter((item) => item.tags.includes(activeTag))
   );
 
   const zineQuote = $derived(feedItems.length > 3 ? feedItems[3] : null);
@@ -91,7 +91,9 @@
         ></div>
         <div class="zine-card__meta">
           <span class="handwritten zine-card__date">{zineQuote.date}</span>
-          <span class="zine-card__tag">{zineQuote.tag.toLowerCase()}</span>
+          {#each zineQuote.tags as t}
+            <span class="zine-card__tag">{t.toLowerCase()}</span>
+          {/each}
         </div>
         <h2 class="serif zine-card__title">{zineQuote.title}</h2>
         {#if zineQuote.excerpt}

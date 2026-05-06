@@ -37,7 +37,7 @@ const postItems = allPosts.map((post) => ({
     month: "long",
     year: "numeric",
   }),
-  tag: (post.data.tags?.[0] ?? "EDITORIAL").toUpperCase(),
+  tags: (post.data.tags ?? ["EDITORIAL"]).map((t) => t.toUpperCase()),
   href: `/${post.id}`,
   imageUrl: post.data.image,
   claps: stats[post.id]?.claps,

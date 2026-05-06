@@ -6,7 +6,7 @@
     date: string;
     title: string;
     excerpt?: string;
-    tag: string;
+    tags: string[];
     readTime?: string;
     imageUrl?: string;
     href: string;
@@ -19,7 +19,7 @@
     date,
     title,
     excerpt = "",
-    tag,
+    tags,
     readTime = "",
     imageUrl = "",
     href,
@@ -54,17 +54,26 @@
   );
 
   const slug = $derived(href.replace(/^\//, ""));
+  const isFirstPost = $derived(slug === "welcome-to-blab-bun");
 </script>
 
 <article
   style="transform: {articleTransform};"
   class="post-card"
   class:hov
+  class:first-post={isFirstPost}
   onmouseenter={() => (hov = true)}
   onmouseleave={() => (hov = false)}
 >
   <!-- "this one →" hover callout — always in DOM, shown via CSS -->
   <span class="handwritten this-one" aria-hidden="true">this one →</span>
+
+  <!-- "first post!" stamp — only on the welcome post -->
+  {#if isFirstPost}
+    <span class="handwritten first-stamp" aria-label="First post"
+      >🍞 first post!</span
+    >
+  {/if}
 
   <!-- Polaroid image (only when imageUrl is provided) -->
   {#if imageUrl}
@@ -96,7 +105,9 @@
   <!-- Date + Tag row -->
   <div class="meta-top">
     <span class="handwritten post-date">{date}</span>
-    <span class="tag-badge {tagClass(tag)}">{tag.toLowerCase()}</span>
+    {#each tags as t}
+      <span class="tag-badge {tagClass(t)}">{t.toLowerCase()}</span>
+    {/each}
   </div>
 
   <!-- Title -->
@@ -116,10 +127,44 @@
         <span class="stat">{readTime}</span>
       {/if}
       {#if claps > 0}
-        <span class="stat">👏 {claps}</span>
+        <span class="stat">
+          <svg
+            width="11"
+            height="11"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+            style="display:inline-block;vertical-align:middle;margin-right:2px"
+          >
+            <path
+              d="M7 11.5V6a1.5 1.5 0 0 1 3 0v3m0-3a1.5 1.5 0 0 1 3 0v3m0-2a1.5 1.5 0 0 1 3 0v6a7 7 0 0 1-14 0v-4a1.5 1.5 0 0 1 3 0v2"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>{claps}
+        </span>
       {/if}
       {#if commentCount > 0}
-        <span class="stat">💬 {commentCount}</span>
+        <span class="stat">
+          <svg
+            width="11"
+            height="11"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+            style="display:inline-block;vertical-align:middle;margin-right:2px"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>{commentCount}
+        </span>
       {/if}
     </div>
     <BookmarkButton {slug} />
@@ -299,5 +344,28 @@
     .post-date {
       font-size: 0.82rem;
     }
+  }
+
+  /* ─── First post stamp ────────────────────────────────────────── */
+  .first-stamp {
+    position: absolute;
+    top: 14px;
+    right: 0;
+    font-size: 1rem;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1.5px dashed var(--accent);
+    padding: 3px 10px;
+    border-radius: 3px;
+    transform: rotate(2deg);
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+    animation: wiggle 4s ease-in-out infinite;
+  }
+
+  .first-post {
+    border-bottom-style: solid;
+    border-bottom-color: var(--accent);
   }
 </style>

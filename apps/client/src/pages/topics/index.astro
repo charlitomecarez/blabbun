@@ -29,19 +29,9 @@ const topics = [...tagMap.entries()]
   description={`Browse all ${topics.length} topics on blabbun — from personal essays to tech rants and everything in between.`}
 >
   <main
-    style="max-width:680px;margin:0 auto;padding:32px 32px;width:100%;flex:1;min-height:60vh"
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-8"
   >
-    <div style="padding-top:48px;padding-bottom:32px">
-      <h1
-        style="font-size:1.6rem;font-weight:700;letter-spacing:-0.03em;color:var(--text);margin-bottom:6px"
-      >
-        topics<span style="color:var(--accent)">.</span>
-      </h1>
-      <p style="font-size:0.72rem;color:var(--muted2)">
-        {topics.length}
-        {topics.length === 1 ? "topic" : "topics"}
-      </p>
-    </div>
+    <h1 style="font-size:1.05rem;font-weight:600;margin-bottom:22px">topics</h1>
 
     <div
       style="border-bottom:1px solid var(--accent);padding-bottom:8px;margin-bottom:4px"
