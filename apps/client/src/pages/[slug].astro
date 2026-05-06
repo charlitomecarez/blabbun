@@ -11,6 +11,7 @@ import { readTime, tagClass } from "@blabbun/utils";
 import { getCollection, render } from "astro:content";
 import { shuffle } from "lodash-es";
 
+import CheckpointDividers from "@/components/post/CheckpointDividers.svelte";
 import ClapShare from "@/components/post/ClapShare.svelte";
 import Comments from "@/components/post/Comments.svelte";
 import FloatingNewsletter from "@/components/post/FloatingNewsletter.svelte";
@@ -153,6 +154,7 @@ const jsonLd = {
       >
         <Content />
       </div>
+      <CheckpointDividers client:idle />
       <MidScrollReaction client:load slug={post.id} />
     </div>
 

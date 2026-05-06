@@ -73,3 +73,37 @@ test.describe("MidScrollReaction", () => {
     expect(stored).toBe("fire");
   });
 });
+
+// ─── CheckpointDividers ───────────────────────────────────────
+test.describe("CheckpointDividers", () => {
+  test("injects one divider before each h2", async ({ page }) => {
+    await page.goto(POST);
+    // welcome-to-blab-bun has 4 h2s → 4 dividers
+    await expect(
+      page.locator("[data-testid='checkpoint-divider']")
+    ).toHaveCount(4);
+  });
+
+  test("dividers start hidden and become visible after scrolling", async ({
+    page,
+  }) => {
+    await page.goto(POST);
+    await page.waitForLoadState("networkidle");
+    const dividers = page.locator("[data-testid='checkpoint-divider']");
+    // Last divider is off-screen on load — should start hidden
+    await expect(dividers.last()).toHaveCSS("opacity", "0");
+    // Scroll the last divider into view
+    await dividers.last().scrollIntoViewIfNeeded();
+    await expect(dividers.last()).toHaveCSS("opacity", "1", {
+      timeout: 3000,
+    });
+  });
+
+  test("displays Caveat-font checkpoint messages", async ({ page }) => {
+    await page.goto(POST);
+    const firstMessage = page
+      .locator("[data-testid='checkpoint-divider'] .checkpoint-message")
+      .first();
+    await expect(firstMessage).toHaveText("✶ still here? respect. ✶");
+  });
+});
