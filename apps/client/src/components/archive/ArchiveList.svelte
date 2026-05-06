@@ -9,7 +9,7 @@
     pubDate: string;
     pubDateRaw: string;
     monthGroup: string;
-    tag: string;
+    tags: string[];
     href: string;
     imageUrl?: string;
     claps?: number;
@@ -47,7 +47,7 @@
 
   const filtered = $derived(
     posts
-      .filter((p) => !activeTag || p.tag === activeTag)
+      .filter((p) => !activeTag || p.tags.includes(activeTag))
       .filter((p) => month === "all" || p.pubDateRaw.startsWith(month))
       .sort((a, b) =>
         sort === "newest"
@@ -134,7 +134,9 @@
           <!-- Date + badge + stats -->
           <div class="archive-meta">
             <span class="archive-date">{p.pubDate}</span>
-            <span class="archive-badge {tagClass(p.tag)}">{p.tag}</span>
+            {#each p.tags as t}
+              <span class="archive-badge {tagClass(t)}">{t}</span>
+            {/each}
             <span class="archive-stats"
               >👏 {p.claps ?? 0} · 💬 {p.commentCount ?? 0}</span
             >

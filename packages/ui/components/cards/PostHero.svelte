@@ -4,7 +4,7 @@
   interface Props {
     title: string;
     description?: string;
-    tag?: string;
+    tags?: string[];
     readTime?: string;
     pubDate: Date;
     author?: string;
@@ -13,7 +13,7 @@
 
   const {
     title,
-    tag = "EDITORIAL",
+    tags = ["EDITORIAL"],
     readTime = "5 min read",
     pubDate,
     backHref = "/",
@@ -56,7 +56,9 @@
       style="font-size:0.95rem;font-family:'Caveat',cursive;color:var(--muted)"
       >{formattedDate}</span
     >
-    <span class="post-badge {tagClass(tag)}">{tag}</span>
+    {#each tags as t}
+      <span class="post-badge {tagClass(t)}">{t}</span>
+    {/each}
     <span style="font-size:0.68rem;color:var(--muted2)">{readTime}</span>
     <span
       style="font-family:'Caveat',cursive;font-size:0.95rem;color:var(--accent);margin-left:4px"

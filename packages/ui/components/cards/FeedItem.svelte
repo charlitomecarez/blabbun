@@ -8,7 +8,7 @@
     date?: string;
     title: string;
     excerpt?: string;
-    tag?: string;
+    tags?: string[];
     readTime?: string;
     imageUrl?: string;
     href?: string;
@@ -20,7 +20,7 @@
     date = "",
     title,
     excerpt = "",
-    tag = "EDITORIAL",
+    tags = ["EDITORIAL"],
     readTime = "",
     imageUrl = "",
     href = "#",
@@ -52,12 +52,14 @@
     </div>
   {/if}
 
-  <!-- Date + tag badge -->
+  <!-- Date + tag badges -->
   <div class="feed-meta-top">
     {#if date}
       <span class="feed-date">{date}</span>
     {/if}
-    <span class="feed-badge {tagClass(tag)}">{tag}</span>
+    {#each tags as t}
+      <span class="feed-badge {tagClass(t)}">{t}</span>
+    {/each}
   </div>
 
   <!-- Title (stretched link) -->
