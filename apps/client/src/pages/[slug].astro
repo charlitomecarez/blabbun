@@ -3,6 +3,7 @@ import { PostHero } from "@blabbun/ui/components/cards";
 import {
   BookmarkButton,
   ReactionBar,
+  ReadingDots,
   ReadingProgress,
 } from "@blabbun/ui/components/post";
 import { readTime, tagClass } from "@blabbun/utils";
@@ -93,6 +94,7 @@ const jsonLd = {
   ogType="article"
 >
   <ReadingProgress client:idle />
+  <ReadingDots client:idle slug={post.id} />
   {slug === "welcome-to-blab-bun" && <WelcomeConfetti client:load />}
 
   <main
