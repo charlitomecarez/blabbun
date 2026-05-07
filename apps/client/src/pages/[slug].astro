@@ -2,16 +2,20 @@
 import { PostHero } from "@blabbun/ui/components/cards";
 import {
   BookmarkButton,
+  MidScrollReaction,
   ReactionBar,
+  ReadingDots,
   ReadingProgress,
 } from "@blabbun/ui/components/post";
 import { readTime, tagClass } from "@blabbun/utils";
 import { getCollection, render } from "astro:content";
 import { shuffle } from "lodash-es";
 
+import CheckpointDividers from "@/components/post/CheckpointDividers.svelte";
 import ClapShare from "@/components/post/ClapShare.svelte";
 import Comments from "@/components/post/Comments.svelte";
 import FloatingNewsletter from "@/components/post/FloatingNewsletter.svelte";
+import QuotePopover from "@/components/post/QuotePopover.svelte";
 import WelcomeConfetti from "@/components/post/WelcomeConfetti.svelte";
 import Layout from "@/layouts/Layout.astro";
 
@@ -93,6 +97,7 @@ const jsonLd = {
   ogType="article"
 >
   <ReadingProgress client:idle />
+  <ReadingDots client:idle />
   {slug === "welcome-to-blab-bun" && <WelcomeConfetti client:load />}
 
   <main
@@ -150,6 +155,8 @@ const jsonLd = {
       >
         <Content />
       </div>
+      <CheckpointDividers client:idle />
+      <MidScrollReaction client:load slug={post.id} />
     </div>
 
     <!-- End of blab marker -->
@@ -327,4 +334,5 @@ const jsonLd = {
   </script>
 
   <FloatingNewsletter client:idle postSlug={post.id} />
+  <QuotePopover client:idle slug={post.id} title={post.data.title} />
 </Layout>
