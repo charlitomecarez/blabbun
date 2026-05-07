@@ -1,6 +1,7 @@
 ---
 import "@blabbun/ui/styles/global.css";
 
+import { ClientRouter } from "astro:transitions";
 import { Footer, Navbar } from "@blabbun/ui/components/layouts";
 import { getCollection } from "astro:content";
 
@@ -197,6 +198,7 @@ const postCount = allPosts.length;
       content="#16120e"
       media="(prefers-color-scheme: dark)"
     />
+    <ClientRouter />
   </head>
   <body
     class="dark"
@@ -208,9 +210,33 @@ const postCount = allPosts.length;
     <Navbar client:load links={navLinks} postCount={postCount} />
     <SearchDropdown client:idle />
     <ScrollToTop client:idle />
-    <div style="flex:1">
+    <div style="flex:1" transition:name="main-content">
       <slot />
     </div>
     <Footer wordCount={totalWords} />
+    <script>
+      function initReveal() {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.15 }
+        );
+        document
+          .querySelectorAll(".reveal:not(.visible)")
+          .forEach((el) => observer.observe(el));
+      }
+
+      // Run on first load
+      initReveal();
+
+      // Re-run after each View Transitions navigation
+      document.addEventListener("astro:page-load", initReveal);
+    </script>
   </body>
 </html>
