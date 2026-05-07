@@ -1,9 +1,9 @@
 ---
 import "@blabbun/ui/styles/global.css";
 
-import { ClientRouter } from "astro:transitions";
 import { Footer, Navbar } from "@blabbun/ui/components/layouts";
 import { getCollection } from "astro:content";
+import { ClientRouter } from "astro:transitions";
 
 import ScrollToTop from "@/components/layouts/ScrollToTop.svelte";
 import SearchDropdown from "@/components/search/SearchDropdown.svelte";
@@ -216,24 +216,34 @@ const postCount = allPosts.length;
     <Footer wordCount={totalWords} />
     <script>
       function initReveal() {
-        const observer = new IntersectionObserver(
+        const io = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting) {
                 entry.target.classList.add("visible");
-                observer.unobserve(entry.target);
+                io.unobserve(entry.target);
               }
             });
           },
           { threshold: 0.15 }
         );
-        document
-          .querySelectorAll(".reveal:not(.visible)")
-          .forEach((el) => observer.observe(el));
+
+        const observeAll = () =>
+          document
+            .querySelectorAll(".reveal:not(.visible)")
+            .forEach((el) => io.observe(el));
+
+        observeAll();
+
+        // client:idle and client:visible components hydrate after page load via
+        // requestIdleCallback, rebuilding DOM nodes that were already observed.
+        // The MutationObserver catches those new nodes and re-observes them.
+        const mo = new MutationObserver(observeAll);
+        mo.observe(document.body, { childList: true, subtree: true });
+        setTimeout(() => mo.disconnect(), 4000);
       }
 
-      // Eager call handles initial hard load (astro:page-load may fire before this
-      // listener is registered on first load). astro:page-load handles soft navigations.
+      // astro:page-load fires on hard loads AND soft navigations when ClientRouter is active.
       // Keep this script as a module (no is:inline) so Astro deduplicates it.
       initReveal();
       document.addEventListener("astro:page-load", initReveal);
