@@ -38,7 +38,7 @@
   });
 </script>
 
-<div class="mascot-wrap" aria-hidden="true">
+<div class="mascot-wrap reveal" aria-hidden="true">
   <div class="logo-float">
     <BunLogo size={64} interactive={true} />
   </div>
