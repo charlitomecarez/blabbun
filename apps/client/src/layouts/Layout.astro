@@ -227,25 +227,25 @@ const postCount = allPosts.length;
           },
           { threshold: 0.15 }
         );
-
-        const observeAll = () =>
-          document
-            .querySelectorAll(".reveal:not(.visible)")
-            .forEach((el) => io.observe(el));
-
-        observeAll();
-
-        // client:idle and client:visible components hydrate after page load via
-        // requestIdleCallback, rebuilding DOM nodes that were already observed.
-        // The MutationObserver catches those new nodes and re-observes them.
-        const mo = new MutationObserver(observeAll);
-        mo.observe(document.body, { childList: true, subtree: true });
-        setTimeout(() => mo.disconnect(), 4000);
+        document
+          .querySelectorAll(".reveal:not(.visible)")
+          .forEach((el) => io.observe(el));
       }
 
-      // astro:page-load fires on hard loads AND soft navigations when ClientRouter is active.
-      // Keep this script as a module (no is:inline) so Astro deduplicates it.
+      // Run immediately for SSR'd elements already in the DOM.
       initReveal();
+
+      // client:idle and client:visible components hydrate via requestIdleCallback,
+      // adding new .reveal elements after initReveal() ran. Re-run on idle so those
+      // elements get picked up. Fallback to setTimeout for browsers without rIC.
+      if (window.requestIdleCallback) {
+        requestIdleCallback(initReveal, { timeout: 2000 });
+      } else {
+        setTimeout(initReveal, 500);
+      }
+
+      // Re-run after each View Transitions soft navigation.
+      // Keep this script as a module (no is:inline) so Astro deduplicates it.
       document.addEventListener("astro:page-load", initReveal);
     </script>
   </body>
