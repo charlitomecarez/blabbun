@@ -15,6 +15,7 @@ import CheckpointDividers from "@/components/post/CheckpointDividers.svelte";
 import ClapShare from "@/components/post/ClapShare.svelte";
 import Comments from "@/components/post/Comments.svelte";
 import FloatingNewsletter from "@/components/post/FloatingNewsletter.svelte";
+import QuotePopover from "@/components/post/QuotePopover.svelte";
 import WelcomeConfetti from "@/components/post/WelcomeConfetti.svelte";
 import Layout from "@/layouts/Layout.astro";
 
@@ -333,4 +334,5 @@ const jsonLd = {
   </script>
 
   <FloatingNewsletter client:idle postSlug={post.id} />
+  <QuotePopover client:idle slug={post.id} title={post.data.title} />
 </Layout>

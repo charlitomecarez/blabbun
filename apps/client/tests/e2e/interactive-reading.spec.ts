@@ -107,3 +107,91 @@ test.describe("CheckpointDividers", () => {
     await expect(firstMessage).toHaveText("✶ still here? respect. ✶");
   });
 });
+
+// ─── QuotePopover ─────────────────────────────────────────────
+test.describe("QuotePopover", () => {
+  test("does not appear for selections under 10 chars", async ({ page }) => {
+    await page.goto(POST);
+    // Select a very short piece of text
+    await page.evaluate(() => {
+      const el = document.querySelector(".post-content p");
+      if (!el) return;
+      const range = document.createRange();
+      range.setStart(el.firstChild!, 0);
+      range.setEnd(el.firstChild!, 5);
+      window.getSelection()!.removeAllRanges();
+      window.getSelection()!.addRange(range);
+    });
+    await expect(page.getByTestId("quote-popover")).not.toBeVisible();
+  });
+
+  test("appears when selecting sufficient text inside article", async ({
+    page,
+  }) => {
+    await page.goto(POST);
+    await page.evaluate(() => {
+      const el = document.querySelector(".post-content p");
+      if (!el || !el.firstChild) return;
+      const text = el.firstChild.textContent ?? "";
+      const range = document.createRange();
+      range.setStart(el.firstChild, 0);
+      range.setEnd(el.firstChild, Math.min(60, text.length));
+      window.getSelection()!.removeAllRanges();
+      window.getSelection()!.addRange(range);
+      // Trigger selectionchange
+      document.dispatchEvent(new Event("selectionchange"));
+    });
+    await expect(page.getByTestId("quote-popover")).toBeVisible({
+      timeout: 1000,
+    });
+  });
+
+  test("save quote button stores quote in localStorage", async ({ page }) => {
+    await page.goto(POST);
+    await page.evaluate(() => {
+      const el = document.querySelector(".post-content p");
+      if (!el || !el.firstChild) return;
+      const text = el.firstChild.textContent ?? "";
+      const range = document.createRange();
+      range.setStart(el.firstChild, 0);
+      range.setEnd(el.firstChild, Math.min(60, text.length));
+      window.getSelection()!.removeAllRanges();
+      window.getSelection()!.addRange(range);
+      document.dispatchEvent(new Event("selectionchange"));
+    });
+    const popover = page.getByTestId("quote-popover");
+    await expect(popover).toBeVisible({ timeout: 1000 });
+    await popover.getByRole("button", { name: /save quote/ }).click();
+    const stored = await page.evaluate(() => {
+      const raw = localStorage.getItem("bb-quotes");
+      return raw ? JSON.parse(raw) : [];
+    });
+    expect(stored.length).toBe(1);
+    expect(stored[0].slug).toBe("welcome-to-blab-bun");
+  });
+
+  test("Escape closes popover without triggering history.back", async ({
+    page,
+  }) => {
+    await page.goto(POST);
+    await page.evaluate(() => {
+      const el = document.querySelector(".post-content p");
+      if (!el || !el.firstChild) return;
+      const text = el.firstChild.textContent ?? "";
+      const range = document.createRange();
+      range.setStart(el.firstChild, 0);
+      range.setEnd(el.firstChild, Math.min(60, text.length));
+      window.getSelection()!.removeAllRanges();
+      window.getSelection()!.addRange(range);
+      document.dispatchEvent(new Event("selectionchange"));
+    });
+    await expect(page.getByTestId("quote-popover")).toBeVisible({
+      timeout: 1000,
+    });
+    await page.keyboard.press("Escape");
+    // Popover closes
+    await expect(page.getByTestId("quote-popover")).not.toBeVisible();
+    // Page did not navigate back (still on the post)
+    expect(page.url()).toContain("welcome-to-blab-bun");
+  });
+});
