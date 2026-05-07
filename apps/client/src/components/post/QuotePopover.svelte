@@ -29,7 +29,9 @@
   let popoverEl: HTMLDivElement | undefined = $state();
 
   onMount(() => {
-    function onSelectionChange() {
+    let postContent: Element | null = document.querySelector(".post-content");
+
+    function checkSelection() {
       const selection = window.getSelection();
       if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
         visible = false;
@@ -42,8 +44,9 @@
         return;
       }
 
+      // Lazy-resolve on first use in case DOM wasn't ready at mount time
+      postContent ??= document.querySelector(".post-content");
       const range = selection.getRangeAt(0);
-      const postContent = document.querySelector(".post-content");
       if (!postContent?.contains(range.commonAncestorContainer)) {
         visible = false;
         return;
@@ -56,9 +59,15 @@
       visible = true;
     }
 
+    function onSelectionChange() {
+      // Defer one animation frame so WebKit commits programmatic selections
+      // before we read window.getSelection()
+      requestAnimationFrame(checkSelection);
+    }
+
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape" && visible) {
-        e.stopPropagation(); // prevent history.back() in [slug].astro
+        e.stopImmediatePropagation(); // prevent history.back() in [slug].astro
         visible = false;
         window.getSelection()?.removeAllRanges();
       }

@@ -127,4 +127,10 @@
     background: var(--divider);
     flex-shrink: 0;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot {
+      transition: none;
+    }
+  }
 </style>
