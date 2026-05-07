@@ -14,7 +14,8 @@ import { shuffle } from "lodash-es";
 import CheckpointDividers from "@/components/post/CheckpointDividers.svelte";
 import ClapShare from "@/components/post/ClapShare.svelte";
 import Comments from "@/components/post/Comments.svelte";
-import FloatingNewsletter from "@/components/post/FloatingNewsletter.svelte";
+import PostNewsletterSidebar from "@/components/post/PostNewsletterSidebar.svelte";
+import PostTableOfContents from "@/components/post/PostTableOfContents.svelte";
 import QuotePopover from "@/components/post/QuotePopover.svelte";
 import WelcomeConfetti from "@/components/post/WelcomeConfetti.svelte";
 import Layout from "@/layouts/Layout.astro";
@@ -30,7 +31,7 @@ const post = allPosts.find((p) => p.id === slug);
 
 if (!post) return new Response(null, { status: 404 });
 
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 
 const postReadTime = readTime(post.body ?? "");
 const tags = (post.data.tags ?? ["EDITORIAL"]).map((t) => t.toUpperCase());
@@ -100,157 +101,175 @@ const jsonLd = {
   <ReadingDots client:idle />
   {slug === "welcome-to-blab-bun" && <WelcomeConfetti client:load />}
 
-  <main
-    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 pt-10 pb-6 sm:px-8 sm:py-8"
-  >
-    <!-- Post header (matches PostDetailView) -->
-    <PostHero
-      title={post.data.title}
-      tags={tags}
-      readTime={postReadTime}
-      pubDate={post.data.pubDate}
-      backHref="/"
-    />
-
-    <!-- Optional image -->
-    {
-      hasImage && (
-        <div style="margin-bottom:24px">
-          <img
-            src={post.data.image}
-            alt={post.data.title}
-            width="616"
-            height="280"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-            class="post-hero-img"
-            style="width:100%;border-radius:6px;object-fit:cover;display:block"
-          />
-          {post.data.imageSource && (
-            <p style="font-size:0.62rem;text-align:right;margin-top:4px;color:var(--muted2)">
-              image:{" "}
-              {post.data.imageSourceUrl ? (
-                <a
-                  href={post.data.imageSourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style="color:var(--accent)"
-                >
-                  {post.data.imageSource}
-                </a>
-              ) : (
-                post.data.imageSource
-              )}
-            </p>
-          )}
-        </div>
-      )
-    }
-
-    <!-- Article body — matches design's content paragraphs -->
-    <div style="padding-top:4px">
-      <div
-        class="prose prose-p:font-mono prose-p:text-[0.94rem] prose-p:leading-[1.9] prose-p:mb-5 prose-p:text-[var(--muted)] prose-p:text-wrap-pretty prose-headings:font-mono prose-headings:font-semibold prose-headings:text-[var(--text)] prose-h2:text-[1.1rem] prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-[0.95rem] prose-h3:mt-7 prose-h3:mb-3 prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:underline prose-strong:text-[var(--text)] prose-strong:font-semibold prose-ul:pl-6 prose-ol:pl-6 prose-li:text-[0.94rem] prose-li:text-[var(--muted)] prose-li:leading-[1.9] prose-li:my-1 prose-code:font-mono prose-code:text-[var(--text)] prose-code:bg-[var(--bg2)] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.82em] prose-pre:bg-[var(--bg2)] prose-pre:text-[var(--text)] prose-pre:rounded prose-pre:overflow-x-auto prose-pre:text-[0.82em] prose-blockquote:border-l-2 prose-blockquote:border-[var(--accent)] prose-blockquote:bg-[var(--bg2)] prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-[var(--muted)] prose-blockquote:not-italic prose-hr:border-[var(--divider)] prose-hr:my-8 prose-img:rounded prose-img:w-full prose-img:my-8 prose-img:block prose-figure:my-8 prose-figcaption:text-center prose-figcaption:text-[0.7rem] prose-figcaption:text-[var(--muted2)] prose-figcaption:mt-[-20px] prose-figcaption:mb-2 post-content max-w-none"
-      >
-        <Content />
-      </div>
-      <CheckpointDividers client:idle />
-      <MidScrollReaction client:load slug={post.id} />
-    </div>
-
-    <!-- End of blab marker -->
-    <div
-      style="text-align:center;margin:48px 0 8px;font-family:'Caveat',cursive;font-size:1.6rem;color:var(--accent);letter-spacing:0.4em"
-    >
-      ✶ · ✶
-    </div>
-    <div
-      style="text-align:center;font-family:'Caveat',cursive;font-size:1.2rem;color:var(--muted);margin-bottom:8px"
-    >
-      end of blab.
-    </div>
-
-    <!-- Reactions -->
-    <ReactionBar client:visible slug={post.id} />
-
-    <!-- Actions: ClapButton + SharePanel + 🔖 (margin-left:auto) — exact PostDetailView layout -->
-    <div
-      style="display:flex;align-items:center;gap:14px;margin-top:28px;padding-top:24px;border-top:1px dashed var(--border);flex-wrap:wrap"
-    >
-      <ClapShare
-        client:visible
-        postSlug={post.id}
+  <div class="post-layout">
+    <!-- Left sidebar: TOC + share -->
+    <aside class="post-sidebar post-sidebar-left">
+      <PostTableOfContents
+        client:idle
+        headings={headings}
         postUrl={postUrl}
         postTitle={post.data.title}
+      />
+    </aside>
+
+    <main class="min-h-[60vh] w-full flex-1 px-4 pt-10 pb-6 sm:px-8 sm:py-8">
+      <!-- Post header (matches PostDetailView) -->
+      <PostHero
+        title={post.data.title}
+        tags={tags}
+        readTime={postReadTime}
+        pubDate={post.data.pubDate}
+        backHref="/"
+      />
+
+      <!-- Optional image -->
+      {
+        hasImage && (
+          <div style="margin-bottom:24px">
+            <img
+              src={post.data.image}
+              alt={post.data.title}
+              width="616"
+              height="280"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              class="post-hero-img"
+              style="width:100%;border-radius:6px;object-fit:cover;display:block"
+            />
+            {post.data.imageSource && (
+              <p style="font-size:0.62rem;text-align:right;margin-top:4px;color:var(--muted2)">
+                image:{" "}
+                {post.data.imageSourceUrl ? (
+                  <a
+                    href={post.data.imageSourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style="color:var(--accent)"
+                  >
+                    {post.data.imageSource}
+                  </a>
+                ) : (
+                  post.data.imageSource
+                )}
+              </p>
+            )}
+          </div>
+        )
+      }
+
+      <!-- Article body — matches design's content paragraphs -->
+      <div style="padding-top:4px">
+        <div
+          class="prose prose-p:font-mono prose-p:text-[0.94rem] prose-p:leading-[1.9] prose-p:mb-5 prose-p:text-[var(--muted)] prose-p:text-wrap-pretty prose-headings:font-mono prose-headings:font-semibold prose-headings:text-[var(--text)] prose-h2:text-[1.1rem] prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-[0.95rem] prose-h3:mt-7 prose-h3:mb-3 prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:underline prose-strong:text-[var(--text)] prose-strong:font-semibold prose-ul:pl-6 prose-ol:pl-6 prose-li:text-[0.94rem] prose-li:text-[var(--muted)] prose-li:leading-[1.9] prose-li:my-1 prose-code:font-mono prose-code:text-[var(--text)] prose-code:bg-[var(--bg2)] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.82em] prose-pre:bg-[var(--bg2)] prose-pre:text-[var(--text)] prose-pre:rounded prose-pre:overflow-x-auto prose-pre:text-[0.82em] prose-blockquote:border-l-2 prose-blockquote:border-[var(--accent)] prose-blockquote:bg-[var(--bg2)] prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:text-[var(--muted)] prose-blockquote:not-italic prose-hr:border-[var(--divider)] prose-hr:my-8 prose-img:rounded prose-img:w-full prose-img:my-8 prose-img:block prose-figure:my-8 prose-figcaption:text-center prose-figcaption:text-[0.7rem] prose-figcaption:text-[var(--muted2)] prose-figcaption:mt-[-20px] prose-figcaption:mb-2 post-content max-w-none"
+        >
+          <Content />
+        </div>
+        <CheckpointDividers client:idle />
+        <MidScrollReaction client:load slug={post.id} />
+      </div>
+
+      <!-- End of blab marker -->
+      <div
+        style="text-align:center;margin:48px 0 8px;font-family:'Caveat',cursive;font-size:1.6rem;color:var(--accent);letter-spacing:0.4em"
       >
-        <div style="margin-left: auto">
-          <BookmarkButton client:visible slug={post.id} />
-        </div>
-      </ClapShare>
-    </div>
+        ✶ · ✶
+      </div>
+      <div
+        style="text-align:center;font-family:'Caveat',cursive;font-size:1.2rem;color:var(--muted);margin-bottom:8px"
+      >
+        end of blab.
+      </div>
 
-    <!-- WHAT NOW card — "still here? read this next →" -->
-    {
-      relatedPosts.length > 0 && (
-        <div class="what-now-card">
-          <div class="tape" style="top:-9px;left:40%;transform:rotate(-3deg)" />
-          <a
-            href={relatedPosts[0].href}
-            class="what-now-link"
-            aria-label={relatedPosts[0].title}
-          >
-            <span />
-          </a>
-          <div style="font-family:'Caveat',cursive;font-size:1.2rem;color:var(--accent);margin-bottom:6px">
-            still here? read this next →
-          </div>
-          <div style="font-family:'Fraunces',serif;font-style:italic;font-size:1.4rem;font-weight:500;line-height:1.25;color:var(--text);text-wrap:pretty">
-            {relatedPosts[0].title}
-          </div>
-          <div style="font-size:0.74rem;color:var(--muted);margin-top:8px">
-            {relatedPosts[0].date} · {relatedPosts[0].readTime}
-          </div>
-        </div>
-      )
-    }
+      <!-- Reactions -->
+      <ReactionBar client:visible slug={post.id} />
 
-    <!-- Comments -->
-    <Comments client:visible postSlug={post.id} />
-
-    <!-- Related posts -->
-    {
-      relatedPosts.length > 0 && (
-        <div style="margin-top:48px;padding-top:32px;border-top:1px solid var(--divider)">
-          <div style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:20px;text-transform:uppercase">
-            more from blab bun
+      <!-- Actions: ClapButton + SharePanel + 🔖 (margin-left:auto) — exact PostDetailView layout -->
+      <div
+        style="display:flex;align-items:center;gap:14px;margin-top:28px;padding-top:24px;border-top:1px dashed var(--border);flex-wrap:wrap"
+      >
+        <ClapShare
+          client:visible
+          postSlug={post.id}
+          postUrl={postUrl}
+          postTitle={post.data.title}
+        >
+          <div style="margin-left: auto">
+            <BookmarkButton client:visible slug={post.id} />
           </div>
-          <div>
-            {relatedPosts.map((p) => (
-              <div class="rel-row">
-                <a
-                  href={p.href}
-                  class="absolute inset-0 z-0"
-                  aria-label={p.title}
-                />
+        </ClapShare>
+      </div>
 
-                <div style="display:flex;gap:8px;align-items:center;margin-bottom:5px">
-                  <span style="font-size:0.65rem;color:var(--muted)">
-                    {p.date}
-                  </span>
-                  {p.tags.map((t) => (
-                    <span class={`rel-badge ${tagClass(t)}`}>{t}</span>
-                  ))}
+      <!-- WHAT NOW card — "still here? read this next →" -->
+      {
+        relatedPosts.length > 0 && (
+          <div class="what-now-card">
+            <div
+              class="tape"
+              style="top:-9px;left:40%;transform:rotate(-3deg)"
+            />
+            <a
+              href={relatedPosts[0].href}
+              class="what-now-link"
+              aria-label={relatedPosts[0].title}
+            >
+              <span />
+            </a>
+            <div style="font-family:'Caveat',cursive;font-size:1.2rem;color:var(--accent);margin-bottom:6px">
+              still here? read this next →
+            </div>
+            <div style="font-family:'Fraunces',serif;font-style:italic;font-size:1.4rem;font-weight:500;line-height:1.25;color:var(--text);text-wrap:pretty">
+              {relatedPosts[0].title}
+            </div>
+            <div style="font-size:0.74rem;color:var(--muted);margin-top:8px">
+              {relatedPosts[0].date} · {relatedPosts[0].readTime}
+            </div>
+          </div>
+        )
+      }
+
+      <!-- Comments -->
+      <Comments client:visible postSlug={post.id} />
+
+      <!-- Related posts -->
+      {
+        relatedPosts.length > 0 && (
+          <div style="margin-top:48px;padding-top:32px;border-top:1px solid var(--divider)">
+            <div style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:20px;text-transform:uppercase">
+              more from blab bun
+            </div>
+            <div>
+              {relatedPosts.map((p) => (
+                <div class="rel-row">
+                  <a
+                    href={p.href}
+                    class="absolute inset-0 z-0"
+                    aria-label={p.title}
+                  />
+
+                  <div style="display:flex;gap:8px;align-items:center;margin-bottom:5px">
+                    <span style="font-size:0.65rem;color:var(--muted)">
+                      {p.date}
+                    </span>
+                    {p.tags.map((t) => (
+                      <span class={`rel-badge ${tagClass(t)}`}>{t}</span>
+                    ))}
+                  </div>
+
+                  <div class="rel-title">{p.title}</div>
                 </div>
-
-                <div class="rel-title">{p.title}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )
-    }
-  </main>
+        )
+      }
+    </main>
+
+    <!-- Right sidebar: newsletter -->
+    <aside class="post-sidebar post-sidebar-right">
+      <PostNewsletterSidebar client:idle />
+    </aside>
+  </div>
 
   <script
     type="application/ld+json"
@@ -259,6 +278,73 @@ const jsonLd = {
   />
 
   <style>
+    /* ─── 3-column post layout ─────────────────────────────────── */
+    .post-layout {
+      display: grid;
+      grid-template-columns: 1fr minmax(0, 680px) 1fr;
+      grid-template-rows: auto;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      align-items: start;
+      gap: 0 32px;
+    }
+
+    .post-sidebar {
+      position: sticky;
+      top: 80px;
+      padding-top: 40px;
+      padding-bottom: 24px;
+      max-width: 200px;
+    }
+
+    .post-sidebar-left {
+      justify-self: end;
+    }
+
+    .post-sidebar-right {
+      justify-self: start;
+    }
+
+    /* Below ~1100px: collapse to single column, sidebars flow below */
+    @media (max-width: 1099px) {
+      .post-layout {
+        grid-template-columns: 1fr;
+        max-width: 680px;
+        padding: 0;
+        gap: 0;
+      }
+
+      .post-sidebar {
+        position: static;
+        padding: 32px 16px 0;
+        max-width: 100%;
+        width: 100%;
+        border-top: 1px solid var(--divider);
+        margin-top: 8px;
+      }
+
+      .post-sidebar-left {
+        justify-self: stretch;
+        order: 2;
+      }
+
+      .post-sidebar-right {
+        justify-self: stretch;
+        order: 3;
+      }
+
+      main {
+        order: 1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .post-sidebar {
+        padding: 24px 16px 0;
+      }
+    }
+
     /* ─── Hero image ───────────────────────────────────────────── */
     .post-hero-img {
       max-height: 280px;
@@ -333,6 +419,5 @@ const jsonLd = {
     });
   </script>
 
-  <FloatingNewsletter client:idle postSlug={post.id} />
   <QuotePopover client:idle slug={post.id} title={post.data.title} />
 </Layout>
