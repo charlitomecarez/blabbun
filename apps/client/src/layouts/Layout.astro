@@ -237,12 +237,8 @@ const postCount = allPosts.length;
 
       // client:idle and client:visible components hydrate via requestIdleCallback,
       // adding new .reveal elements after initReveal() ran. Re-run on idle so those
-      // elements get picked up. Fallback to setTimeout for browsers without rIC.
-      if (window.requestIdleCallback) {
-        requestIdleCallback(initReveal, { timeout: 2000 });
-      } else {
-        setTimeout(initReveal, 500);
-      }
+      // elements get picked up.
+      requestIdleCallback(initReveal, { timeout: 2000 });
 
       // Re-run after each View Transitions soft navigation.
       // Keep this script as a module (no is:inline) so Astro deduplicates it.
