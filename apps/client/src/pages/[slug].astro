@@ -31,7 +31,7 @@ const post = allPosts.find((p) => p.id === slug);
 
 if (!post) return new Response(null, { status: 404 });
 
-const { Content, headings } = await render(post);
+const { Content } = await render(post);
 
 const postReadTime = readTime(post.body ?? "");
 const tags = (post.data.tags ?? ["EDITORIAL"]).map((t) => t.toUpperCase());
@@ -106,7 +106,6 @@ const jsonLd = {
     <aside class="post-sidebar post-sidebar-left">
       <PostTableOfContents
         client:idle
-        headings={headings}
         postUrl={postUrl}
         postTitle={post.data.title}
       />

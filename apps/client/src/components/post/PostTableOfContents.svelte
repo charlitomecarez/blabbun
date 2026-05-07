@@ -1,25 +1,51 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
   interface Heading {
     slug: string;
     text: string;
     depth: number;
   }
 
-  const {
-    headings,
-    postUrl,
-    postTitle,
-  }: { headings: Heading[]; postUrl: string; postTitle: string } = $props();
+  const { postUrl, postTitle }: { postUrl: string; postTitle: string } =
+    $props();
 
+  let headings = $state<Heading[]>([]);
   let activeSlug = $state("");
   let copied = $state(false);
 
-  $effect(() => {
-    if (headings.length === 0) return;
+  function slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
 
-    const elements = headings
-      .map((h) => document.getElementById(h.slug))
-      .filter(Boolean) as HTMLElement[];
+  onMount(() => {
+    const container = document.querySelector(".post-content");
+    if (!container) return;
+
+    // Scan for h2 and h3 elements — works for both markdown ## and raw <h2> HTML
+    const els = Array.from(
+      container.querySelectorAll("h2, h3")
+    ) as HTMLElement[];
+
+    // Assign IDs to headings that don't have one (raw HTML tags in MDX)
+    els.forEach((el) => {
+      if (!el.id) {
+        el.id = slugify(el.textContent ?? "");
+      }
+    });
+
+    headings = els.map((el) => ({
+      slug: el.id,
+      text: el.textContent?.trim() ?? "",
+      depth: el.tagName === "H3" ? 3 : 2,
+    }));
+
+    if (!els.length) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -33,7 +59,7 @@
       { rootMargin: "-15% 0px -70% 0px", threshold: 0 }
     );
 
-    elements.forEach((el) => observer.observe(el));
+    els.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   });
 
@@ -67,7 +93,6 @@
         </a>
       {/each}
     </nav>
-    <div class="toc-divider"></div>
   {/if}
 
   <div class="share-section">
@@ -137,6 +162,23 @@
   .toc-aside {
     display: flex;
     flex-direction: column;
+    height: calc(100vh - 220px);
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .toc-aside::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (max-width: 1099px) {
+    .toc-aside {
+      height: auto;
+    }
+
+    .share-section {
+      margin-top: 20px;
+    }
   }
 
   .toc-label {
@@ -171,19 +213,19 @@
     border-left-color: var(--accent);
   }
 
-  .toc-divider {
-    margin: 20px 0;
-    border-top: 1px solid var(--divider);
-  }
-
   .share-section {
     display: flex;
     flex-direction: column;
+    margin-top: auto;
+    padding: 16px 12px 12px;
+    /* background: var(--bg2);
+    border: 1px solid var(--border); */
+    border-radius: 4px;
   }
 
   .share-links {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     align-items: center;
   }
 
@@ -191,10 +233,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 3px;
-    background: var(--bg2);
+    background: var(--bg);
     border: 1px solid var(--border);
     color: var(--muted);
     text-decoration: none;
