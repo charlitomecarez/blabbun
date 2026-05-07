@@ -44,8 +44,12 @@
     });
   }
 
-  const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
-  const xShareUrl = `https://x.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(postTitle)}`;
+  const fbShareUrl = $derived(
+    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`
+  );
+  const xShareUrl = $derived(
+    `https://x.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(postTitle)}`
+  );
 </script>
 
 <aside class="toc-aside" aria-label="Table of contents">
