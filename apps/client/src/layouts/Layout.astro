@@ -232,10 +232,9 @@ const postCount = allPosts.length;
           .forEach((el) => observer.observe(el));
       }
 
-      // Run on first load
-      initReveal();
-
-      // Re-run after each View Transitions navigation
+      // astro:page-load fires on hard loads AND soft navigations when ClientRouter is active.
+      // Keep this script as a module (no is:inline) so Astro deduplicates it and the
+      // listener is registered only once per hard load.
       document.addEventListener("astro:page-load", initReveal);
     </script>
   </body>
