@@ -32,11 +32,12 @@
       container.querySelectorAll("h2, h3")
     ) as HTMLElement[];
 
-    // Assign IDs to headings that don't have one (raw HTML tags in MDX)
+    // Assign IDs and scroll offset (clears sticky navbar) for all headings
     els.forEach((el) => {
       if (!el.id) {
         el.id = slugify(el.textContent ?? "");
       }
+      el.style.scrollMarginTop = "72px";
     });
 
     headings = els.map((el) => ({
@@ -47,21 +48,45 @@
 
     if (!els.length) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            activeSlug = entry.target.id;
-            break;
-          }
-        }
-      },
-      { rootMargin: "-15% 0px -70% 0px", threshold: 0 }
-    );
+    const OFFSET = 76; // navbar ~52px + 24px breathing room
 
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    function updateActive() {
+      // If we're near the top, deactivate all (title item is default)
+      if (window.scrollY < 80) {
+        activeSlug = "";
+        return;
+      }
+      let current = els[0].id;
+      for (const el of els) {
+        if (el.getBoundingClientRect().top <= OFFSET) {
+          current = el.id;
+        } else {
+          break;
+        }
+      }
+      activeSlug = current;
+    }
+
+    updateActive();
+    window.addEventListener("scroll", updateActive, { passive: true });
+    return () => window.removeEventListener("scroll", updateActive);
   });
+
+  function scrollToTop(e: MouseEvent) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    history.pushState(null, "", location.pathname);
+    activeSlug = "";
+  }
+
+  function scrollToHeading(e: MouseEvent, slug: string) {
+    e.preventDefault();
+    const el = document.getElementById(slug);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    history.pushState(null, "", `#${slug}`);
+    activeSlug = slug;
+  }
 
   function copyLink() {
     navigator.clipboard.writeText(postUrl).then(() => {
@@ -79,21 +104,31 @@
 </script>
 
 <aside class="toc-aside" aria-label="Table of contents">
-  {#if headings.length > 0}
-    <div class="toc-label">on this page</div>
-    <nav>
+  <div class="toc-label">on this page</div>
+  <nav>
+    <a
+      href="#"
+      class="toc-link toc-title"
+      class:toc-active={activeSlug === ""}
+      onclick={scrollToTop}
+    >
+      {postTitle}
+    </a>
+
+    {#if headings.length > 0}
       {#each headings as h}
         <a
           href={`#${h.slug}`}
           class="toc-link"
           class:toc-active={activeSlug === h.slug}
-          style={h.depth >= 3 ? "padding-left: 18px;" : ""}
+          style={h.depth >= 3 ? "padding-left: 20px;" : ""}
+          onclick={(e) => scrollToHeading(e, h.slug)}
         >
           {h.text}
         </a>
       {/each}
-    </nav>
-  {/if}
+    {/if}
+  </nav>
 
   <div class="share-section">
     <div class="toc-label">share</div>
@@ -196,21 +231,38 @@
     line-height: 1.55;
     color: var(--muted);
     text-decoration: none;
-    padding: 2px 0 2px 8px;
+    padding: 3px 6px 3px 8px;
     border-left: 2px solid transparent;
+    border-radius: 0 3px 3px 0;
     transition:
-      color 0.15s,
-      border-color 0.15s;
+      color 0.2s,
+      border-color 0.2s,
+      background 0.2s;
     font-family: inherit;
+  }
+
+  .toc-title {
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
   }
 
   .toc-link:hover {
     color: var(--text);
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
   }
 
   .toc-active {
     color: var(--accent);
     border-left-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    font-weight: 500;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .toc-link {
+      transition: none;
+    }
   }
 
   .share-section {
