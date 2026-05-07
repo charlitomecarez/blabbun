@@ -3,7 +3,6 @@ import "@blabbun/ui/styles/global.css";
 
 import { Footer, Navbar } from "@blabbun/ui/components/layouts";
 import { getCollection } from "astro:content";
-import { ClientRouter } from "astro:transitions";
 
 import ScrollToTop from "@/components/layouts/ScrollToTop.svelte";
 import SearchDropdown from "@/components/search/SearchDropdown.svelte";
@@ -198,7 +197,6 @@ const postCount = allPosts.length;
       content="#16120e"
       media="(prefers-color-scheme: dark)"
     />
-    <ClientRouter />
   </head>
   <body
     class="dark"
@@ -210,7 +208,7 @@ const postCount = allPosts.length;
     <Navbar client:load links={navLinks} postCount={postCount} />
     <SearchDropdown client:idle />
     <ScrollToTop client:idle />
-    <div style="flex:1" transition:name="main-content">
+    <div style="flex:1">
       <slot />
     </div>
     <Footer wordCount={totalWords} />
