@@ -212,11 +212,11 @@ const postCount = allPosts.length;
       <slot />
     </div>
     <Footer wordCount={totalWords} />
-    <script>
+    <script is:inline>
       function initReveal() {
         const io = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
+          function (entries) {
+            entries.forEach(function (entry) {
               if (entry.isIntersecting) {
                 entry.target.classList.add("visible");
                 io.unobserve(entry.target);
@@ -227,20 +227,17 @@ const postCount = allPosts.length;
         );
         document
           .querySelectorAll(".reveal:not(.visible)")
-          .forEach((el) => io.observe(el));
+          .forEach(function (el) {
+            io.observe(el);
+          });
       }
 
-      // Run immediately for SSR'd elements already in the DOM.
+      // Run immediately for SSR'd elements.
       initReveal();
 
-      // client:idle and client:visible components hydrate via requestIdleCallback,
-      // adding new .reveal elements after initReveal() ran. Re-run on idle so those
-      // elements get picked up.
+      // client:idle / client:visible components hydrate via requestIdleCallback —
+      // re-run once idle to pick up elements added after initial render.
       requestIdleCallback(initReveal, { timeout: 2000 });
-
-      // Re-run after each View Transitions soft navigation.
-      // Keep this script as a module (no is:inline) so Astro deduplicates it.
-      document.addEventListener("astro:page-load", initReveal);
     </script>
   </body>
 </html>
