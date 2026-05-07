@@ -121,6 +121,7 @@ test.describe("QuotePopover", () => {
       range.setEnd(el.firstChild!, 5);
       window.getSelection()!.removeAllRanges();
       window.getSelection()!.addRange(range);
+      document.dispatchEvent(new Event("selectionchange"));
     });
     await expect(page.getByTestId("quote-popover")).not.toBeVisible();
   });

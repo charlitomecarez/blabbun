@@ -83,7 +83,14 @@
 
   function saveQuote() {
     const raw = localStorage.getItem("bb-quotes");
-    const quotes: SavedQuote[] = raw ? (JSON.parse(raw) as SavedQuote[]) : [];
+    let quotes: SavedQuote[] = [];
+    if (raw) {
+      try {
+        quotes = JSON.parse(raw) as SavedQuote[];
+      } catch {
+        quotes = [];
+      }
+    }
     quotes.push({
       text: selectedText,
       slug,
@@ -95,6 +102,8 @@
     localStorage.setItem("bb-quotes", JSON.stringify(quotes));
     saveLabel = "✓ saved!";
     setTimeout(() => (saveLabel = "💬 save quote"), 1500);
+    visible = false;
+    window.getSelection()?.removeAllRanges();
   }
 
   async function shareQuote() {
@@ -103,6 +112,8 @@
       await navigator.clipboard.writeText(shareText);
       shareLabel = "✓ copied!";
       setTimeout(() => (shareLabel = "✦ share"), 1500);
+      visible = false;
+      window.getSelection()?.removeAllRanges();
     } catch {
       // Clipboard API not available — silently skip
     }
