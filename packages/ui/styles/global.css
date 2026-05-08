@@ -179,18 +179,12 @@ body.dark::before {
   }
 }
 
-html.js .reveal {
-  opacity: 0;
-}
-
 .reveal.visible {
   animation: fadeSlideUp 0.5s ease-out var(--reveal-delay, 0s) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal,
   .reveal.visible {
-    opacity: 1;
     animation: none;
   }
 }
