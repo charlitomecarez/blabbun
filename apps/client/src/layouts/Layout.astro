@@ -79,7 +79,6 @@ const postCount = allPosts.length;
     <!-- Prevent theme flash: set body class before paint -->
     <script is:inline>
       (function () {
-        document.documentElement.classList.add("js");
         const t = localStorage.getItem("bb-theme") || "dark";
         document.documentElement.setAttribute("data-theme-loading", t);
       })();
