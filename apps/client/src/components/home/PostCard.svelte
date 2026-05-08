@@ -58,8 +58,9 @@
 </script>
 
 <article
-  style="transform: {articleTransform};"
-  class="post-card"
+  style="transform: {articleTransform}; --reveal-delay: {Math.min(index, 4) *
+    0.05}s"
+  class="post-card reveal"
   class:hov
   class:first-post={isFirstPost}
   onmouseenter={() => (hov = true)}

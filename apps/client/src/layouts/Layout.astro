@@ -211,5 +211,44 @@ const postCount = allPosts.length;
       <slot />
     </div>
     <Footer wordCount={totalWords} />
+    <script is:inline>
+      function initReveal() {
+        const io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.style.opacity = "";
+                entry.target.style.translate = "";
+                entry.target.classList.add("visible");
+                io.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.15 }
+        );
+
+        document
+          .querySelectorAll(".reveal:not(.visible)")
+          .forEach(function (el) {
+            const top = el.getBoundingClientRect().top;
+            if (top >= window.innerHeight) {
+              // Below fold — hide via inline style and observe for scroll reveal.
+              // Inline style (not CSS class) avoids breaking Svelte re-renders.
+              el.style.opacity = "0";
+              el.style.translate = "0 16px";
+              io.observe(el);
+            } else {
+              // In or above the viewport — show immediately.
+              el.classList.add("visible");
+            }
+          });
+      }
+
+      initReveal();
+
+      // client:idle / client:visible components hydrate via requestIdleCallback —
+      // re-run once idle to pick up elements added after initial render.
+      requestIdleCallback(initReveal, { timeout: 2000 });
+    </script>
   </body>
 </html>

@@ -10,27 +10,46 @@
   ];
 
   onMount(() => {
-    const h2s = Array.from(
-      document.querySelectorAll(".post-content h2")
-    ) as HTMLElement[];
-    if (!h2s.length) return;
+    const container = document.querySelector(".post-content");
+    if (!container) return;
 
+    const h2s = Array.from(container.querySelectorAll("h2")) as HTMLElement[];
     const injected: HTMLElement[] = [];
 
-    h2s.forEach((h2, i) => {
+    function makeDivider(i: number): HTMLElement {
       const div = document.createElement("div");
       div.className = "checkpoint-divider";
       div.setAttribute("aria-hidden", "true");
       div.setAttribute("data-testid", "checkpoint-divider");
-
       const msg = document.createElement("span");
       msg.className = "checkpoint-message";
       msg.textContent = MESSAGES[i % MESSAGES.length];
       div.appendChild(msg);
+      return div;
+    }
 
-      h2.parentElement?.insertBefore(div, h2);
-      injected.push(div);
-    });
+    if (h2s.length > 0) {
+      // Inject before each h2 heading
+      h2s.forEach((h2, i) => {
+        const div = makeDivider(i);
+        h2.parentElement?.insertBefore(div, h2);
+        injected.push(div);
+      });
+    } else {
+      // No headings: inject after every 4th paragraph
+      const paras = Array.from(
+        container.querySelectorAll("p")
+      ) as HTMLElement[];
+      paras.forEach((p, i) => {
+        if ((i + 1) % 4 === 0) {
+          const div = makeDivider(Math.floor(i / 4));
+          p.parentElement?.insertBefore(div, p.nextSibling);
+          injected.push(div);
+        }
+      });
+    }
+
+    if (!injected.length) return;
 
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
