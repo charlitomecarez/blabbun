@@ -97,7 +97,7 @@
   }
 </script>
 
-<aside aria-label="Newsletter signup" class="newsletter-wrap">
+<aside aria-label="Newsletter signup" class="newsletter-wrap reveal">
   <!-- Tape strip -->
   <div class="tape" style="top:-9px; left:40%; transform:rotate(-3deg);"></div>
 
