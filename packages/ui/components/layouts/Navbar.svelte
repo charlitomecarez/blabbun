@@ -131,6 +131,7 @@
     <!-- Logo -->
     <a
       href="/"
+      class="logo-link"
       style="
         background:none;border:none;cursor:pointer;padding:0;
         font-family:inherit;
@@ -144,9 +145,11 @@
         width="28"
         height="28"
         fetchpriority="high"
+        class="logo-img"
         style="width:28px;height:28px;object-fit:contain;flex-shrink:0"
       />
       <span
+        class="logo-text"
         style="font-size:0.95rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)"
       >
         blab bun<span style="color:var(--accent)">.</span>
@@ -158,7 +161,7 @@
       {#each links as link}
         <a
           href={link.href}
-          class={link.active ? "scribble-underline" : ""}
+          class="nav-link {link.active ? 'nav-link--active' : ''}"
           style="
             background:none;border:none;font-size:0.74rem;
             font-family:inherit;cursor:pointer;letter-spacing:0.03em;
@@ -178,11 +181,8 @@
       class="hidden md:flex"
     >
       <!-- Inline search bar -->
-      <div style="position:relative;flex:1;max-width:240px">
-        <span
-          style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.85rem;pointer-events:none"
-          >⌕</span
-        >
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
         <input
           value={search}
           oninput={handleDesktopSearch}
@@ -190,34 +190,15 @@
           placeholder="search..."
           type="search"
           aria-label="Search posts"
-          style="
-            width:100%;background:var(--input-bg);
-            border:1px solid var(--border);border-radius:3px;
-            padding:6px 28px 6px 28px;font-size:0.74rem;
-            font-family:inherit;color:var(--text);outline:none;
-          "
+          class="search-input"
         />
         {#if !search}
-          <span
-            style="position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:0.6rem;color:var(--muted2);pointer-events:none"
-            >/</span
-          >
+          <span class="kbd-hint">/</span>
         {/if}
       </div>
 
       <!-- Saved / bookmarks -->
-      <a
-        href="/saved"
-        title="saved posts"
-        style="
-          background:none;border:1px solid var(--border);border-radius:3px;
-          padding:5px 8px;font-size:0.72rem;cursor:pointer;
-          color:var(--muted);
-          display:flex;align-items:center;gap:4px;
-          text-decoration:none;white-space:nowrap;position:relative;
-          font-family:inherit;
-        "
-      >
+      <a href="/saved" title="saved posts" class="saved-btn">
         <svg
           width="13"
           height="13"
@@ -247,13 +228,9 @@
       <button
         onclick={toggleTheme}
         aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-        style="
-          background:none;border:1px solid var(--border);border-radius:3px;
-          padding:5px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;
-          font-family:inherit;letter-spacing:0.04em;white-space:nowrap;
-        "
+        class="theme-btn"
       >
-        {isDark ? "☀" : "◑"}
+        {isDark ? "☀ light mode" : "◑ dark mode"}
       </button>
     </div>
 
@@ -265,11 +242,8 @@
       <button
         onclick={toggleTheme}
         aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-        style="
-          background:none;border:1px solid var(--border);border-radius:3px;
-          padding:5px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;
-          font-family:inherit;
-        "
+        class="theme-btn"
+        style="font-size:0.82rem"
       >
         {isDark ? "☀" : "◑"}
       </button>
@@ -405,3 +379,157 @@
     </div>
   {/if}
 </header>
+
+<style>
+  /* ── Logo ── */
+  .logo-link .logo-img {
+    transition: transform 0.2s ease;
+    transform-origin: center bottom;
+  }
+  .logo-link:hover .logo-img {
+    transform: rotate(8deg) scale(1.08);
+  }
+  .logo-link .logo-text {
+    transition: color 0.15s;
+  }
+  .logo-link:hover .logo-text {
+    color: var(--accent);
+  }
+
+  /* ── Nav links ── */
+  .nav-link {
+    position: relative;
+    padding-bottom: 3px;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6' preserveAspectRatio='none'><path d='M0 4 Q 12 1, 25 4 T 50 4 T 75 4 T 100 4' stroke='%23C4832A' stroke-width='2' fill='none' stroke-linecap='round'/></svg>")
+      no-repeat;
+    background-size: 100% 100%;
+    opacity: 0;
+    transform: scaleX(0.6);
+    transform-origin: left;
+    transition:
+      opacity 0.2s ease,
+      transform 0.22s ease;
+  }
+  .nav-link:hover::after,
+  .nav-link.nav-link--active::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  /* dark mode — warmer amber stroke */
+  :global(body.dark) .nav-link::after {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6' preserveAspectRatio='none'><path d='M0 4 Q 12 1, 25 4 T 50 4 T 75 4 T 100 4' stroke='%23D4A040' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+  }
+
+  /* ── Search ── */
+  .search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-wrap .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 0.85rem;
+    pointer-events: none;
+    transition: color 0.15s;
+  }
+  .search-wrap:focus-within .search-icon {
+    color: var(--accent);
+  }
+  .search-input {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 28px 5px 28px;
+    font-size: 0.74rem;
+    font-family: inherit;
+    color: var(--text);
+    width: 160px;
+    outline: none;
+    transition:
+      width 0.25s ease,
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  .search-input:focus {
+    width: 220px;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .search-input::placeholder {
+    color: var(--muted2);
+  }
+  .kbd-hint {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.58rem;
+    color: var(--muted2);
+    pointer-events: none;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0 4px;
+    line-height: 1.6;
+    transition: opacity 0.15s;
+  }
+  .search-wrap:focus-within .kbd-hint {
+    opacity: 0;
+  }
+
+  /* ── Saved button ── */
+  .saved-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 0.68rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    white-space: nowrap;
+    font-family: inherit;
+    transition:
+      border-color 0.15s,
+      color 0.15s;
+  }
+  .saved-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── Theme toggle ── */
+  .theme-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-family: "Caveat", cursive;
+    font-size: 0.92rem;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    transition:
+      border-color 0.15s,
+      color 0.15s;
+  }
+  .theme-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+</style>

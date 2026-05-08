@@ -21,7 +21,7 @@
   Hover: image desaturation lifts + scales, arrow turns green.
   No client: directive needed — hover effects are pure CSS.
 -->
-<a {href} class="group flex flex-col items-start">
+<a {href} class="group reveal flex flex-col items-start">
   <!-- Image — grayscale lifts on hover -->
   <div class="w-full pb-8">
     <div class="overflow-hidden bg-[#e7e5e4]">
