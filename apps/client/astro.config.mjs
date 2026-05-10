@@ -6,6 +6,7 @@ import { defineConfig } from "astro/config";
 
 export default defineConfig({
   site: "https://blabbun.com",
+  trailingSlash: "never",
 
   output: "static",
   adapter: cloudflare(),
