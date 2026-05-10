@@ -280,7 +280,7 @@
     font-size: 0.86rem;
     font-weight: 500;
     line-height: 1.45;
-    color: var(--text);
+    color: var(--muted);
     transition: color 0.15s;
     text-wrap: pretty;
     position: relative;
