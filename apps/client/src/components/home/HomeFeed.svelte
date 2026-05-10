@@ -13,6 +13,7 @@
     href: string;
     claps?: number;
     commentCount?: number;
+    postNumber?: number;
   }
 
   interface Props {

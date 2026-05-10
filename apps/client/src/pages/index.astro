@@ -28,7 +28,8 @@ const stats = await fetchPostStats(
   supabase
 );
 
-const feedItems = posts.map((post) => ({
+const feedItems = posts.map((post, i) => ({
+  postNumber: posts.length - i,
   date: post.data.pubDate.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",

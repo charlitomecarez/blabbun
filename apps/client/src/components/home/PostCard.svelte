@@ -13,6 +13,7 @@
     claps?: number;
     commentCount?: number;
     index?: number;
+    postNumber?: number;
   }
 
   const {
@@ -26,6 +27,7 @@
     claps = 0,
     commentCount = 0,
     index = 0,
+    postNumber,
   }: Props = $props();
 
   let hov = $state(false);
@@ -68,6 +70,13 @@
 >
   <!-- "this one →" hover callout — always in DOM, shown via CSS -->
   <span class="handwritten this-one" aria-hidden="true">this one →</span>
+
+  <!-- post number stamp — hidden when first-stamp takes the slot -->
+  {#if !isFirstPost}
+    <span class="handwritten post-num" aria-hidden="true"
+      >#{postNumber ?? index + 1}</span
+    >
+  {/if}
 
   <!-- "first post!" stamp — only on the welcome post -->
   {#if isFirstPost}
@@ -320,6 +329,28 @@
   .stat {
     font-size: 0.65rem;
     color: var(--muted2);
+  }
+
+  /* ─── Post number stamp ──────────────────────────────────────── */
+  .post-num {
+    position: absolute;
+    top: 14px;
+    right: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px dashed var(--accent);
+    background: var(--accent-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    color: var(--accent);
+    transform: rotate(-5deg);
+    pointer-events: none;
+    z-index: 5;
+    line-height: 1;
+    letter-spacing: 0;
   }
 
   /* ─── Mobile ──────────────────────────────────────────────────── */
