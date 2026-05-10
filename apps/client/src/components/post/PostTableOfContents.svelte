@@ -88,6 +88,13 @@
     activeSlug = slug;
   }
 
+  function scrollToMorePosts(e: MouseEvent) {
+    e.preventDefault();
+    const el = document.getElementById("more-posts");
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   function copyLink() {
     navigator.clipboard.writeText(postUrl).then(() => {
       copied = true;
@@ -128,6 +135,10 @@
         </a>
       {/each}
     {/if}
+
+    <a href="#more-posts" class="toc-link toc-more" onclick={scrollToMorePosts}>
+      see more posts →
+    </a>
   </nav>
 
   <div class="share-section">
@@ -250,6 +261,20 @@
   .toc-link:hover {
     color: var(--text);
     background: color-mix(in srgb, var(--accent) 6%, transparent);
+  }
+
+  .toc-more {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    color: var(--accent);
+    font-family: "Caveat", cursive;
+    font-size: 0.85rem;
+  }
+
+  .toc-more:hover {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
   }
 
   .toc-active {
