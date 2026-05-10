@@ -180,8 +180,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
+    gap: 5px;
+    padding: 6px 10px;
     border-radius: 3px;
     background: var(--bg);
     border: 1px solid var(--border);
@@ -189,6 +189,7 @@
     font-size: 0.7rem;
     font-family: inherit;
     cursor: pointer;
+    width: fit-content;
     transition:
       color 0.15s,
       border-color 0.15s,
