@@ -56,12 +56,59 @@ const allTags = [
   description={`Browse all ${allPosts.length} posts on blabbun — unfiltered thoughts, essays, and half-baked ideas.`}
 >
   <main
-    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-8"
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-10"
   >
-    <h1 style="font-size:1.05rem;font-weight:600;margin-bottom:22px">
-      all posts
-    </h1>
+    <div style="animation:fadeIn 0.2s ease">
+      <!-- back -->
+      <a
+        href="/"
+        style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
+               text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
+      >
+        ← back to the blabs
+      </a>
 
-    <ArchiveList posts={postItems} tags={allTags} client:load />
+      <!-- title row -->
+      <div
+        style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px"
+      >
+        <h1
+          style="font-family:'Fraunces',serif;font-size:2.4rem;font-weight:600;letter-spacing:-0.02em"
+        >
+          all posts
+        </h1>
+        <span
+          style="font-family:'Caveat',cursive;font-size:1.2rem;color:var(--accent);
+                     transform:rotate(-3deg);display:inline-block"
+        >
+          {allPosts.length} blabs &amp; counting
+        </span>
+      </div>
+
+      <!-- scribble underline -->
+      <svg
+        width="180"
+        height="14"
+        viewBox="0 0 180 14"
+        style="margin-bottom:28px;display:block"
+      >
+        <path
+          d="M2 8 Q 30 2, 60 8 T 120 8 T 178 7"
+          stroke="var(--accent)"
+          stroke-width="2"
+          fill="none"
+          stroke-linecap="round"></path>
+      </svg>
+
+      <ArchiveList posts={postItems} tags={allTags} client:load />
+    </div>
   </main>
+
+  <style>
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.75rem !important;
+      }
+    }
+  </style>
 </Layout>

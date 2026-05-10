@@ -65,7 +65,7 @@ const stats = [
     manage
   </div>
   <div
-    style="display:flex;flex-direction:column;gap:1px;border:1px solid var(--border);border-radius:4px;overflow:hidden"
+    style="display:flex;flex-direction:column;gap:1px;border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:40px"
   >
     {
       [
@@ -90,4 +90,87 @@ const stats = [
       ))
     }
   </div>
+
+  <!-- Danger zone -->
+  <div
+    style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px"
+  >
+    danger zone
+  </div>
+  <div
+    style="border:1px solid #e05c5c;border-radius:4px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap"
+  >
+    <div>
+      <div
+        style="font-size:0.82rem;font-weight:500;color:var(--text);margin-bottom:4px"
+      >
+        purge all test data
+      </div>
+      <div style="font-size:0.72rem;color:var(--muted);line-height:1.6">
+        deletes every subscriber, comment, clap vote, and post clap.
+        irreversible.
+      </div>
+    </div>
+    <button
+      id="purge-btn"
+      style="
+        background:none;border:1px solid #e05c5c;border-radius:3px;
+        padding:8px 18px;font-size:0.76rem;font-family:inherit;
+        color:#e05c5c;cursor:pointer;white-space:nowrap;
+        transition:background 0.15s,color 0.15s;flex-shrink:0;
+      "
+      onmouseenter="this.style.background='#e05c5c';this.style.color='#fff'"
+      onmouseleave="this.style.background='none';this.style.color='#e05c5c'"
+    >
+      purge test data
+    </button>
+  </div>
+
+  <div id="purge-status" style="margin-top:10px;font-size:0.74rem;display:none">
+  </div>
 </Layout>
+
+<script is:inline>
+  document
+    .getElementById("purge-btn")
+    ?.addEventListener("click", async function () {
+      const confirmed = window.confirm(
+        "This will permanently delete ALL subscribers, comments, claps, and clap votes.\n\nContinue?"
+      );
+      if (!confirmed) return;
+
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const btn = this;
+      const status = document.getElementById("purge-status");
+
+      btn.disabled = true;
+      btn.textContent = "purging…";
+      if (status) {
+        status.style.display = "none";
+        status.textContent = "";
+      }
+
+      try {
+        const res = await fetch("/api/purge-test-data", { method: "DELETE" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? "something went wrong");
+
+        if (status) {
+          status.textContent =
+            "✓ all test data purged. reload to see updated counts.";
+          status.style.color = "var(--accent3)";
+          status.style.display = "block";
+        }
+        btn.textContent = "done";
+      } catch (err) {
+        if (status) {
+          status.textContent =
+            "✗ " + (err instanceof Error ? err.message : "failed");
+          status.style.color = "#e05c5c";
+          status.style.display = "block";
+        }
+        btn.disabled = false;
+        btn.textContent = "purge test data";
+      }
+    });
+</script>
