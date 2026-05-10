@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
   const RATE_LIMIT_MS = 10 * 60 * 1000;
   const STORAGE_KEY = "bb-newsletter-last";
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -9,6 +11,14 @@
   let submitting = $state(false);
   let cooldownMs = $state(0);
   let done = $state(false);
+  let scrollVisible = $state(false);
+
+  onMount(() => {
+    const onScroll = () => (scrollVisible = window.scrollY > 300);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  });
 
   $effect(() => {
     tick();
@@ -124,6 +134,19 @@
       </button>
     </form>
   {/if}
+
+  <div class="scroll-section">
+    <div class="nl-label">scroll</div>
+    <button
+      type="button"
+      onclick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      aria-label="Scroll to top"
+      class="scroll-btn"
+      class:scroll-visible={scrollVisible}
+    >
+      ↑ top
+    </button>
+  </div>
 </aside>
 
 <style>
@@ -131,6 +154,63 @@
     display: flex;
     flex-direction: column;
     gap: 0;
+    height: calc(100vh - 220px);
+  }
+
+  @media (max-width: 1099px) {
+    .nl-aside {
+      height: auto;
+    }
+  }
+
+  .scroll-section {
+    display: none;
+    margin-top: auto;
+    padding: 16px 0 12px;
+  }
+
+  @media (min-width: 1100px) {
+    .scroll-section {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .scroll-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 3px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition:
+      color 0.15s,
+      border-color 0.15s,
+      opacity 0.2s;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .scroll-btn.scroll-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .scroll-btn:hover {
+    color: var(--text);
+    border-color: var(--muted);
+  }
+
+  .scroll-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
   }
 
   .nl-label {
