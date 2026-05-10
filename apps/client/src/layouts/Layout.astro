@@ -23,9 +23,13 @@ const {
 
 const siteTitle = "Blab Bun";
 const pageTitle = rawTitle ? `${rawTitle} · ${siteTitle}` : siteTitle;
-const canonicalUrl = Astro.url.href;
 const siteUrl =
   Astro.site?.toString().replace(/\/$/, "") ?? "https://blabbun.com";
+// Strip query params and trailing slashes so every variant of a URL
+// points to the same canonical. Guarantees https:// via siteUrl.
+const normalizedPath =
+  Astro.url.pathname === "/" ? "/" : Astro.url.pathname.replace(/\/$/, "");
+const canonicalUrl = siteUrl + normalizedPath;
 
 const { pathname } = Astro.url;
 // Nav matches design exactly: "home" | "all posts"

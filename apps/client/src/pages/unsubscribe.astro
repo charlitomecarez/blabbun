@@ -44,72 +44,138 @@ const validLink =
 
 <Layout title="unsubscribe" description="Manage your subscription to blab bun.">
   <main
-    class="mx-auto flex min-h-[60vh] w-full max-w-[680px] flex-1 flex-col justify-center px-8"
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-10"
   >
-    <div class="animate-[fadeIn_0.2s_ease]">
+    <div style="animation:fadeIn 0.2s ease">
       {
         done ? (
           <>
-            <div class="mb-4 text-[0.68rem] tracking-[0.06em] text-[var(--muted)] uppercase">
-              unsubscribed
+            <a
+              href="/"
+              style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
+                     text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
+            >
+              ← back to the blabs
+            </a>
+
+            <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px">
+              <h1 style="font-family:'Fraunces',serif;font-size:2.4rem;font-weight:600;letter-spacing:-0.02em">
+                you're out.
+              </h1>
+              <span
+                style="font-family:'Caveat',cursive;font-size:1.2rem;color:var(--accent);
+                           transform:rotate(-3deg);display:inline-block"
+              >
+                all good ✶
+              </span>
             </div>
 
-            <h1 class="mb-3 text-[1.2rem] leading-[1.4] font-semibold text-[var(--text)]">
-              you're out.
-            </h1>
+            <svg
+              width="140"
+              height="14"
+              viewBox="0 0 140 14"
+              style="margin-bottom:28px;display:block"
+            >
+              <path
+                d="M2 8 Q 24 2, 48 8 T 96 8 T 138 7"
+                stroke="var(--accent)"
+                stroke-width="2"
+                fill="none"
+                stroke-linecap="round"
+              />
+            </svg>
 
-            <p class="mb-8 max-w-[440px] text-[0.84rem] leading-[1.8] text-pretty text-[var(--muted)]">
+            <p style="font-size:0.88rem;color:var(--muted);line-height:1.85;max-width:440px;margin-bottom:32px">
               you won't hear from blab bun again. no confirmation emails, no
               "we'll miss you" sequence. just silence.
             </p>
 
             <a
               href="/"
-              class="inline-block rounded-[3px] border border-[var(--accent)] px-[14px] py-[7px] text-[0.78rem] text-[var(--accent)] no-underline transition-colors hover:bg-[var(--accent-soft)]"
+              style="display:inline-block;border:1.5px solid var(--accent);
+                     padding:7px 18px;border-radius:3px;font-size:0.78rem;
+                     color:var(--accent);text-decoration:none;
+                     transition:background 0.15s"
+              onmouseenter="this.style.background='var(--accent-soft)'"
+              onmouseleave="this.style.background='transparent'"
             >
               ← go home
             </a>
           </>
         ) : validLink ? (
           <>
-            <div class="mb-4 text-[0.68rem] tracking-[0.06em] text-[var(--muted)] uppercase">
-              unsubscribe
+            <a
+              href="/"
+              style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
+                     text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
+            >
+              ← back to the blabs
+            </a>
+
+            <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px">
+              <h1 style="font-family:'Fraunces',serif;font-size:2.4rem;font-weight:600;letter-spacing:-0.02em">
+                leave the list?
+              </h1>
+              <span
+                style="font-family:'Caveat',cursive;font-size:1.2rem;color:var(--accent);
+                           transform:rotate(-3deg);display:inline-block"
+              >
+                no hard feelings
+              </span>
             </div>
 
-            <h1 class="mb-3 text-[1.2rem] leading-[1.4] font-semibold text-[var(--text)]">
-              leave the list?
-            </h1>
+            <svg
+              width="200"
+              height="14"
+              viewBox="0 0 200 14"
+              style="margin-bottom:28px;display:block"
+            >
+              <path
+                d="M2 8 Q 34 2, 68 8 T 136 8 T 198 7"
+                stroke="var(--accent)"
+                stroke-width="2"
+                fill="none"
+                stroke-linecap="round"
+              />
+            </svg>
 
-            <p class="mb-2 max-w-[440px] text-[0.84rem] leading-[1.8] text-pretty text-[var(--muted)]">
+            <p style="font-size:0.88rem;color:var(--muted);line-height:1.85;max-width:440px;margin-bottom:10px">
               this will remove{" "}
-              <strong class="font-medium text-[var(--text)]">{email}</strong>{" "}
+              <strong style="font-weight:500;color:var(--text)">{email}</strong>{" "}
               from the blab bun mailing list.
             </p>
-
-            <p class="mb-8 max-w-[440px] text-[0.84rem] leading-[1.8] text-pretty text-[var(--muted)]">
-              no hard feelings. you can always resubscribe from the homepage.
+            <p style="font-size:0.88rem;color:var(--muted);line-height:1.85;max-width:440px;margin-bottom:28px">
+              you can always resubscribe from the homepage.
             </p>
 
             {formError && (
-              <p class="mb-5 text-[0.78rem] leading-[1.6] text-red-600">
+              <p style="font-size:0.78rem;color:var(--accent2);line-height:1.6;margin-bottom:20px">
                 {formError}
               </p>
             )}
 
-            <form class="flex flex-wrap gap-3" method="POST">
+            <form style="display:flex;flex-wrap:wrap;gap:12px" method="POST">
               <input type="hidden" name="email" value={email} />
               <input type="hidden" name="token" value={token} />
 
               <button
                 type="submit"
-                class="font-inherit cursor-pointer rounded-[3px] border-none bg-[#c4832a] px-[18px] py-[8px] text-[0.78rem] text-white transition-opacity hover:opacity-80"
+                style="background:var(--accent);border:none;border-radius:3px;
+                       padding:8px 20px;font-size:0.78rem;font-family:inherit;
+                       color:#fff;cursor:pointer;transition:opacity 0.15s;letter-spacing:0.02em"
+                onmouseenter="this.style.opacity='0.85'"
+                onmouseleave="this.style.opacity='1'"
               >
                 yes, unsubscribe me
               </button>
 
               <a
                 href="/"
-                class="rounded-[3px] border border-[var(--border)] px-[14px] py-[7px] text-[0.78rem] text-[var(--muted)] no-underline transition-colors hover:bg-[var(--bg2)]"
+                style="display:inline-flex;align-items:center;border:1px solid var(--border);
+                       border-radius:3px;padding:8px 16px;font-size:0.78rem;
+                       color:var(--muted);text-decoration:none;transition:background 0.15s"
+                onmouseenter="this.style.background='var(--bg2)'"
+                onmouseleave="this.style.background='transparent'"
               >
                 never mind
               </a>
@@ -117,22 +183,55 @@ const validLink =
           </>
         ) : (
           <>
-            <div class="mb-4 text-[0.68rem] tracking-[0.06em] text-[var(--muted)] uppercase">
-              invalid link
+            <a
+              href="/"
+              style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
+                     text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
+            >
+              ← back to the blabs
+            </a>
+
+            <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px">
+              <h1 style="font-family:'Fraunces',serif;font-size:2.4rem;font-weight:600;letter-spacing:-0.02em">
+                broken link.
+              </h1>
+              <span
+                style="font-family:'Caveat',cursive;font-size:1.2rem;color:var(--accent);
+                           transform:rotate(-3deg);display:inline-block"
+              >
+                hm.
+              </span>
             </div>
 
-            <h1 class="mb-3 text-[1.2rem] leading-[1.4] font-semibold text-[var(--text)]">
-              this link doesn't work.
-            </h1>
+            <svg
+              width="120"
+              height="14"
+              viewBox="0 0 120 14"
+              style="margin-bottom:28px;display:block"
+            >
+              <path
+                d="M2 8 Q 20 2, 40 8 T 80 8 T 118 7"
+                stroke="var(--accent)"
+                stroke-width="2"
+                fill="none"
+                stroke-linecap="round"
+              />
+            </svg>
 
-            <p class="mb-8 max-w-[440px] text-[0.84rem] leading-[1.8] text-pretty text-[var(--muted)]">
-              it's either expired, malformed, or you got here by accident. try
-              clicking the unsubscribe link directly from the email.
+            <p style="font-size:0.88rem;color:var(--muted);line-height:1.85;max-width:440px;margin-bottom:32px">
+              this link is either expired, malformed, or you got here by
+              accident. try clicking the unsubscribe link directly from the
+              email.
             </p>
 
             <a
               href="/"
-              class="inline-block rounded-[3px] border border-[var(--accent)] px-[14px] py-[7px] text-[0.78rem] text-[var(--accent)] no-underline transition-colors hover:bg-[var(--accent-soft)]"
+              style="display:inline-block;border:1.5px solid var(--accent);
+                     padding:7px 18px;border-radius:3px;font-size:0.78rem;
+                     color:var(--accent);text-decoration:none;
+                     transition:background 0.15s"
+              onmouseenter="this.style.background='var(--accent-soft)'"
+              onmouseleave="this.style.background='transparent'"
             >
               ← go home
             </a>
@@ -141,4 +240,12 @@ const validLink =
       }
     </div>
   </main>
+
+  <style>
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.75rem !important;
+      }
+    }
+  </style>
 </Layout>
