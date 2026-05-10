@@ -210,7 +210,7 @@
   }
 
   .polaroid-frame {
-    background: #fff;
+    background: var(--bg3);
     padding: 8px 8px 22px;
     box-shadow: 4px 4px 0 var(--text);
     border: 1.5px solid var(--text);
