@@ -25,23 +25,52 @@
 
   let activeTag = $state("all");
   let visibleCount = $state(10);
+  let sort = $state<"newest" | "oldest">("newest");
 
   const filtered = $derived(
-    activeTag === "all"
+    (activeTag === "all"
       ? feedItems
       : feedItems.filter((item) => item.tags.includes(activeTag))
+    )
+      .slice()
+      .sort((a, b) =>
+        sort === "oldest"
+          ? (a.postNumber ?? 0) - (b.postNumber ?? 0)
+          : (b.postNumber ?? 0) - (a.postNumber ?? 0)
+      )
   );
 
-  const zineQuote = $derived(feedItems.length > 3 ? feedItems[3] : null);
+  const zineQuote = $derived(
+    sort === "newest" && feedItems.length > 3 ? feedItems[3] : null
+  );
 
   const visible = $derived(filtered.slice(0, visibleCount));
   const hasMore = $derived(visibleCount < filtered.length);
 
   $effect(() => {
-    activeTag; // track — reset count when filter changes
+    activeTag;
+    sort; // track — reset count when filter or sort changes
     visibleCount = 10;
   });
 </script>
+
+<!-- Sort toggle -->
+<div style="position:relative; margin-bottom:8px; margin-top:8px;">
+  <span
+    class="handwritten"
+    style="position:absolute; top:-14px; right:12px; background:var(--accent2); color:#fff; font-size:1.1rem; padding:4px 14px; border-radius:14px; transform:rotate(6deg); animation:wiggle 3s ease-in-out infinite; box-shadow:2px 2px 0 var(--text); z-index:5;"
+    aria-hidden="true"
+  >
+    fresh out the oven!
+  </span>
+  <button
+    class="handwritten sort-btn"
+    onclick={() => (sort = sort === "newest" ? "oldest" : "newest")}
+    aria-label="Toggle sort order"
+  >
+    {sort === "newest" ? "latest blab ↓" : "oldest blab ↑"}
+  </button>
+</div>
 
 <!-- Tag filter -->
 <nav
@@ -123,6 +152,29 @@
 </div>
 
 <style>
+  /* ─── Sort button ────────────────────────────────────────────── */
+  .sort-btn {
+    font-size: 1.4rem;
+    color: var(--accent);
+    margin-bottom: 4px;
+    transform: rotate(-1deg);
+    display: inline-block;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: "Caveat", cursive;
+    text-decoration-line: underline;
+    text-decoration-style: dashed;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.15s;
+  }
+
+  .sort-btn:hover {
+    text-decoration-color: var(--accent);
+  }
+
   .tag-filter-wrap {
     border-top: 1px solid var(--divider);
     padding-top: 18px;

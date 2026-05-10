@@ -83,23 +83,6 @@ const allTags = [
 
     <Ticker client:idle />
 
-    <!-- "latest blab" label + fresh badge wrapper -->
-    <div style="position:relative; margin-bottom:8px; margin-top:8px;">
-      <span
-        class="handwritten"
-        style="position:absolute; top:-14px; right:12px; background:var(--accent2); color:#fff; font-size:1.1rem; padding:4px 14px; border-radius:14px; transform:rotate(6deg); animation:wiggle 3s ease-in-out infinite; box-shadow:2px 2px 0 var(--text); z-index:5;"
-        aria-hidden="true"
-      >
-        fresh out the oven!
-      </span>
-      <div
-        class="handwritten"
-        style="font-size:1.4rem; color:var(--accent); margin-bottom:4px; transform:rotate(-1deg); display:inline-block;"
-      >
-        latest blab ↓
-      </div>
-    </div>
-
     <HomeFeed feedItems={feedItems} allTags={allTags} client:idle />
 
     <ScribbleDivider client:idle />
