@@ -12,6 +12,7 @@
     href: string;
     claps?: number;
     commentCount?: number;
+    views?: number;
     index?: number;
     postNumber?: number;
   }
@@ -26,6 +27,7 @@
     href,
     claps = 0,
     commentCount = 0,
+    views = 0,
     index = 0,
     postNumber,
   }: Props = $props();
@@ -174,6 +176,33 @@
               stroke-linejoin="round"
             />
           </svg>{commentCount}
+        </span>
+      {/if}
+      {#if views > 0}
+        <span class="stat">
+          <svg
+            width="11"
+            height="11"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+            style="display:inline-block;vertical-align:middle;margin-right:2px"
+          >
+            <path
+              d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle
+              cx="12"
+              cy="12"
+              r="3"
+              stroke="currentColor"
+              stroke-width="1.5"
+            />
+          </svg>{views.toLocaleString()} views
         </span>
       {/if}
     </div>

@@ -16,6 +16,7 @@ import ClapShare from "@/components/post/ClapShare.svelte";
 import Comments from "@/components/post/Comments.svelte";
 import PostNewsletterSidebar from "@/components/post/PostNewsletterSidebar.svelte";
 import PostTableOfContents from "@/components/post/PostTableOfContents.svelte";
+import PostViews from "@/components/post/PostViews.svelte";
 import QuotePopover from "@/components/post/QuotePopover.svelte";
 import WelcomeConfetti from "@/components/post/WelcomeConfetti.svelte";
 import Layout from "@/layouts/Layout.astro";
@@ -35,8 +36,11 @@ const { Content } = await render(post);
 
 const postReadTime = readTime(post.body ?? "");
 const tags = (post.data.tags ?? ["EDITORIAL"]).map((t) => t.toUpperCase());
-const postUrl = `${Astro.site ?? "https://blabbun.com"}/${post.id}`;
+const siteUrl =
+  Astro.site?.toString().replace(/\/$/, "") ?? "https://blabbun.com";
+const postUrl = `${siteUrl}/${post.id}`;
 const hasImage = !!post.data.image;
+const wordCount = (post.body ?? "").trim().split(/\s+/).length;
 
 const postTags = new Set((post.data.tags ?? []).map((t) => t.toUpperCase()));
 
@@ -70,24 +74,55 @@ const relatedPosts = relatedSlice.map((p) => ({
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
+  mainEntityOfPage: { "@type": "WebPage", "@id": postUrl },
   headline: post.data.title,
   description: post.data.description,
   url: postUrl,
   datePublished: post.data.pubDate.toISOString(),
   dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
   keywords: post.data.tags?.join(", "),
+  wordCount,
+  timeRequired: postReadTime,
+  inLanguage: "en-US",
   author: {
     "@type": "Person",
     name: "blabbun",
-    url: `${Astro.site ?? "https://blabbun.com"}/about`,
+    url: `${siteUrl}/about`,
   },
   publisher: {
     "@type": "Organization",
-    name: "blabbun",
-    alternateName: "Blab Bun",
-    url: Astro.site ?? "https://blabbun.com",
+    name: "Blab Bun",
+    alternateName: "blabbun",
+    url: siteUrl,
+    logo: { "@type": "ImageObject", url: `${siteUrl}/blabbun-logo.webp` },
   },
-  ...(post.data.image ? { image: post.data.image } : {}),
+  ...(post.data.image
+    ? {
+        image: {
+          "@type": "ImageObject",
+          url: post.data.image.startsWith("http")
+            ? post.data.image
+            : `${siteUrl}${post.data.image}`,
+          width: 1200,
+          height: 630,
+        },
+      }
+    : {}),
+};
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "All Posts",
+      item: `${siteUrl}/archive`,
+    },
+    { "@type": "ListItem", position: 3, name: post.data.title, item: postUrl },
+  ],
 };
 ---
 
@@ -96,7 +131,29 @@ const jsonLd = {
   description={post.data.description}
   ogImage={post.data.image}
   ogType="article"
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  articleTags={post.data.tags ?? []}
+  readTime={postReadTime}
+  keywords={post.data.tags ?? []}
 >
+  <Fragment slot="head">
+    {
+      hasImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={post.data.image}
+          fetchpriority="high"
+        />
+      )
+    }
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(breadcrumbLd)}
+    />
+  </Fragment>
   <ReadingProgress client:idle />
   <ReadingDots client:idle />
   {slug === "welcome-to-blab-bun" && <WelcomeConfetti client:load />}
@@ -120,6 +177,11 @@ const jsonLd = {
         pubDate={post.data.pubDate}
         backHref="/"
       />
+
+      <!-- View counter -->
+      <div style="margin-bottom:16px;margin-top:-4px">
+        <PostViews client:idle slug={post.id} />
+      </div>
 
       <!-- Optional image -->
       {
