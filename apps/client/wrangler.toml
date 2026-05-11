@@ -3,11 +3,13 @@ account_id = "ea34ec600104eb55cd5df21faec4d56c"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-[[custom_domains]]
+[[routes]]
 pattern = "blabbun.com"
+custom_domain = true
 
-[[custom_domains]]
+[[routes]]
 pattern = "www.blabbun.com"
+custom_domain = true
 
 [triggers]
 crons = ["0 9 * * *"]
