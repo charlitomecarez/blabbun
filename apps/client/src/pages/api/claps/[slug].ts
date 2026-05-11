@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 
 import {
+  getAppEnv,
   getRuntimeEnv,
   getSupabaseClient,
   hashIp,
@@ -11,10 +12,12 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ params, request, locals }) => {
   const { slug } = params;
-  const env = getRuntimeEnv(locals);
+  const runtimeEnv = getRuntimeEnv(locals);
+  const appEnv = getAppEnv(runtimeEnv);
   const supabase = getSupabaseClient(
-    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
-    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
   const hash = await hashIp(request);
 
@@ -22,11 +25,13 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
     supabase
       .from("post_claps")
       .select("count")
+      .eq("env", appEnv)
       .eq("post_slug", slug!)
       .maybeSingle(),
     supabase
       .from("clap_votes")
       .select("ip_hash")
+      .eq("env", appEnv)
       .eq("post_slug", slug!)
       .eq("ip_hash", hash)
       .maybeSingle(),
@@ -43,10 +48,12 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
 
 export const POST: APIRoute = async ({ params, request, locals }) => {
   const { slug } = params;
-  const env = getRuntimeEnv(locals);
+  const runtimeEnv = getRuntimeEnv(locals);
+  const appEnv = getAppEnv(runtimeEnv);
   const supabase = getSupabaseClient(
-    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
-    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
   const hash = await hashIp(request);
 
@@ -54,12 +61,14 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     supabase
       .from("clap_votes")
       .select("ip_hash")
+      .eq("env", appEnv)
       .eq("post_slug", slug!)
       .eq("ip_hash", hash)
       .maybeSingle(),
     supabase
       .from("post_claps")
       .select("count")
+      .eq("env", appEnv)
       .eq("post_slug", slug!)
       .maybeSingle(),
   ]);
@@ -72,6 +81,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     const { error: deleteError } = await supabase
       .from("clap_votes")
       .delete()
+      .eq("env", appEnv)
       .eq("post_slug", slug!)
       .eq("ip_hash", hash);
 
@@ -80,7 +90,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     const newCount = Math.max(0, currentCount - 1);
     const { error: upsertError } = await supabase
       .from("post_claps")
-      .upsert({ post_slug: slug!, count: newCount });
+      .upsert({ env: appEnv, post_slug: slug!, count: newCount });
 
     if (upsertError) return jsonResponse({ error: upsertError.message }, 500);
 
@@ -89,14 +99,14 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     // Not yet clapped — insert vote and increment.
     const { error: insertError } = await supabase
       .from("clap_votes")
-      .insert({ post_slug: slug!, ip_hash: hash });
+      .insert({ env: appEnv, post_slug: slug!, ip_hash: hash });
 
     if (insertError) return jsonResponse({ error: insertError.message }, 500);
 
     const newCount = currentCount + 1;
     const { error: upsertError } = await supabase
       .from("post_claps")
-      .upsert({ post_slug: slug!, count: newCount });
+      .upsert({ env: appEnv, post_slug: slug!, count: newCount });
 
     if (upsertError) return jsonResponse({ error: upsertError.message }, 500);
 
