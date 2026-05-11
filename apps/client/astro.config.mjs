@@ -1,8 +1,12 @@
+import { EventEmitter } from "node:events";
+
 import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
 import svelte from "@astrojs/svelte";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
+
+EventEmitter.defaultMaxListeners = 20;
 
 export default defineConfig({
   site: "https://blabbun.com",

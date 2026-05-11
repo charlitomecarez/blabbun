@@ -8,19 +8,59 @@ import Layout from "@/layouts/Layout.astro";
   description="Your bookmarked posts on Blab Bun — read them later, whenever."
 >
   <main
-    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-8"
-    style="animation:fadeIn 0.2s ease"
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-10"
   >
-    <a
-      href="/"
-      style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
-             text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
-    >
-      ← back to the blabs
-    </a>
+    <div style="animation:fadeIn 0.2s ease">
+      <!-- back -->
+      <a
+        href="/"
+        style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
+               text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
+      >
+        ← back to the blabs
+      </a>
 
-    <h1 style="font-size:1.05rem;font-weight:600;margin-bottom:6px">saved</h1>
+      <!-- title row -->
+      <div
+        style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px"
+      >
+        <h1
+          style="font-family:'Fraunces',serif;font-size:2.4rem;font-weight:600;letter-spacing:-0.02em"
+        >
+          saved
+        </h1>
+        <span
+          style="font-family:'Caveat',cursive;font-size:1.2rem;color:var(--accent);
+                     transform:rotate(-3deg);display:inline-block"
+        >
+          read later 🏷
+        </span>
+      </div>
 
-    <SavedFeed client:load />
+      <!-- scribble underline -->
+      <svg
+        width="140"
+        height="14"
+        viewBox="0 0 140 14"
+        style="margin-bottom:28px;display:block"
+      >
+        <path
+          d="M2 8 Q 24 2, 48 8 T 96 8 T 138 7"
+          stroke="var(--accent)"
+          stroke-width="2"
+          fill="none"
+          stroke-linecap="round"></path>
+      </svg>
+
+      <SavedFeed client:load />
+    </div>
   </main>
+
+  <style>
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.75rem !important;
+      }
+    }
+  </style>
 </Layout>

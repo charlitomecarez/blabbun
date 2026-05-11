@@ -23,20 +23,22 @@ function json(data: unknown, status = 200) {
 export const DELETE: APIRoute = async () => {
   const supabase = getClient();
 
-  const [comments, clapVotes, postClaps, subscribers] = await Promise.all([
-    supabase
-      .from("comments")
-      .delete()
-      .neq("id", "00000000-0000-0000-0000-000000000000"),
-    supabase.from("clap_votes").delete().neq("post_slug", ""),
-    supabase.from("post_claps").delete().neq("post_slug", ""),
-    supabase
-      .from("subscribers")
-      .delete()
-      .neq("id", "00000000-0000-0000-0000-000000000000"),
-  ]);
+  const [comments, clapVotes, postClaps, postViews, subscribers] =
+    await Promise.all([
+      supabase
+        .from("comments")
+        .delete()
+        .neq("id", "00000000-0000-0000-0000-000000000000"),
+      supabase.from("clap_votes").delete().neq("post_slug", ""),
+      supabase.from("post_claps").delete().neq("post_slug", ""),
+      supabase.from("post_views").delete().neq("post_slug", ""),
+      supabase
+        .from("subscribers")
+        .delete()
+        .neq("id", "00000000-0000-0000-0000-000000000000"),
+    ]);
 
-  const errors = [comments, clapVotes, postClaps, subscribers]
+  const errors = [comments, clapVotes, postClaps, postViews, subscribers]
     .map((r) => r.error?.message)
     .filter(Boolean);
 
