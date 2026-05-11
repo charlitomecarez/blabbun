@@ -24,7 +24,7 @@ const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
 );
 
 const stats = await fetchPostStats(
-  posts.slice(0, 10).map((p) => p.id),
+  posts.slice(0, 5).map((p) => p.id),
   supabase
 );
 
