@@ -15,6 +15,7 @@
     commentCount?: number;
     views?: number;
     postNumber?: number;
+    isLatest?: boolean;
   }
 
   interface Props {
@@ -45,7 +46,11 @@
     sort === "newest" && feedItems.length > 3 ? feedItems[3] : null
   );
 
-  const visible = $derived(filtered.slice(0, visibleCount));
+  const visible = $derived(
+    filtered
+      .slice(0, visibleCount)
+      .map((item, i) => ({ ...item, isLatest: i === 0 }))
+  );
   const hasMore = $derived(visibleCount < filtered.length);
 
   $effect(() => {
