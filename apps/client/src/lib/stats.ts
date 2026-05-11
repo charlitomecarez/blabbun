@@ -8,7 +8,8 @@ export interface PostStats {
 
 export async function fetchPostStats(
   slugs: string[],
-  supabase: SupabaseClient
+  supabase: SupabaseClient,
+  appEnv: string
 ): Promise<Record<string, PostStats>> {
   if (slugs.length === 0) return {};
 
@@ -16,16 +17,19 @@ export async function fetchPostStats(
     supabase
       .from("post_claps")
       .select("post_slug, count")
+      .eq("env", appEnv)
       .in("post_slug", slugs),
     // Only count top-level comments (parent_id IS NULL) — replies are nested under parents.
     supabase
       .from("comments")
       .select("post_slug")
+      .eq("env", appEnv)
       .in("post_slug", slugs)
       .is("parent_id", null),
     supabase
       .from("post_views")
       .select("post_slug, count")
+      .eq("env", appEnv)
       .in("post_slug", slugs),
   ]);
 

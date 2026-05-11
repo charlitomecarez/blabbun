@@ -1,7 +1,12 @@
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 
-import { getRuntimeEnv, getSupabaseClient, jsonResponse } from "@/lib/api";
+import {
+  getAppEnv,
+  getRuntimeEnv,
+  getSupabaseClient,
+  jsonResponse,
+} from "@/lib/api";
 import {
   getResendClient,
   newPostEmailHtml,
@@ -13,6 +18,7 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ request, locals }) => {
   const env = getRuntimeEnv(locals);
+  const appEnv = getAppEnv(env);
   const secret = env.CRON_SECRET ?? import.meta.env.CRON_SECRET;
   if (!secret || request.headers.get("authorization") !== `Bearer ${secret}`) {
     return jsonResponse({ error: "unauthorized" }, 401);
@@ -25,8 +31,8 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   const [allPosts, notifiedResult, subscribersResult] = await Promise.all([
     getCollection("posts"),
-    supabase.from("post_notifications").select("post_slug"),
-    supabase.from("subscribers").select("email"),
+    supabase.from("post_notifications").select("post_slug").eq("env", appEnv),
+    supabase.from("subscribers").select("email").eq("env", appEnv),
   ]);
 
   const today = new Date();
@@ -93,7 +99,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   await supabase
     .from("post_notifications")
-    .insert({ post_slug: post.id })
+    .insert({ env: appEnv, post_slug: post.id })
     .throwOnError();
 
   return jsonResponse({

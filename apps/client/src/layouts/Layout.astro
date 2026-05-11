@@ -21,7 +21,7 @@ interface Props {
 
 const {
   title: rawTitle,
-  description = "Blab Bun — a quiet corner of the internet where thoughts settle, drift, and take shape. Unfiltered reflections, no pressure to be complete.",
+  description = "Blab Bun — a quiet corner of the internet where thoughts settle, drift, and take shape. Unfiltered takes, no pressure to be complete.",
   ogImage,
   ogType = "website",
   pubDate,
@@ -117,6 +117,8 @@ const postCount = allPosts.length;
         : "blabbun, blab bun, personal blog, writing, thoughts, essays"}
     />
     <link rel="canonical" href={canonicalUrl} />
+    <link rel="me" href="https://twitter.com/blabbun" />
+    <link rel="me" href="https://x.com/blabbun" />
 
     <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
@@ -219,16 +221,36 @@ const postCount = allPosts.length;
       is:inline
       set:html={JSON.stringify({
         "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: siteTitle,
-        alternateName: "blabbun",
-        url: siteUrl,
-        description,
-        potentialAction: {
-          "@type": "SearchAction",
-          target: `${siteUrl}/archive?q={search_term_string}`,
-          "query-input": "required name=search_term_string",
-        },
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": `${siteUrl}/#website`,
+            name: siteTitle,
+            alternateName: ["blabbun", "blab bun"],
+            url: siteUrl,
+            description,
+            inLanguage: "en-US",
+            potentialAction: {
+              "@type": "SearchAction",
+              target: `${siteUrl}/archive?q={search_term_string}`,
+              "query-input": "required name=search_term_string",
+            },
+          },
+          {
+            "@type": "Organization",
+            "@id": `${siteUrl}/#organization`,
+            name: siteTitle,
+            alternateName: ["blabbun", "blab bun"],
+            url: siteUrl,
+            logo: {
+              "@type": "ImageObject",
+              url: `${siteUrl}/blabbun-logo.webp`,
+              width: 512,
+              height: 512,
+            },
+            sameAs: ["https://twitter.com/blabbun", "https://x.com/blabbun"],
+          },
+        ],
       })}
     />
 

@@ -12,15 +12,34 @@ const totalWords = posts.reduce(
 
 <Layout
   title="About"
-  description="The person behind blabbun — a blog of unfiltered takes, half-finished thoughts, and things probably better left unsaid."
+  description="The person behind Blab Bun — a blog of unfiltered takes, half-finished thoughts, and things probably better left unsaid."
 >
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "@id": "https://blabbun.com/#author",
+      name: "Blab Bun",
+      alternateName: ["blabbun", "blab bun"],
+      url: "https://blabbun.com/about",
+      sameAs: [
+        "https://twitter.com/blabbun",
+        "https://x.com/blabbun",
+        "https://blabbun.com",
+      ],
+      worksFor: { "@id": "https://blabbun.com/#organization" },
+    })}
+  />
   <main
     class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-10"
   >
     <div class="reveal">
       <!-- back -->
       <a
-        href="/"
+        href="/?utm_source=about&utm_medium=internal&utm_campaign=back_nav"
         style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
                text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
       >
@@ -186,7 +205,7 @@ const totalWords = posts.reduce(
         }
         <!-- changelog card -->
         <a
-          href="/changelog"
+          href="/changelog?utm_source=about&utm_medium=internal&utm_campaign=changelog_card"
           style="min-width:200px;flex:1 1 200px;background:var(--bg2);
                  border:1.5px solid var(--text);padding:14px 16px;
                  transform:rotate(1deg);box-shadow:3px 3px 0 var(--text);

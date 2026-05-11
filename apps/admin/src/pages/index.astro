@@ -2,9 +2,11 @@
 import { createSupabaseClient } from "@blabbun/db";
 import { env } from "cloudflare:workers";
 
+import { getAppEnv } from "@/lib/env";
 import Layout from "../layouts/Layout.astro";
 
 const runtimeEnv = env as unknown as Record<string, string | undefined>;
+const appEnv = getAppEnv(runtimeEnv);
 const supabase = createSupabaseClient(
   runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
   runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
@@ -12,9 +14,15 @@ const supabase = createSupabaseClient(
 );
 
 const [comments, subscribers, claps] = await Promise.all([
-  supabase.from("comments").select("id", { count: "exact", head: true }),
-  supabase.from("subscribers").select("id", { count: "exact", head: true }),
-  supabase.from("post_claps").select("count"),
+  supabase
+    .from("comments")
+    .select("id", { count: "exact", head: true })
+    .eq("env", appEnv),
+  supabase
+    .from("subscribers")
+    .select("id", { count: "exact", head: true })
+    .eq("env", appEnv),
+  supabase.from("post_claps").select("count").eq("env", appEnv),
 ]);
 
 const totalClaps = ((claps.data ?? []) as { count: number }[]).reduce(

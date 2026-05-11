@@ -5,10 +5,11 @@ import { getCollection } from "astro:content";
 
 import ArchiveList from "@/components/archive/ArchiveList.svelte";
 import Layout from "@/layouts/Layout.astro";
-import { getRuntimeEnv, getSupabaseClient } from "@/lib/api";
+import { getAppEnv, getRuntimeEnv, getSupabaseClient } from "@/lib/api";
 import { fetchPostStats } from "@/lib/stats";
 
 const runtimeEnv = getRuntimeEnv(Astro.locals);
+const appEnv = getAppEnv(runtimeEnv);
 const supabase = getSupabaseClient(
   runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
   runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
@@ -21,7 +22,8 @@ const allPosts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
 
 const stats = await fetchPostStats(
   allPosts.map((p) => p.id),
-  supabase
+  supabase,
+  appEnv
 );
 
 const postItems = allPosts.map((post) => ({
@@ -61,7 +63,7 @@ const allTags = [
     <div style="animation:fadeIn 0.2s ease">
       <!-- back -->
       <a
-        href="/"
+        href="/?utm_source=archive&utm_medium=internal&utm_campaign=back_nav"
         style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
                text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
       >

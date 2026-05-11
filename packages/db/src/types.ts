@@ -6,6 +6,7 @@ export type Database = {
           anon_name: string | null;
           body: string;
           created_at: string;
+          env: string;
           id: string;
           parent_id: string | null;
           post_slug: string;
@@ -14,6 +15,7 @@ export type Database = {
           anon_name?: string | null;
           body: string;
           created_at?: string;
+          env?: string;
           id?: string;
           parent_id?: string | null;
           post_slug: string;
@@ -22,6 +24,7 @@ export type Database = {
           anon_name?: string | null;
           body?: string;
           created_at?: string;
+          env?: string;
           id?: string;
           parent_id?: string | null;
           post_slug?: string;
@@ -39,16 +42,19 @@ export type Database = {
       clap_votes: {
         Row: {
           created_at: string;
+          env: string;
           ip_hash: string;
           post_slug: string;
         };
         Insert: {
           created_at?: string;
+          env?: string;
           ip_hash: string;
           post_slug: string;
         };
         Update: {
           created_at?: string;
+          env?: string;
           ip_hash?: string;
           post_slug?: string;
         };
@@ -58,16 +64,19 @@ export type Database = {
         Row: {
           count: number;
           created_at: string;
+          env: string;
           post_slug: string;
         };
         Insert: {
           count?: number;
           created_at?: string;
+          env?: string;
           post_slug: string;
         };
         Update: {
           count?: number;
           created_at?: string;
+          env?: string;
           post_slug?: string;
         };
         Relationships: [];
@@ -75,16 +84,19 @@ export type Database = {
       subscribers: {
         Row: {
           email: string;
+          env: string;
           id: string;
           subscribed_at: string;
         };
         Insert: {
           email: string;
+          env?: string;
           id?: string;
           subscribed_at?: string;
         };
         Update: {
           email?: string;
+          env?: string;
           id?: string;
           subscribed_at?: string;
         };
@@ -92,29 +104,35 @@ export type Database = {
       };
       post_views: {
         Row: {
-          post_slug: string;
           count: number;
+          env: string;
+          post_slug: string;
         };
         Insert: {
-          post_slug: string;
           count?: number;
+          env?: string;
+          post_slug: string;
         };
         Update: {
-          post_slug?: string;
           count?: number;
+          env?: string;
+          post_slug?: string;
         };
         Relationships: [];
       };
       post_notifications: {
         Row: {
+          env: string;
           notified_at: string;
           post_slug: string;
         };
         Insert: {
+          env?: string;
           notified_at?: string;
           post_slug: string;
         };
         Update: {
+          env?: string;
           notified_at?: string;
           post_slug?: string;
         };
@@ -122,25 +140,28 @@ export type Database = {
       };
       admin_users: {
         Row: {
-          id: string;
+          created_at: string;
           email: string;
+          env: string;
+          id: string;
           password_hash: string;
           role: string;
-          created_at: string;
         };
         Insert: {
-          id?: string;
+          created_at?: string;
           email: string;
+          env?: string;
+          id?: string;
           password_hash: string;
           role?: string;
-          created_at?: string;
         };
         Update: {
-          id?: string;
+          created_at?: string;
           email?: string;
+          env?: string;
+          id?: string;
           password_hash?: string;
           role?: string;
-          created_at?: string;
         };
         Relationships: [];
       };

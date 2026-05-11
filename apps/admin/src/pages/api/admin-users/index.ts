@@ -3,10 +3,13 @@ import type { APIRoute } from "astro";
 import bcrypt from "bcryptjs";
 import { env } from "cloudflare:workers";
 
+import { getAppEnv } from "@/lib/env";
+
 export const prerender = false;
 
+const runtimeEnv = env as unknown as Record<string, string | undefined>;
+
 function getClient() {
-  const runtimeEnv = env as unknown as Record<string, string | undefined>;
   return createSupabaseClient(
     runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
     runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
@@ -22,9 +25,11 @@ function json(data: unknown, status = 200) {
 }
 
 export const GET: APIRoute = async () => {
+  const appEnv = getAppEnv(runtimeEnv);
   const { data, error } = await getClient()
     .from("admin_users")
     .select("id, email, role, created_at")
+    .eq("env", appEnv)
     .order("created_at", { ascending: true });
 
   if (error) return json({ error: error.message }, 500);
@@ -47,10 +52,11 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: "password must be at least 8 characters" }, 400);
   if (!["admin"].includes(role)) return json({ error: "invalid role" }, 400);
 
+  const appEnv = getAppEnv(runtimeEnv);
   const password_hash = await bcrypt.hash(password, 8);
   const { data, error } = await getClient()
     .from("admin_users")
-    .insert({ email, password_hash, role })
+    .insert({ email, password_hash, role, env: appEnv })
     .select("id, email, role, created_at")
     .single();
 

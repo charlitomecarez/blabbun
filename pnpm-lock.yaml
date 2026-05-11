@@ -176,6 +176,9 @@ importers:
       '@astrojs/check':
         specifier: ^0.9.8
         version: 0.9.8(prettier-plugin-astro@0.14.1)(prettier@3.8.2)(typescript@5.9.3)
+      '@cloudflare/workers-types':
+        specifier: ^4.20260430.1
+        version: 4.20260430.1
       '@playwright/test':
         specifier: ^1.59.1
         version: 1.59.1

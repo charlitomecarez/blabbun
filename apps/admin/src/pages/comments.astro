@@ -3,9 +3,11 @@ import type { CommentRow } from "@blabbun/db";
 import { createSupabaseClient } from "@blabbun/db";
 import { env } from "cloudflare:workers";
 
+import { getAppEnv } from "@/lib/env";
 import Layout from "../layouts/Layout.astro";
 
 const runtimeEnv = env as unknown as Record<string, string | undefined>;
+const appEnv = getAppEnv(runtimeEnv);
 const supabase = createSupabaseClient(
   runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
   runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
@@ -15,6 +17,7 @@ const supabase = createSupabaseClient(
 const { data: comments } = await supabase
   .from("comments")
   .select("*")
+  .eq("env", appEnv)
   .order("created_at", { ascending: false });
 ---
 

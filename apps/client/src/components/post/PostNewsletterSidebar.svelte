@@ -79,6 +79,11 @@
         done = true;
         localStorage.setItem(STORAGE_KEY, String(Date.now()));
         tick();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (window as any).gtag?.("event", "subscribe", {
+          method: "newsletter",
+          source: "post_sidebar",
+        });
       } else if (already > 0) {
         info = "already subscribed.";
         done = true;

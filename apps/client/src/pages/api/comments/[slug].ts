@@ -1,26 +1,33 @@
 import type { APIRoute } from "astro";
 
-import { getRuntimeEnv, getSupabaseClient, jsonResponse } from "@/lib/api";
+import {
+  getAppEnv,
+  getRuntimeEnv,
+  getSupabaseClient,
+  jsonResponse,
+} from "@/lib/api";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params, locals }) => {
   const { slug } = params;
-  const env = getRuntimeEnv(locals);
+  const runtimeEnv = getRuntimeEnv(locals);
+  const appEnv = getAppEnv(runtimeEnv);
   const supabase = getSupabaseClient(
-    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
-    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
   const { data, error } = await supabase
     .from("comments")
     .select("*")
+    .eq("env", appEnv)
     .eq("post_slug", slug!)
     .order("created_at", { ascending: true });
 
   if (error) return jsonResponse({ error: error.message }, 500);
 
-  // Nest replies under their parent comments in a single pass.
   const rows = data ?? [];
   const topLevel = rows.filter((r) => r.parent_id === null);
   const nested = topLevel.map((comment) => ({
@@ -33,10 +40,12 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
 export const POST: APIRoute = async ({ params, request, locals }) => {
   const { slug } = params;
-  const env = getRuntimeEnv(locals);
+  const runtimeEnv = getRuntimeEnv(locals);
+  const appEnv = getAppEnv(runtimeEnv);
   const supabase = getSupabaseClient(
-    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
-    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+    runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
   let body: { body?: string; parent_id?: string; anon_name?: string };
@@ -55,6 +64,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   }
 
   const insert = {
+    env: appEnv,
     post_slug: slug!,
     body: body.body.trim(),
     parent_id: body.parent_id ?? null,
