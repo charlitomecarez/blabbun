@@ -1,11 +1,12 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { getRuntimeEnv, getSupabaseClient } from "@/lib/api";
+import { getAppEnv, getRuntimeEnv, getSupabaseClient } from "@/lib/api";
 import { verifyUnsubscribeToken } from "@/lib/unsubscribe";
 
 export const prerender = false;
 
 const runtimeEnv = getRuntimeEnv(Astro.locals);
+const appEnv = getAppEnv(runtimeEnv);
 const secret: string =
   runtimeEnv.UNSUBSCRIBE_SECRET ?? import.meta.env.UNSUBSCRIBE_SECRET ?? "";
 
@@ -29,7 +30,11 @@ if (Astro.request.method === "POST") {
       runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
         import.meta.env.SUPABASE_SERVICE_ROLE_KEY
     );
-    await supabase.from("subscribers").delete().eq("email", email);
+    await supabase
+      .from("subscribers")
+      .delete()
+      .eq("env", appEnv)
+      .eq("email", email);
     return Astro.redirect("/unsubscribe?done=true");
   }
 }

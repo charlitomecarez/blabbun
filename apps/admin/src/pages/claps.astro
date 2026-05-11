@@ -3,9 +3,11 @@ import type { PostClapRow } from "@blabbun/db";
 import { createSupabaseClient } from "@blabbun/db";
 import { env } from "cloudflare:workers";
 
+import { getAppEnv } from "@/lib/env";
 import Layout from "../layouts/Layout.astro";
 
 const runtimeEnv = env as unknown as Record<string, string | undefined>;
+const appEnv = getAppEnv(runtimeEnv);
 const supabase = createSupabaseClient(
   runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
   runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
@@ -15,6 +17,7 @@ const supabase = createSupabaseClient(
 const { data: claps } = await supabase
   .from("post_claps")
   .select("*")
+  .eq("env", appEnv)
   .order("count", { ascending: false });
 
 const total = ((claps ?? []) as PostClapRow[]).reduce(
