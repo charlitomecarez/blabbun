@@ -9,7 +9,7 @@ import Layout from "@/layouts/Layout.astro";
     <div style="animation:fadeIn 0.2s ease">
       <!-- back -->
       <a
-        href="/"
+        href="/?utm_source=terms&utm_medium=internal&utm_campaign=back_nav"
         style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
                text-decoration:none;padding:0;display:inline-block;margin-bottom:24px"
       >
@@ -81,17 +81,23 @@ import Layout from "@/layouts/Layout.astro";
               privacy
             </div>
             <p style="margin-bottom:8px">
-              i don't collect your data. i don't have analytics. i can't see who
-              you are or where you're from.
+              this site uses Google Analytics (GA4) for basic traffic stats —
+              page views, referrers, that kind of thing. GA uses cookies. no
+              personally identifiable info is collected beyond what GA does by
+              default.
             </p>
             <p style="margin-bottom:8px">
-              if you subscribe to the newsletter, i get your email address and
+              if you subscribe to the newsletter, i store your email address and
               nothing else. i won't sell it, share it, or use it for anything
-              other than sending you the occasional post.
+              other than sending you the occasional post. unsubscribe any time.
             </p>
             <p>
-              comments are anonymous and stored locally in your browser. they're
-              yours.
+              comments are anonymous and stored server-side. claps use a one-way
+              hash of your IP to prevent duplicates — the raw address is never
+              stored. full details on the <a
+                href="/privacy"
+                style="color:var(--accent);text-decoration:none">privacy page</a
+              >.
             </p>
           </div>
 

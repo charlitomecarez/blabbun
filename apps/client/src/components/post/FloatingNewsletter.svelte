@@ -101,6 +101,11 @@
         cooldownMs = 0;
         succeeded = true;
         autoDismissTimer = setTimeout(dismiss, 3000);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (window as any).gtag?.("event", "subscribe", {
+          method: "newsletter",
+          source: "post_floating",
+        });
       } else if (already > 0) {
         info = "already subscribed.";
         succeeded = true;

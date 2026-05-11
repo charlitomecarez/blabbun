@@ -15,6 +15,7 @@
     views?: number;
     index?: number;
     postNumber?: number;
+    isLatest?: boolean;
   }
 
   const {
@@ -30,6 +31,7 @@
     views = 0,
     index = 0,
     postNumber,
+    isLatest = false,
   }: Props = $props();
 
   let hov = $state(false);
@@ -67,16 +69,24 @@
   class="post-card reveal"
   class:hov
   class:first-post={isFirstPost}
+  class:latest-post={isLatest}
   onmouseenter={() => (hov = true)}
   onmouseleave={() => (hov = false)}
 >
   <!-- "this one →" hover callout — always in DOM, shown via CSS -->
   <span class="handwritten this-one" aria-hidden="true">this one →</span>
 
-  <!-- post number stamp — hidden when first-stamp takes the slot -->
-  {#if !isFirstPost}
+  <!-- post number stamp — hidden when first-stamp or latest-stamp takes the slot -->
+  {#if !isFirstPost && !isLatest}
     <span class="handwritten post-num" aria-hidden="true"
       >#{postNumber ?? index + 1}</span
+    >
+  {/if}
+
+  <!-- "new ✶" stamp — only on the latest post in the current view -->
+  {#if isLatest && !isFirstPost}
+    <span class="handwritten latest-stamp" aria-label="Latest post"
+      >🚀 new ✶</span
     >
   {/if}
 
@@ -404,6 +414,39 @@
 
     .post-date {
       font-size: 0.82rem;
+    }
+  }
+
+  /* ─── Latest post treatment ──────────────────────────────────── */
+  .latest-post {
+    padding: 26px 0;
+    border-bottom-style: dashed;
+    border-bottom-color: var(--border);
+  }
+
+  .latest-post .post-title {
+    font-size: 1.5rem;
+  }
+
+  .latest-stamp {
+    position: absolute;
+    top: 14px;
+    right: 0;
+    font-size: 1rem;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1.5px dashed var(--accent);
+    padding: 3px 10px;
+    border-radius: 3px;
+    transform: rotate(-2deg);
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .latest-post .post-title {
+      font-size: 1.2rem;
     }
   }
 
