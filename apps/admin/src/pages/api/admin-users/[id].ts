@@ -3,13 +3,16 @@ import type { APIRoute } from "astro";
 import bcrypt from "bcryptjs";
 import { env } from "cloudflare:workers";
 
+import { getAppEnv } from "@/lib/env";
+
 export const prerender = false;
+
+const runtimeEnv = env as unknown as Record<string, string | undefined>;
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function getClient() {
-  const runtimeEnv = env as unknown as Record<string, string | undefined>;
   return createSupabaseClient(
     runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
     runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
@@ -53,9 +56,11 @@ export const PATCH: APIRoute = async ({ params, request }) => {
   if (Object.keys(updates).length === 0)
     return json({ error: "no valid fields to update" }, 400);
 
+  const appEnv = getAppEnv(runtimeEnv);
   const { data, error } = await getClient()
     .from("admin_users")
     .update(updates)
+    .eq("env", appEnv)
     .eq("id", id!)
     .select("id, email, role, created_at")
     .single();
@@ -75,16 +80,22 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
   if (locals.admin?.id === id)
     return json({ error: "cannot delete your own account" }, 403);
 
+  const appEnv = getAppEnv(runtimeEnv);
   const supabase = getClient();
 
   const { count } = await supabase
     .from("admin_users")
-    .select("id", { count: "exact", head: true });
+    .select("id", { count: "exact", head: true })
+    .eq("env", appEnv);
 
   if ((count ?? 0) <= 1)
     return json({ error: "cannot delete the last admin" }, 403);
 
-  const { error } = await supabase.from("admin_users").delete().eq("id", id!);
+  const { error } = await supabase
+    .from("admin_users")
+    .delete()
+    .eq("env", appEnv)
+    .eq("id", id!);
   if (error) return json({ error: error.message }, 500);
   return json({ success: true });
 };

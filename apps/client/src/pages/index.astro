@@ -9,10 +9,11 @@ import NewsletterBar from "@/components/home/NewsletterBar.svelte";
 import ScribbleDivider from "@/components/home/ScribbleDivider.svelte";
 import Ticker from "@/components/home/Ticker.svelte";
 import Layout from "@/layouts/Layout.astro";
-import { getRuntimeEnv, getSupabaseClient } from "@/lib/api";
+import { getAppEnv, getRuntimeEnv, getSupabaseClient } from "@/lib/api";
 import { fetchPostStats } from "@/lib/stats";
 
 const runtimeEnv = getRuntimeEnv(Astro.locals);
+const appEnv = getAppEnv(runtimeEnv);
 const supabase = getSupabaseClient(
   runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
   runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
@@ -25,7 +26,8 @@ const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
 
 const stats = await fetchPostStats(
   posts.slice(0, 5).map((p) => p.id),
-  supabase
+  supabase,
+  appEnv
 );
 
 const feedItems = posts.map((post, i) => ({

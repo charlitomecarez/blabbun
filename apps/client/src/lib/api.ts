@@ -38,3 +38,8 @@ export async function hashIp(request: Request): Promise<string> {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
+
+export function getAppEnv(runtimeEnv: RuntimeEnv): "staging" | "live" {
+  const val = runtimeEnv.APP_ENV ?? import.meta.env.APP_ENV;
+  return val === "live" ? "live" : "staging";
+}

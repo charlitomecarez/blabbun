@@ -1,6 +1,11 @@
 import type { APIRoute } from "astro";
 
-import { getRuntimeEnv, getSupabaseClient, jsonResponse } from "@/lib/api";
+import {
+  getAppEnv,
+  getRuntimeEnv,
+  getSupabaseClient,
+  jsonResponse,
+} from "@/lib/api";
 import {
   getResendClient,
   welcomeEmailHtml,
@@ -42,6 +47,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   const env = getRuntimeEnv(locals);
+  const appEnv = getAppEnv(env);
   const supabase = getSupabaseClient(
     env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
     env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
@@ -56,7 +62,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     emails.map(async (email) => {
       const { error } = await supabase
         .from("subscribers")
-        .insert({ email })
+        .insert({ env: appEnv, email })
         .select()
         .single();
 

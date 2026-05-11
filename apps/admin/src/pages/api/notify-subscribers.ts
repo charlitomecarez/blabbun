@@ -3,7 +3,11 @@ import type { APIRoute } from "astro";
 import { env } from "cloudflare:workers";
 import { Resend } from "resend";
 
+import { getAppEnv } from "@/lib/env";
+
 export const prerender = false;
+
+const runtimeEnv = env as unknown as Record<string, string | undefined>;
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -84,7 +88,7 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: "title and slug are required" }, 400);
   }
 
-  const runtimeEnv = env as unknown as Record<string, string | undefined>;
+  const appEnv = getAppEnv(runtimeEnv);
   const supabase = createSupabaseClient(
     runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
     runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
@@ -96,7 +100,8 @@ export const POST: APIRoute = async ({ request }) => {
 
   const { data: subscribers, error } = await supabase
     .from("subscribers")
-    .select("email");
+    .select("email")
+    .eq("env", appEnv);
 
   if (error) return json({ error: error.message }, 500);
   if (!subscribers?.length) return json({ sent: 0 }, 200);
