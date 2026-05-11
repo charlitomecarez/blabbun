@@ -12,6 +12,11 @@ interface Props {
   description?: string;
   ogImage?: string;
   ogType?: "website" | "article";
+  pubDate?: Date;
+  updatedDate?: Date;
+  articleTags?: string[];
+  readTime?: string;
+  keywords?: string[];
 }
 
 const {
@@ -19,6 +24,11 @@ const {
   description = "Blab Bun — a quiet corner of the internet where thoughts settle, drift, and take shape. Unfiltered reflections, no pressure to be complete.",
   ogImage,
   ogType = "website",
+  pubDate,
+  updatedDate,
+  articleTags,
+  readTime,
+  keywords,
 } = Astro.props;
 
 const siteTitle = "Blab Bun";
@@ -102,9 +112,13 @@ const postCount = allPosts.length;
     <meta name="description" content={description} />
     <meta
       name="keywords"
-      content="blabbun, blab bun, personal blog, writing, thoughts, essays"
+      content={keywords && keywords.length > 0
+        ? [...keywords, "blabbun", "blab bun", "personal blog"].join(", ")
+        : "blabbun, blab bun, personal blog, writing, thoughts, essays"}
     />
     <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content={siteTitle} />
@@ -126,19 +140,77 @@ const postCount = allPosts.length;
         </>
       )
     }
+
+    <!-- Article-specific Open Graph -->
+    {
+      pubDate && (
+        <meta
+          property="article:published_time"
+          content={pubDate.toISOString()}
+        />
+      )
+    }
+    {
+      updatedDate && (
+        <meta
+          property="article:modified_time"
+          content={updatedDate.toISOString()}
+        />
+      )
+    }
+    {
+      pubDate && !updatedDate && (
+        <meta
+          property="article:modified_time"
+          content={pubDate.toISOString()}
+        />
+      )
+    }
+    {
+      ogType === "article" && (
+        <meta property="article:author" content={`${siteUrl}/about`} />
+      )
+    }
+    {ogType === "article" && <meta property="article:section" content="Blog" />}
+    {
+      articleTags &&
+        articleTags.map((tag) => <meta property="article:tag" content={tag} />)
+    }
+
+    <!-- Twitter card -->
     <meta
       name="twitter:card"
       content={ogImage ? "summary_large_image" : "summary"}
     />
+    <meta name="twitter:site" content="@blabbun" />
+    <meta name="twitter:creator" content="@blabbun" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     {
       ogImage && (
+        <>
+          <meta
+            name="twitter:image"
+            content={
+              ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`
+            }
+          />
+          <meta name="twitter:image:alt" content={pageTitle} />
+        </>
+      )
+    }
+    {readTime && <meta name="twitter:label1" content="Reading time" />}
+    {readTime && <meta name="twitter:data1" content={readTime} />}
+    {pubDate && <meta name="twitter:label2" content="Published" />}
+    {
+      pubDate && (
         <meta
-          name="twitter:image"
-          content={
-            ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`
-          }
+          name="twitter:data2"
+          content={pubDate.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
         />
       )
     }
@@ -159,6 +231,8 @@ const postCount = allPosts.length;
         },
       })}
     />
+
+    <slot name="head" />
 
     <style>
       @font-face {

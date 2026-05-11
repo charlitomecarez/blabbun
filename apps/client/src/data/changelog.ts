@@ -16,6 +16,124 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "v1.3.1",
+    date: "May 2026",
+    label: "Polish & SEO",
+    changes: [
+      {
+        type: "feat",
+        description:
+          "Post number badge added to every post card — a circular stamp showing chronological order (oldest = #1), hidden when the first-post stamp is displayed",
+      },
+      {
+        type: "feat",
+        description:
+          'Sort toggle on the home feed lets you flip between newest and oldest posts; the "fresh out the oven!" badge stays visible regardless of sort order',
+      },
+      {
+        type: "feat",
+        description:
+          '"See more posts →" link added to the Table of Contents on post pages, jumping straight to the related posts section',
+      },
+      {
+        type: "feat",
+        description:
+          "Full SEO pass on post pages: Open Graph article tags, Twitter card labels, BreadcrumbList JSON-LD, enhanced BlogPosting schema, and hero image preloading",
+      },
+      {
+        type: "feat",
+        description:
+          'Admin danger zone now includes a "Purge test data" button that wipes all subscribers, comments, claps, and clap votes after a confirmation prompt',
+      },
+      {
+        type: "improvement",
+        description:
+          "Polaroid card background updated from white to the warm-brown design token so it blends naturally with the site palette",
+      },
+      {
+        type: "improvement",
+        description:
+          "Body text across About, Now, Changelog, Terms, Archive, Help, and Unsubscribe pages switched to the muted color token, matching the warmth of blog post prose",
+      },
+      {
+        type: "improvement",
+        description:
+          "Archive page redesigned with a Fraunces heading, Caveat tagline, and scribble SVG to match the rest of the site's visual language",
+      },
+      {
+        type: "improvement",
+        description:
+          "Help page redesigned with a Fraunces heading, Caveat tagline, scribble SVG, and back link",
+      },
+      {
+        type: "improvement",
+        description:
+          "Unsubscribe page all three states (success, valid, invalid) redesigned with Fraunces headings, Caveat taglines, and scribble SVGs",
+      },
+      {
+        type: "improvement",
+        description:
+          "Scroll-to-top button relocated into the right-sidebar newsletter column on desktop so it no longer overlaps content; still visible as a fixed button on mobile",
+      },
+      {
+        type: "improvement",
+        description:
+          "Sitemap now includes /changelog and /saved, and both pages are marked for prerendering",
+      },
+      {
+        type: "fix",
+        description:
+          "Canonical URL now always uses the site origin plus pathname, stripping any query parameters and guaranteeing an https:// prefix",
+      },
+      {
+        type: "fix",
+        description:
+          "Added security headers (HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy) via the Vercel _headers file",
+      },
+      {
+        type: "fix",
+        description:
+          "Resolved a MaxListenersExceededWarning in development by raising the EventEmitter listener limit in astro.config.mjs",
+      },
+    ],
+  },
+  {
+    version: "v1.3.0",
+    date: "May 2026",
+    changes: [
+      {
+        type: "feat",
+        description:
+          "Matched admin post preview layout to the client — Fraunces title, Caveat date, tag badges, read time, scribble underline, and prose-styled body",
+      },
+      {
+        type: "improvement",
+        description:
+          "Enforced design consistency across all pages — unified h1 sizes, container padding, and layout patterns",
+      },
+      {
+        type: "fix",
+        description:
+          "Raised base font-size from 15px to 16px and bumped post body text to 0.94rem for better reading comfort",
+      },
+      {
+        type: "fix",
+        description:
+          "Admin preview now shows accurate spacing for standalone br tags between paragraphs, preventing writers from over-adding breaks",
+      },
+      {
+        type: "fix",
+        description:
+          "Replaced emoji icons with SVG icons in Navbar and PostCard",
+      },
+      {
+        type: "fix",
+        description:
+          "Fixed topics tag page postItems type mapping to match ArchiveList expectations",
+      },
+    ],
+  },
+  {
     version: "v1.2.0",
     date: "May 2026",
     label: "Design Overhaul",
