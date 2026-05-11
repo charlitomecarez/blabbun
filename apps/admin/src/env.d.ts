@@ -11,6 +11,7 @@ declare namespace App {
 }
 
 interface CloudflareEnv {
+  APP_ENV: string;
   JWT_SECRET: string;
   SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
