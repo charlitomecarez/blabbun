@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { env } from "cloudflare:workers";
 
 import { signToken } from "@/lib/auth";
+import { getAppEnv } from "@/lib/env";
 
 export const prerender = false;
 
@@ -27,6 +28,7 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: "email and password are required" }, 400);
 
   const runtimeEnv = env as unknown as Record<string, string | undefined>;
+  const appEnv = getAppEnv(runtimeEnv);
   const jwtSecret =
     runtimeEnv.JWT_SECRET ?? (import.meta.env.JWT_SECRET as string | undefined);
 
@@ -44,6 +46,7 @@ export const POST: APIRoute = async ({ request }) => {
   const { data: user, error: dbError } = await supabase
     .from("admin_users")
     .select("id, email, role, password_hash")
+    .eq("env", appEnv)
     .eq("email", email)
     .single();
 
