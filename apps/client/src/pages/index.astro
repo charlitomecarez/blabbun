@@ -43,6 +43,7 @@ const feedItems = posts.map((post, i) => ({
   href: `/${post.id}`,
   claps: stats[post.id]?.claps,
   commentCount: stats[post.id]?.commentCount,
+  views: stats[post.id]?.views,
 }));
 
 const allTags = [

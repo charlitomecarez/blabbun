@@ -90,6 +90,21 @@ export type Database = {
         };
         Relationships: [];
       };
+      post_views: {
+        Row: {
+          post_slug: string;
+          count: number;
+        };
+        Insert: {
+          post_slug: string;
+          count?: number;
+        };
+        Update: {
+          post_slug?: string;
+          count?: number;
+        };
+        Relationships: [];
+      };
       post_notifications: {
         Row: {
           notified_at: string;
@@ -144,3 +159,4 @@ export type SubscriberRow = Database["public"]["Tables"]["subscribers"]["Row"];
 export type PostNotificationRow =
   Database["public"]["Tables"]["post_notifications"]["Row"];
 export type AdminUserRow = Database["public"]["Tables"]["admin_users"]["Row"];
+export type PostViewRow = Database["public"]["Tables"]["post_views"]["Row"];

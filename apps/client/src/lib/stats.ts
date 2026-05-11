@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@blabbun/db";
 export interface PostStats {
   claps: number;
   commentCount: number;
+  views: number;
 }
 
 export async function fetchPostStats(
@@ -11,7 +12,7 @@ export async function fetchPostStats(
 ): Promise<Record<string, PostStats>> {
   if (slugs.length === 0) return {};
 
-  const [clapsResult, commentsResult] = await Promise.all([
+  const [clapsResult, commentsResult, viewsResult] = await Promise.all([
     supabase
       .from("post_claps")
       .select("post_slug, count")
@@ -22,10 +23,14 @@ export async function fetchPostStats(
       .select("post_slug")
       .in("post_slug", slugs)
       .is("parent_id", null),
+    supabase
+      .from("post_views")
+      .select("post_slug, count")
+      .in("post_slug", slugs),
   ]);
 
   const stats: Record<string, PostStats> = Object.fromEntries(
-    slugs.map((slug) => [slug, { claps: 0, commentCount: 0 }])
+    slugs.map((slug) => [slug, { claps: 0, commentCount: 0, views: 0 }])
   );
 
   for (const row of clapsResult.data ?? []) {
@@ -34,6 +39,10 @@ export async function fetchPostStats(
 
   for (const row of commentsResult.data ?? []) {
     if (stats[row.post_slug]) stats[row.post_slug].commentCount++;
+  }
+
+  for (const row of viewsResult.data ?? []) {
+    if (stats[row.post_slug]) stats[row.post_slug].views = row.count;
   }
 
   return stats;

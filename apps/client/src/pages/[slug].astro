@@ -16,6 +16,7 @@ import ClapShare from "@/components/post/ClapShare.svelte";
 import Comments from "@/components/post/Comments.svelte";
 import PostNewsletterSidebar from "@/components/post/PostNewsletterSidebar.svelte";
 import PostTableOfContents from "@/components/post/PostTableOfContents.svelte";
+import PostViews from "@/components/post/PostViews.svelte";
 import QuotePopover from "@/components/post/QuotePopover.svelte";
 import WelcomeConfetti from "@/components/post/WelcomeConfetti.svelte";
 import Layout from "@/layouts/Layout.astro";
@@ -176,6 +177,11 @@ const breadcrumbLd = {
         pubDate={post.data.pubDate}
         backHref="/"
       />
+
+      <!-- View counter -->
+      <div style="margin-bottom:16px;margin-top:-4px">
+        <PostViews client:idle slug={post.id} />
+      </div>
 
       <!-- Optional image -->
       {
