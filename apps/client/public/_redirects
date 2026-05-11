@@ -1,5 +1,5 @@
-# www → non-www 301 redirect
-# Cloudflare Pages _redirects supports this when both domains are proxied via Cloudflare.
-# If this doesn't fire, create the rule in Cloudflare Dashboard → Rules → Redirect Rules:
-#   Match: https://www.blabbun.com/*  →  https://blabbun.com/:splat  301
-https://www.blabbun.com/* https://blabbun.com/:splat 301
+# www → non-www redirect must be configured in the Cloudflare dashboard:
+# Dashboard → Rules → Redirect Rules → Create a rule:
+#   Request URL matches: https://www.blabbun.com/*
+#   Redirect to: https://blabbun.com/${1}
+#   Type: 301 Permanent
