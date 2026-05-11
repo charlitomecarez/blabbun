@@ -12,8 +12,27 @@ const totalWords = posts.reduce(
 
 <Layout
   title="About"
-  description="The person behind blabbun — a blog of unfiltered takes, half-finished thoughts, and things probably better left unsaid."
+  description="The person behind Blab Bun — a blog of unfiltered takes, half-finished thoughts, and things probably better left unsaid."
 >
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "@id": "https://blabbun.com/#author",
+      name: "Blab Bun",
+      alternateName: ["blabbun", "blab bun"],
+      url: "https://blabbun.com/about",
+      sameAs: [
+        "https://twitter.com/blabbun",
+        "https://x.com/blabbun",
+        "https://blabbun.com",
+      ],
+      worksFor: { "@id": "https://blabbun.com/#organization" },
+    })}
+  />
   <main
     class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-10"
   >
