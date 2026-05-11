@@ -7,7 +7,7 @@ import Layout from "@/layouts/Layout.astro";
     <div class="animate-[fadeIn_0.2s_ease]">
       <!-- back -->
       <a
-        href="/"
+        href="/?utm_source=privacy&utm_medium=internal&utm_campaign=back_nav"
         class="mb-7 inline-block text-[0.76rem] text-[var(--accent)] no-underline"
       >
         ← back
@@ -18,27 +18,44 @@ import Layout from "@/layouts/Layout.astro";
 
       <!-- content -->
       <div
-        class="max-w-[540px] space-y-3.5 text-[0.82rem] leading-[1.9] text-[var(--muted)]"
+        class="”max-w-[540px]"
+        space-y-3.5
+        text-[0.82rem]
+        leading-[1.9]
+        text-[var(--muted)]”
       >
         <p>
-          i don&apos;t collect your personal data in any creepy way. there *is*
-          basic analytics running (shoutout cloudflare) but it&apos;s the boring
-          kind — just general traffic stats, not “who you are, where you live,
-          what you had for lunch” type stuff.
+          this site uses <strong class="”font-medium" text-[var(--text)]”
+            >Google Analytics (GA4)</strong
+          > to understand basic traffic patterns — page views, referrers, session
+          counts, and which posts people actually read. GA sets cookies and sends
+          that data to Google. you can opt out via
+          <a
+            href="”https://tools.google.com/dlpage/gaoptout”"
+            target="”_blank”"
+            rel="”noopener"
+            noreferrer”
+            class="”text-[var(--accent)]"
+            no-underline”>Google's opt-out tool</a
+          >.
         </p>
 
         <p>
-          if you subscribe to the newsletter, i get your email address and
-          that&apos;s it. i&apos;m not selling it, renting it, or doing anything
-          weird with it. you&apos;ll just get the occasional post when i
-          remember this blog exists.
+          if you subscribe to the newsletter, i store your email address in a
+          database (supabase). that&apos;s it. i&apos;m not selling it, renting
+          it, or doing anything weird with it. you can unsubscribe any time via
+          the link in any email i send.
         </p>
 
         <p>
-          comments aren&apos;t stored in your browser anymore — they&apos;re
-          saved in a database (supabase gang). they&apos;re still anonymous
-          though, unless you decide to expose yourself in the comment box which
-          is between you and your future self.
+          comments are saved server-side and are anonymous — no account, no name
+          required. claps work the same way: your IP address is hashed (sha-256,
+          one-way) to prevent duplicates, but the raw address is never stored.
+        </p>
+
+        <p>
+          page view counts are tracked per post. no personal data is attached to
+          a view — it&apos;s just a counter.
         </p>
       </div>
     </div>
