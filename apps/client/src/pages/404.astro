@@ -4,43 +4,72 @@ import Layout from "@/layouts/Layout.astro";
 
 <Layout title="404 — not found" description="This page doesn't exist.">
   <main
-    class="mx-auto flex min-h-[60vh] w-full max-w-[680px] flex-1 flex-col justify-center px-8"
+    class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-4 py-6 sm:px-8 sm:py-10"
   >
-    <div class="animate-[fadeIn_0.2s_ease]">
+    <div class="reveal">
+      <!-- back -->
+      <a
+        href="/?utm_source=404&utm_medium=internal&utm_campaign=error_recovery"
+        style="color:var(--accent);font-family:'Caveat',cursive;font-size:1.1rem;
+               text-decoration:none;display:inline-block;margin-bottom:24px"
+      >
+        ← back to the blabs
+      </a>
+
+      <!-- 404 label -->
       <div
-        class="mb-4 text-[0.68rem] tracking-[0.06em] text-[var(--muted)] uppercase"
+        style="font-family:'Caveat',cursive;font-size:1.2rem;color:var(--accent);margin-bottom:8px"
       >
         404
       </div>
 
+      <!-- heading -->
       <h1
-        class="mb-3 text-[1.05rem] leading-[1.4] font-semibold text-[var(--text)]"
+        style="font-family:'Fraunces',serif;font-size:2.2rem;font-weight:600;
+               line-height:1.05;margin-bottom:16px;letter-spacing:-0.02em;text-wrap:balance"
       >
-        this page doesn't exist.
+        this page <span style="font-style:italic">doesn't exist.</span>
       </h1>
 
+      <!-- scribble divider -->
+      <svg
+        width="160"
+        height="14"
+        viewBox="0 0 160 14"
+        style="margin-bottom:28px;display:block"
+        aria-hidden="true"
+      >
+        <path
+          d="M2 8 Q 24 2, 48 8 T 96 8 T 158 7"
+          stroke="var(--accent)"
+          stroke-width="2"
+          fill="none"
+          stroke-linecap="round"></path>
+      </svg>
+
+      <!-- body -->
       <p
-        class="mb-8 max-w-[420px] text-[0.84rem] leading-[1.8] text-pretty text-[var(--muted)]"
+        style="font-size:0.92rem;color:var(--muted);line-height:1.95;max-width:480px;margin-bottom:32px"
       >
         it might've been moved, deleted, or never existed in the first place.
         either way, it's not here now.
       </p>
 
-      <div class="flex flex-wrap gap-3">
-        <a
-          href="/"
-          class="rounded-[3px] border border-[var(--accent)] px-[14px] py-[7px] text-[0.78rem] text-[var(--accent)] no-underline transition-colors duration-150 hover:bg-[var(--accent-soft)]"
-        >
-          ← go home
-        </a>
-
-        <a
-          href="/archive"
-          class="rounded-[3px] border border-[var(--border)] px-[14px] py-[7px] text-[0.78rem] text-[var(--muted)] no-underline transition-colors duration-150 hover:bg-[var(--bg2)]"
-        >
-          browse all posts
-        </a>
-      </div>
+      <!-- secondary link -->
+      <a
+        href="/archive?utm_source=404&utm_medium=internal&utm_campaign=error_recovery"
+        style="font-size:0.84rem;color:var(--muted);text-decoration:none;transition:color 0.15s"
+      >
+        browse all posts →
+      </a>
     </div>
   </main>
+
+  <style>
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.75rem !important;
+      }
+    }
+  </style>
 </Layout>

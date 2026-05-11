@@ -27,6 +27,11 @@ export const DELETE: APIRoute = async () => {
   const appEnv = getAppEnv(runtimeEnv);
   const supabase = getClient();
 
+  // Only delete rows created by Playwright/Jest: test slugs (test-post-*, clap-test-*)
+  // and test subscriber emails (*@example.com).
+  const testSlugFilter =
+    "post_slug.ilike.test-post-%,post_slug.ilike.clap-test-%";
+
   const [
     comments,
     clapVotes,
@@ -39,20 +44,20 @@ export const DELETE: APIRoute = async () => {
       .from("comments")
       .delete()
       .eq("env", appEnv)
-      .neq("id", "00000000-0000-0000-0000-000000000000"),
-    supabase.from("clap_votes").delete().eq("env", appEnv).neq("post_slug", ""),
-    supabase.from("post_claps").delete().eq("env", appEnv).neq("post_slug", ""),
-    supabase.from("post_views").delete().eq("env", appEnv).neq("post_slug", ""),
+      .ilike("post_slug", "test-post-%"),
+    supabase.from("clap_votes").delete().eq("env", appEnv).or(testSlugFilter),
+    supabase.from("post_claps").delete().eq("env", appEnv).or(testSlugFilter),
+    supabase.from("post_views").delete().eq("env", appEnv).or(testSlugFilter),
     supabase
       .from("post_notifications")
       .delete()
       .eq("env", appEnv)
-      .neq("post_slug", ""),
+      .or(testSlugFilter),
     supabase
       .from("subscribers")
       .delete()
       .eq("env", appEnv)
-      .neq("id", "00000000-0000-0000-0000-000000000000"),
+      .ilike("email", "%@example.com"),
   ]);
 
   const errors = [
