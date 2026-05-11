@@ -2,10 +2,13 @@ import { createSupabaseClient } from "@blabbun/db";
 import type { APIRoute } from "astro";
 import { env } from "cloudflare:workers";
 
+import { getAppEnv } from "@/lib/env";
+
 export const prerender = false;
 
+const runtimeEnv = env as unknown as Record<string, string | undefined>;
+
 function getClient() {
-  const runtimeEnv = env as unknown as Record<string, string | undefined>;
   return createSupabaseClient(
     runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
     runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
@@ -21,13 +24,14 @@ function json(data: unknown, status = 200) {
 }
 
 export const POST: APIRoute = async ({ request }) => {
+  const appEnv = getAppEnv(runtimeEnv);
   const { email } = (await request.json()) as { email?: string };
   if (!email?.trim()) return json({ error: "email is required" }, 400);
 
   const supabase = getClient();
   const { data, error } = await supabase
     .from("subscribers")
-    .insert({ email: email.trim() })
+    .insert({ env: appEnv, email: email.trim() })
     .select()
     .single();
 
