@@ -85,6 +85,20 @@ const allTags = [
       </div>
     </section>
 
+    <!-- Static content for search engine crawlers -->
+    <div
+      style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;"
+      aria-hidden="true"
+    >
+      <p>
+        Blab Bun is a personal blog of unfiltered opinions, half-baked thoughts,
+        and writing that probably should have stayed in the drafts. Topics
+        include life, culture, anime, traffic, and whatever else the bun is
+        thinking about. New posts published regularly — no editorial calendar,
+        no agenda, just honest writing.
+      </p>
+    </div>
+
     <Ticker client:idle />
 
     <HomeFeed feedItems={feedItems} allTags={allTags} client:idle />
