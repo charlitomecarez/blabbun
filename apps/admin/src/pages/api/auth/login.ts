@@ -48,10 +48,9 @@ export const POST: APIRoute = async ({ request }) => {
     .select("id, email, role, password_hash")
     .eq("env", appEnv)
     .eq("email", email)
-    .single();
+    .maybeSingle();
 
-  if (dbError && dbError.code !== "PGRST116")
-    return json({ error: "server error" }, 500);
+  if (dbError) return json({ error: "server error" }, 500);
 
   const passwordMatch = await bcrypt.compare(
     password,

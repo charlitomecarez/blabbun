@@ -27,36 +27,42 @@ export const DELETE: APIRoute = async () => {
   const appEnv = getAppEnv(runtimeEnv);
   const supabase = getClient();
 
-  const [comments, clapVotes, postClaps, postViews, subscribers] =
-    await Promise.all([
-      supabase
-        .from("comments")
-        .delete()
-        .eq("env", appEnv)
-        .neq("id", "00000000-0000-0000-0000-000000000000"),
-      supabase
-        .from("clap_votes")
-        .delete()
-        .eq("env", appEnv)
-        .neq("post_slug", ""),
-      supabase
-        .from("post_claps")
-        .delete()
-        .eq("env", appEnv)
-        .neq("post_slug", ""),
-      supabase
-        .from("post_views")
-        .delete()
-        .eq("env", appEnv)
-        .neq("post_slug", ""),
-      supabase
-        .from("subscribers")
-        .delete()
-        .eq("env", appEnv)
-        .neq("id", "00000000-0000-0000-0000-000000000000"),
-    ]);
+  const [
+    comments,
+    clapVotes,
+    postClaps,
+    postViews,
+    postNotifications,
+    subscribers,
+  ] = await Promise.all([
+    supabase
+      .from("comments")
+      .delete()
+      .eq("env", appEnv)
+      .neq("id", "00000000-0000-0000-0000-000000000000"),
+    supabase.from("clap_votes").delete().eq("env", appEnv).neq("post_slug", ""),
+    supabase.from("post_claps").delete().eq("env", appEnv).neq("post_slug", ""),
+    supabase.from("post_views").delete().eq("env", appEnv).neq("post_slug", ""),
+    supabase
+      .from("post_notifications")
+      .delete()
+      .eq("env", appEnv)
+      .neq("post_slug", ""),
+    supabase
+      .from("subscribers")
+      .delete()
+      .eq("env", appEnv)
+      .neq("id", "00000000-0000-0000-0000-000000000000"),
+  ]);
 
-  const errors = [comments, clapVotes, postClaps, postViews, subscribers]
+  const errors = [
+    comments,
+    clapVotes,
+    postClaps,
+    postViews,
+    postNotifications,
+    subscribers,
+  ]
     .map((r) => r.error?.message)
     .filter(Boolean);
 
