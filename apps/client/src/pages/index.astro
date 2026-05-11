@@ -24,7 +24,7 @@ const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
 );
 
 const stats = await fetchPostStats(
-  posts.slice(0, 10).map((p) => p.id),
+  posts.slice(0, 5).map((p) => p.id),
   supabase
 );
 
@@ -53,7 +53,10 @@ const allTags = [
 ];
 ---
 
-<Layout>
+<Layout
+  title="Unfiltered Takes & Half-Baked Thoughts"
+  description="Blab Bun — a blog of unfiltered takes, half-finished thoughts, and things probably better left unsaid. New posts drop whenever the bun feels like it."
+>
   <main class="mx-auto min-h-[60vh] w-full max-w-[680px] flex-1 px-8">
     <!-- Hero section -->
     <section
@@ -78,9 +81,70 @@ const allTags = [
           >
             probably should've kept to myself. but here we are.
           </p>
+          <!-- Social share links -->
+          <div
+            style="display:flex;gap:14px;align-items:center;margin-top:18px;flex-wrap:wrap;"
+          >
+            <a
+              href="https://twitter.com/intent/tweet?url=https://blabbun.com&text=check+out+blab+bun+%E2%80%94+unfiltered+takes+%26+half-baked+thoughts"
+              target="_blank"
+              rel="noopener noreferrer"
+              style="font-size:0.72rem;color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:color 0.15s;"
+              aria-label="Share Blab Bun on X (Twitter)"
+            >
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                ></path>
+              </svg>
+              share on x
+            </a>
+            <a
+              href="/rss.xml"
+              style="font-size:0.72rem;color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:color 0.15s;"
+              aria-label="Subscribe via RSS"
+            >
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+                <circle cx="5" cy="19" r="1" fill="currentColor"></circle>
+              </svg>
+              rss
+            </a>
+          </div>
         </div>
       </div>
     </section>
+
+    <!-- Static content for search engine crawlers -->
+    <div
+      style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden;"
+      aria-hidden="true"
+    >
+      <p>
+        Blab Bun is a personal blog of unfiltered opinions, half-baked thoughts,
+        and writing that probably should have stayed in the drafts. Topics
+        include life, culture, anime, traffic, and whatever else the bun is
+        thinking about. New posts published regularly — no editorial calendar,
+        no agenda, just honest writing.
+      </p>
+    </div>
 
     <Ticker client:idle />
 
