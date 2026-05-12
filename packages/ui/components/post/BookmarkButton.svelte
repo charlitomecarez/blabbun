@@ -7,6 +7,8 @@
 
   let saved = $state(false);
   let mounted = $state(false);
+  let burst = $state(false);
+  let burstTimer: ReturnType<typeof setTimeout> | undefined;
 
   $effect(() => {
     saved = localStorage.getItem(`bb-bookmark-${slug}`) === "1";
@@ -16,6 +18,9 @@
   function toggle() {
     if (!mounted) return;
     saved = !saved;
+    burst = true;
+    clearTimeout(burstTimer);
+    burstTimer = setTimeout(() => (burst = false), 350);
     if (saved) {
       localStorage.setItem(`bb-bookmark-${slug}`, "1");
     } else {
@@ -32,35 +37,52 @@
     class="bookmark-btn"
     onclick={toggle}
     aria-label={saved ? "Remove bookmark" : "Bookmark this post"}
-    title={saved ? "Bookmarked" : "Bookmark"}
+    title={saved ? "Remove bookmark" : "Bookmark"}
     class:saved
+    class:burst
+    aria-pressed={saved}
   >
-    🔖{#if saved}<span class="bookmark-label">saved</span>{/if}
+    🔖<span class="bookmark-label">{saved ? "saved" : "save"}</span>
   </button>
 {/if}
 
 <style>
   .bookmark-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 2px 6px;
-    font-family: inherit;
-    font-size: 1rem;
-    transition:
-      color 0.15s,
-      background 0.15s;
-    color: var(--muted);
-    border-radius: 4px;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: var(--muted);
+    cursor: pointer;
     line-height: 1;
+    transition:
+      color 0.15s,
+      border-color 0.15s,
+      background 0.15s,
+      transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+
+  .bookmark-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
   .bookmark-btn.saved {
     color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
   }
+
+  .bookmark-btn.burst {
+    transform: scale(1.2);
+  }
+
   .bookmark-label {
     font-size: 0.6rem;
     font-weight: 600;
