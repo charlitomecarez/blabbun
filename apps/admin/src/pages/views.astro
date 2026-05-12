@@ -1,0 +1,429 @@
+---
+import type { PostViewRow } from "@blabbun/db";
+import { createSupabaseClient } from "@blabbun/db";
+import { env } from "cloudflare:workers";
+
+import Layout from "../layouts/Layout.astro";
+
+const runtimeEnv = env as unknown as Record<string, string | undefined>;
+const supabase = createSupabaseClient(
+  runtimeEnv.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+  runtimeEnv.SUPABASE_SERVICE_ROLE_KEY ??
+    import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+const { data: views } = await supabase
+  .from("post_views")
+  .select("*")
+  .order("count", { ascending: false });
+
+const rows = (views ?? []) as PostViewRow[];
+const total = rows.reduce((s, r) => s + (r.count ?? 0), 0);
+---
+
+<Layout title="post views">
+  <!-- Create form -->
+  <div
+    style="border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:24px;background:var(--bg2)"
+  >
+    <div
+      style="font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px"
+    >
+      add entry
+    </div>
+    <form id="create-form" style="display:flex;gap:8px;flex-wrap:wrap">
+      <input
+        name="post_slug"
+        placeholder="post-slug"
+        required
+        style="flex:1;min-width:160px;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+      />
+      <input
+        name="count"
+        type="number"
+        min="0"
+        placeholder="count (default 0)"
+        style="width:160px;padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+      />
+      <select
+        name="env"
+        style="padding:7px 10px;font-size:0.78rem;font-family:inherit;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none"
+      >
+        <option value="staging">staging</option>
+        <option value="live">live</option>
+      </select>
+      <button
+        type="submit"
+        style="padding:7px 14px;font-size:0.75rem;font-family:inherit;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer;white-space:nowrap"
+        >add</button
+      >
+    </form>
+  </div>
+
+  <!-- Bulk action bar -->
+  <div
+    id="bulk-bar"
+    style="display:none;align-items:center;gap:12px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:8px"
+  >
+    <span id="selection-count" style="font-size:0.75rem;color:var(--muted)"
+      >0 selected</span
+    >
+    <button
+      id="delete-selected"
+      style="padding:4px 12px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid #e05c5c;border-radius:3px;color:#e05c5c;cursor:pointer"
+      onmouseenter="this.style.background='rgba(224,92,92,0.08)'"
+      onmouseleave="this.style.background='none'">delete selected</button
+    >
+  </div>
+
+  <div
+    style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"
+  >
+    <span style="font-size:0.72rem;color:var(--muted)"
+      >{rows.length} posts · {total.toLocaleString()} total views</span
+    >
+    <div id="pagination" style="display:flex;align-items:center;gap:6px">
+      <button
+        id="prev-btn"
+        style="padding:3px 9px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;line-height:1"
+        onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+        onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+        >←</button
+      >
+      <span id="page-info" style="font-size:0.72rem;color:var(--muted)"
+        >page 1 of 1</span
+      >
+      <button
+        id="next-btn"
+        style="padding:3px 9px;font-size:0.72rem;font-family:inherit;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;line-height:1"
+        onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+        onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+        >→</button
+      >
+    </div>
+  </div>
+
+  {
+    !rows.length ? (
+      <p style="font-size:0.8rem;color:var(--muted);padding:32px 0;border-top:1px solid var(--divider)">
+        no views yet.
+      </p>
+    ) : (
+      <div style="border:1px solid var(--border);border-radius:4px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:var(--bg2)">
+              <th style="padding:10px 12px;width:36px;text-align:center">
+                <input
+                  type="checkbox"
+                  id="check-all"
+                  style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent)"
+                />
+              </th>
+              <th style="text-align:left;padding:10px 16px;font-size:0.68rem;font-weight:500;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase">
+                env
+              </th>
+              <th style="text-align:left;padding:10px 16px;font-size:0.68rem;font-weight:500;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase">
+                post
+              </th>
+              <th style="text-align:right;padding:10px 16px;font-size:0.68rem;font-weight:500;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase">
+                views
+              </th>
+              <th style="padding:10px 16px;width:160px" />
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr
+                data-slug={r.post_slug}
+                data-env={r.env}
+                style="border-top:1px solid var(--divider);background:var(--bg)"
+              >
+                <td style="padding:12px;text-align:center">
+                  <input
+                    type="checkbox"
+                    class="row-check"
+                    data-slug={r.post_slug}
+                    data-env={r.env}
+                    style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent)"
+                  />
+                </td>
+                <td style="padding:12px 16px">
+                  {r.env === "live" ? (
+                    <span style="font-size:0.65rem;padding:2px 7px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-weight:500;letter-spacing:0.03em">
+                      live
+                    </span>
+                  ) : (
+                    <span style="font-size:0.65rem;padding:2px 7px;border-radius:20px;background:var(--bg2);color:var(--muted);font-weight:500;letter-spacing:0.03em;border:1px solid var(--border)">
+                      staging
+                    </span>
+                  )}
+                </td>
+                <td style="padding:12px 16px;font-size:0.8rem;color:var(--text)">
+                  <a
+                    href={`https://blabbun.com/${r.post_slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style="color:var(--text);text-decoration:none"
+                    onmouseenter="this.style.color='var(--accent)'"
+                    onmouseleave="this.style.color='var(--text)'"
+                  >
+                    /{r.post_slug}
+                  </a>
+                </td>
+                <td style="padding:12px 16px;font-size:0.8rem;color:var(--text);text-align:right;font-weight:500">
+                  <span class="count-text">{r.count.toLocaleString()}</span>
+                  <div class="edit-mode" style="display:none">
+                    <input
+                      type="number"
+                      min="0"
+                      class="edit-input"
+                      value={r.count}
+                      style="width:80px;padding:4px 6px;font-size:0.78rem;font-family:inherit;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);outline:none;text-align:right"
+                    />
+                  </div>
+                </td>
+                <td style="padding:12px 16px;text-align:right">
+                  <div
+                    class="action-btns"
+                    style="display:flex;gap:6px;justify-content:flex-end"
+                  >
+                    <button
+                      onclick={`startEdit('${r.post_slug}','${r.env}')`}
+                      style="background:none;border:1px solid var(--border);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit"
+                      onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+                      onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                    >
+                      edit
+                    </button>
+                    <button
+                      onclick={`deleteEntry('${r.post_slug}','${r.env}')`}
+                      style="background:none;border:1px solid var(--border);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit"
+                      onmouseenter="this.style.borderColor='#e05c5c';this.style.color='#e05c5c'"
+                      onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"
+                    >
+                      delete
+                    </button>
+                  </div>
+                  <div
+                    class="edit-btns"
+                    style="display:none;gap:6px;justify-content:flex-end"
+                  >
+                    <button
+                      onclick={`saveViews('${r.post_slug}','${r.env}',this)`}
+                      style="background:none;border:1px solid var(--accent);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--accent);cursor:pointer;font-family:inherit"
+                    >
+                      save
+                    </button>
+                    <button
+                      onclick={`cancelEdit('${r.post_slug}','${r.env}')`}
+                      style="background:none;border:1px solid var(--border);border-radius:3px;padding:3px 10px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:inherit"
+                    >
+                      cancel
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+</Layout>
+
+<script>
+  const PAGE_SIZE = 20;
+  let currentPage = 1;
+
+  function allRows(): HTMLElement[] {
+    return Array.from(
+      document.querySelectorAll<HTMLElement>("tbody tr[data-slug]")
+    );
+  }
+
+  function pageRows(): HTMLElement[] {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return allRows().slice(start, start + PAGE_SIZE);
+  }
+
+  function totalPages(): number {
+    return Math.max(1, Math.ceil(allRows().length / PAGE_SIZE));
+  }
+
+  function updatePage() {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    allRows().forEach((row, i) => {
+      row.style.display = i >= start && i < end ? "" : "none";
+      if (i < start || i >= end) {
+        const cb = row.querySelector<HTMLInputElement>(".row-check");
+        if (cb) cb.checked = false;
+      }
+    });
+    updatePaginationUI();
+    updateSelectionUI();
+  }
+
+  function updatePaginationUI() {
+    const tp = totalPages();
+    const pageInfo = document.getElementById("page-info");
+    const prevBtn = document.getElementById("prev-btn") as HTMLButtonElement | null;
+    const nextBtn = document.getElementById("next-btn") as HTMLButtonElement | null;
+    if (pageInfo) pageInfo.textContent = `page ${currentPage} of ${tp}`;
+    if (prevBtn) {
+      prevBtn.disabled = currentPage <= 1;
+      prevBtn.style.opacity = currentPage <= 1 ? "0.4" : "1";
+    }
+    if (nextBtn) {
+      nextBtn.disabled = currentPage >= tp;
+      nextBtn.style.opacity = currentPage >= tp ? "0.4" : "1";
+    }
+    const pag = document.getElementById("pagination");
+    if (pag) pag.style.display = tp <= 1 ? "none" : "flex";
+  }
+
+  function getCheckedRows(): { slug: string; env: string }[] {
+    return Array.from(
+      document.querySelectorAll<HTMLInputElement>(".row-check:checked")
+    ).map((cb) => ({ slug: cb.dataset.slug!, env: cb.dataset.env! }));
+  }
+
+  function updateSelectionUI() {
+    const rows = getCheckedRows();
+    const bar = document.getElementById("bulk-bar");
+    const countEl = document.getElementById("selection-count");
+    if (bar) bar.style.display = rows.length > 0 ? "flex" : "none";
+    if (countEl) countEl.textContent = `${rows.length} selected`;
+
+    const pageChecks = pageRows().map((r) =>
+      r.querySelector<HTMLInputElement>(".row-check")
+    );
+    const checkedCount = pageChecks.filter((cb) => cb?.checked).length;
+    const all = pageChecks.length;
+    const headerCb = document.getElementById("check-all") as HTMLInputElement | null;
+    if (headerCb) {
+      headerCb.checked = all > 0 && checkedCount === all;
+      headerCb.indeterminate = checkedCount > 0 && checkedCount < all;
+    }
+  }
+
+  document.getElementById("prev-btn")?.addEventListener("click", () => {
+    if (currentPage > 1) { currentPage--; updatePage(); }
+  });
+  document.getElementById("next-btn")?.addEventListener("click", () => {
+    if (currentPage < totalPages()) { currentPage++; updatePage(); }
+  });
+
+  document.getElementById("check-all")?.addEventListener("change", (e) => {
+    const checked = (e.target as HTMLInputElement).checked;
+    pageRows().forEach((row) => {
+      const cb = row.querySelector<HTMLInputElement>(".row-check");
+      if (cb) cb.checked = checked;
+    });
+    updateSelectionUI();
+  });
+
+  document.querySelector("tbody")?.addEventListener("change", (e) => {
+    if ((e.target as HTMLElement).classList.contains("row-check")) {
+      updateSelectionUI();
+    }
+  });
+
+  document.getElementById("delete-selected")?.addEventListener("click", async () => {
+    const selected = getCheckedRows();
+    if (!selected.length) return;
+    if (!confirm(`delete ${selected.length} entr${selected.length > 1 ? "ies" : "y"}?`)) return;
+    await Promise.all(
+      selected.map(({ slug, env }) =>
+        fetch(`/api/views/${encodeURIComponent(slug)}?env=${env}`, { method: "DELETE" })
+      )
+    );
+    selected.forEach(({ slug, env }) =>
+      document
+        .querySelector(`[data-slug="${slug}"][data-env="${env}"]`)
+        ?.remove()
+    );
+    if (currentPage > totalPages()) currentPage = totalPages();
+    updatePage();
+  });
+
+  function getRow(slug: string, env: string) {
+    return document.querySelector(`[data-slug="${slug}"][data-env="${env}"]`);
+  }
+
+  function startEdit(slug: string, env: string) {
+    const row = getRow(slug, env);
+    (row?.querySelector(".count-text") as HTMLElement).style.display = "none";
+    (row?.querySelector(".edit-mode") as HTMLElement).style.display = "block";
+    (row?.querySelector(".action-btns") as HTMLElement).style.display = "none";
+    (row?.querySelector(".edit-btns") as HTMLElement).style.display = "flex";
+  }
+
+  function cancelEdit(slug: string, env: string) {
+    const row = getRow(slug, env);
+    (row?.querySelector(".count-text") as HTMLElement).style.display = "";
+    (row?.querySelector(".edit-mode") as HTMLElement).style.display = "none";
+    (row?.querySelector(".action-btns") as HTMLElement).style.display = "flex";
+    (row?.querySelector(".edit-btns") as HTMLElement).style.display = "none";
+  }
+
+  async function saveViews(slug: string, env: string, btn: HTMLButtonElement) {
+    const row = getRow(slug, env);
+    const input = row?.querySelector(".edit-input") as HTMLInputElement | null;
+    const count = parseInt(input?.value ?? "0", 10);
+    btn.textContent = "saving…";
+    const res = await fetch(`/api/views/${encodeURIComponent(slug)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ count, env }),
+    });
+    if (res.ok) {
+      const txt = row?.querySelector(".count-text");
+      if (txt) txt.textContent = count.toLocaleString();
+      cancelEdit(slug, env);
+    } else {
+      alert("failed to save");
+      btn.textContent = "save";
+    }
+  }
+
+  async function deleteEntry(slug: string, env: string) {
+    if (!confirm(`delete view entry for "${slug}" (${env})?`)) return;
+    const res = await fetch(
+      `/api/views/${encodeURIComponent(slug)}?env=${env}`,
+      { method: "DELETE" }
+    );
+    if (res.ok) {
+      getRow(slug, env)?.remove();
+      if (currentPage > totalPages()) currentPage = totalPages();
+      updatePage();
+    } else alert("failed to delete");
+  }
+
+  document.getElementById("create-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const data = Object.fromEntries(new FormData(form));
+    const res = await fetch("/api/views", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        post_slug: data.post_slug,
+        count: Number(data.count) || 0,
+        env: data.env,
+      }),
+    });
+    if (res.ok) {
+      form.reset();
+      location.reload();
+    } else {
+      const j = (await res.json()) as { error?: string };
+      alert(j.error ?? "failed");
+    }
+  });
+
+  Object.assign(window, { startEdit, cancelEdit, saveViews, deleteEntry });
+
+  updatePage();
+</script>
