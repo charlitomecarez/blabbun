@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
   import { BookmarkButton } from "@blabbun/ui/components/post";
   import { tagClass } from "@blabbun/utils";
 
@@ -35,6 +37,14 @@
   }: Props = $props();
 
   let hov = $state(false);
+  // svelte-ignore state_referenced_locally
+  let clapCount = $state(claps);
+  let hasClapped = $state(false);
+  let clapLoading = $state(true);
+  let burst = $state(false);
+  let showPlus = $state(false);
+  let burstTimer: ReturnType<typeof setTimeout> | undefined;
+  let plusTimer: ReturnType<typeof setTimeout> | undefined;
 
   /**
    * Derive a consistent tilt angle from the href string so each card
@@ -61,6 +71,57 @@
 
   const slug = $derived(href.replace(/^\//, ""));
   const isFirstPost = $derived(slug === "welcome-to-blab-bun");
+
+  onMount(() => {
+    fetch(`/api/claps/${slug}`)
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json() as Promise<{ count: number; hasClapped: boolean }>;
+      })
+      .then((data) => {
+        clapCount = data.count ?? claps;
+        hasClapped = data.hasClapped;
+      })
+      .catch(() => {
+        /* silent — clap state failing shouldn't block the feed */
+      })
+      .finally(() => {
+        clapLoading = false;
+      });
+    return () => {
+      clearTimeout(burstTimer);
+      clearTimeout(plusTimer);
+    };
+  });
+
+  async function toggleClap(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (clapLoading) return;
+    const optimisticCount = hasClapped ? clapCount - 1 : clapCount + 1;
+    const optimisticHasClapped = !hasClapped;
+    clapCount = optimisticCount;
+    hasClapped = optimisticHasClapped;
+    burst = true;
+    clearTimeout(burstTimer);
+    burstTimer = setTimeout(() => (burst = false), 350);
+    if (optimisticHasClapped) {
+      showPlus = true;
+      clearTimeout(plusTimer);
+      plusTimer = setTimeout(() => (showPlus = false), 700);
+    }
+    try {
+      const res = await fetch(`/api/claps/${slug}`, { method: "POST" });
+      if (!res.ok) throw new Error();
+      const data = (await res.json()) as { count: number; hasClapped: boolean };
+      clapCount = data.count;
+      hasClapped = data.hasClapped;
+    } catch {
+      // revert optimistic update — hasClapped is already the new value, so inverse it
+      clapCount = hasClapped ? clapCount - 1 : clapCount + 1;
+      hasClapped = !hasClapped;
+    }
+  }
 </script>
 
 <article
@@ -148,26 +209,36 @@
       {#if readTime}
         <span class="stat">{readTime}</span>
       {/if}
-      {#if claps > 0}
-        <span class="stat">
-          <svg
-            width="11"
-            height="11"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-            style="display:inline-block;vertical-align:middle;margin-right:2px"
-          >
-            <path
-              d="M7 11.5V6a1.5 1.5 0 0 1 3 0v3m0-3a1.5 1.5 0 0 1 3 0v3m0-2a1.5 1.5 0 0 1 3 0v6a7 7 0 0 1-14 0v-4a1.5 1.5 0 0 1 3 0v2"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>{claps}
-        </span>
-      {/if}
+      <button
+        type="button"
+        class="clap-stat"
+        class:clapped={hasClapped}
+        class:burst
+        onclick={toggleClap}
+        disabled={clapLoading}
+        title={hasClapped ? "remove clap" : "clap for this post"}
+        aria-pressed={hasClapped}
+      >
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M7 11.5V6a1.5 1.5 0 0 1 3 0v3m0-3a1.5 1.5 0 0 1 3 0v3m0-2a1.5 1.5 0 0 1 3 0v6a7 7 0 0 1-14 0v-4a1.5 1.5 0 0 1 3 0v2"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span class="clap-count">{clapCount}</span>
+        {#if showPlus}
+          <span class="clap-plus" aria-hidden="true">+1</span>
+        {/if}
+      </button>
       {#if commentCount > 0}
         <span class="stat">
           <svg
@@ -448,6 +519,69 @@
     .latest-post .post-title {
       font-size: 1.2rem;
     }
+  }
+
+  /* ─── Clap button ────────────────────────────────────────────── */
+  .clap-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-family: inherit;
+    font-size: 0.65rem;
+    color: var(--muted);
+    cursor: pointer;
+    position: relative;
+    transition:
+      color 0.15s,
+      border-color 0.15s,
+      background 0.15s,
+      transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .clap-stat:hover:not(:disabled) {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .clap-stat:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  .clap-stat.clapped {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .clap-stat.burst {
+    transform: scale(1.2);
+  }
+
+  .clap-count {
+    font-weight: 500;
+  }
+
+  .clap-plus {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--accent);
+    pointer-events: none;
+    animation: float-up 0.7s ease forwards;
+  }
+
+  @keyframes float-up {
+    0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-12px); }
   }
 
   /* ─── First post stamp ────────────────────────────────────────── */
