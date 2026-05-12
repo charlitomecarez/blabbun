@@ -6,6 +6,7 @@ import { getCollection } from "astro:content";
 
 import ScrollToTop from "@/components/layouts/ScrollToTop.svelte";
 import SearchDropdown from "@/components/search/SearchDropdown.svelte";
+import { getAppEnv, getRuntimeEnv } from "@/lib/api";
 
 interface Props {
   title?: string;
@@ -59,6 +60,7 @@ const totalWords = allPosts.reduce(
   0
 );
 const postCount = allPosts.length;
+const isLive = getAppEnv(getRuntimeEnv(Astro.locals)) === "live";
 ---
 
 <!doctype html>
@@ -254,20 +256,20 @@ const postCount = allPosts.length;
       })}
     />
 
-    <!-- Google Analytics -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-W2X0YT96BY"
-      is:inline></script>
-    <script is:inline>
-      /* eslint-disable prefer-rest-params */
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "G-W2X0YT96BY");
-    </script>
+    <!-- Google Analytics (live only) -->
+    {
+      isLive && (
+        <Fragment
+          set:html={`<script async src="https://www.googletagmanager.com/gtag/js?id=G-W2X0YT96BY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag("js", new Date());
+  gtag("config", "G-W2X0YT96BY");
+</script>`}
+        />
+      )
+    }
 
     <slot name="head" />
 

@@ -7,5 +7,6 @@ export type {
   Database,
   PostClapRow,
   PostNotificationRow,
+  PostViewRow,
   SubscriberRow,
 } from "./types.js";

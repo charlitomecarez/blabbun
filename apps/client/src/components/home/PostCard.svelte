@@ -86,7 +86,7 @@
   <!-- "new ✶" stamp — only on the latest post in the current view -->
   {#if isLatest && !isFirstPost}
     <span class="handwritten latest-stamp" aria-label="Latest post"
-      >🚀 new ✶</span
+      >🚀 new ✶ #{postNumber}</span
     >
   {/if}
 
