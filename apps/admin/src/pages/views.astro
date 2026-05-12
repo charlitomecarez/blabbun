@@ -371,7 +371,7 @@ const total = rows.reduce((s, r) => s + (r.count ?? 0), 0);
   async function saveViews(slug: string, env: string, btn: HTMLButtonElement) {
     const row = getRow(slug, env);
     const input = row?.querySelector(".edit-input") as HTMLInputElement | null;
-    const count = parseInt(input?.value ?? "0", 10);
+    const count = Math.max(0, parseInt(input?.value ?? "0", 10) || 0);
     btn.textContent = "saving…";
     const res = await fetch(`/api/views/${encodeURIComponent(slug)}`, {
       method: "PUT",

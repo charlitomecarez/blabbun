@@ -29,6 +29,8 @@ export const POST: APIRoute = async ({ request }) => {
   };
   if (!post_slug?.trim()) return json({ error: "post_slug is required" }, 400);
 
+  // env is intentionally client-supplied: the views page shows all envs in one table
+  // and admins must be able to target either env explicitly. Admin routes are auth-gated.
   const validEnv = rowEnv === "live" ? "live" : "staging";
   const supabase = getClient();
   const { data, error } = await supabase

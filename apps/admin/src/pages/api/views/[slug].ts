@@ -28,6 +28,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     unknown
   >;
   const count = typeof body.count === "number" ? body.count : 0;
+  // env is intentionally client-supplied: cross-env admin management (auth-gated)
   const rowEnv = body.env === "live" ? "live" : "staging";
 
   const supabase = getClient();
@@ -43,6 +44,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
 export const DELETE: APIRoute = async ({ params, url }) => {
   const slug = decodeURIComponent(params.slug!);
+  // env is intentionally client-supplied: cross-env admin management (auth-gated)
   const rowEnv = url.searchParams.get("env") === "live" ? "live" : "staging";
 
   const supabase = getClient();
