@@ -1,7 +1,6 @@
 <script lang="ts">
-  import InfiniteScroll from "@/components/InfiniteScroll.svelte";
+  import FeaturedCard from "@/components/home/FeaturedCard.svelte";
   import PostCard from "@/components/home/PostCard.svelte";
-  import ScribbleDivider from "@/components/home/ScribbleDivider.svelte";
 
   interface FeedItemData {
     date: string;
@@ -42,16 +41,12 @@
       )
   );
 
-  const zineQuote = $derived(
-    sort === "newest" && feedItems.length > 3 ? feedItems[3] : null
-  );
-
-  const visible = $derived(
-    filtered
-      .slice(0, visibleCount)
-      .map((item, i) => ({ ...item, isLatest: i === 0 }))
-  );
-  const hasMore = $derived(visibleCount < filtered.length);
+  const isGridView = $derived(sort === "newest" && activeTag === "all");
+  const featuredPost = $derived(filtered[0] ?? null);
+  const sidebarPosts = $derived(filtered.slice(1, 4));
+  const listingPosts = $derived(isGridView ? filtered.slice(4) : filtered);
+  const visibleListing = $derived(listingPosts.slice(0, visibleCount));
+  const hasMore = $derived(visibleCount < listingPosts.length);
 
   $effect(() => {
     activeTag;
@@ -107,13 +102,56 @@
   {/each}
 </nav>
 
-<!-- Post list -->
-<div id="post-list" class="animate-[fadeIn_0.2s_ease] px-5">
-  {#each visible as item, i}
-    <PostCard {...item} index={i} />
-  {/each}
-  <InfiniteScroll {hasMore} onLoadMore={() => (visibleCount += 10)} />
-</div>
+{#if isGridView && featuredPost}
+  <section class="grid-section" aria-label="Featured posts">
+    <div class="featured-grid">
+      <FeaturedCard
+        date={featuredPost.date}
+        title={featuredPost.title}
+        excerpt={featuredPost.excerpt}
+        tags={featuredPost.tags}
+        readTime={featuredPost.readTime}
+        href={featuredPost.href}
+        claps={featuredPost.claps}
+        commentCount={featuredPost.commentCount}
+        views={featuredPost.views}
+        postNumber={featuredPost.postNumber}
+      />
+      <div class="sidebar-col">
+        <div class="sidebar-label handwritten">also fresh</div>
+        {#each sidebarPosts as item, i}
+          <PostCard {...item} index={i} compact={true} />
+        {/each}
+      </div>
+    </div>
+  </section>
+
+  {#if visibleListing.length > 0}
+    <div class="listing-divider" aria-hidden="true">
+      <span class="divider-label">more posts</span>
+    </div>
+    <section class="listing-section" aria-label="More posts">
+      {#each visibleListing as item, i}
+        <PostCard {...item} index={i} />
+      {/each}
+    </section>
+  {/if}
+
+{:else}
+  <div id="post-list" class="animate-[fadeIn_0.2s_ease] px-5">
+    {#each visibleListing.map((item, i) => ({ ...item, isLatest: i === 0 })) as item, i}
+      <PostCard {...item} index={i} />
+    {/each}
+  </div>
+{/if}
+
+{#if hasMore}
+  <div class="load-more-wrap">
+    <button class="load-more-btn" onclick={() => (visibleCount += 10)}>
+      ↓ load more posts
+    </button>
+  </div>
+{/if}
 
 <style>
   /* ─── Sort button ────────────────────────────────────────────── */
@@ -178,5 +216,93 @@
   .tag-btn--active {
     color: var(--accent);
     font-weight: 500;
+  }
+
+  /* ─── Grid section ───────────────────────────────────────────── */
+  .grid-section {
+    margin-top: 20px;
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+
+  .sidebar-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .sidebar-label {
+    font-size: 0.85rem;
+    color: var(--muted2);
+    margin-bottom: 2px;
+    transform: rotate(-1deg);
+    display: inline-block;
+  }
+
+  /* ─── Listing divider ────────────────────────────────────────── */
+  .listing-divider {
+    position: relative;
+    border-top: 1px dashed var(--border);
+    margin: 28px 0 0;
+    text-align: center;
+  }
+
+  .divider-label {
+    position: relative;
+    top: -9px;
+    display: inline-block;
+    background: var(--bg);
+    padding: 0 12px;
+    font-size: 0.65rem;
+    color: var(--muted2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .listing-section {
+    padding: 0 20px;
+  }
+
+  /* ─── Load more ──────────────────────────────────────────────── */
+  .load-more-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 24px 0 8px;
+  }
+
+  .load-more-btn {
+    background: none;
+    border: 1.5px dashed var(--border);
+    border-radius: 6px;
+    padding: 10px 32px;
+    font-size: 0.72rem;
+    font-family: inherit;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition:
+      color 0.15s,
+      border-color 0.15s;
+  }
+
+  .load-more-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* ─── Responsive ─────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .featured-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .listing-section {
+      padding: 0;
+    }
   }
 </style>
