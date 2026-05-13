@@ -49,8 +49,8 @@
   const hasMore = $derived(visibleCount < listingPosts.length);
 
   $effect(() => {
-    activeTag;
-    sort; // track — reset count when filter or sort changes
+    activeTag; // track — reset count when filter changes
+    sort; // track — reset count when sort changes
     visibleCount = 10;
   });
 </script>
@@ -117,12 +117,14 @@
         views={featuredPost.views}
         postNumber={featuredPost.postNumber}
       />
-      <div class="sidebar-col">
-        <div class="sidebar-label handwritten">also fresh</div>
-        {#each sidebarPosts as item, i}
-          <PostCard {...item} index={i} compact={true} />
-        {/each}
-      </div>
+      {#if sidebarPosts.length > 0}
+        <div class="sidebar-col">
+          <div class="sidebar-label handwritten">also fresh</div>
+          {#each sidebarPosts as item, i}
+            <PostCard {...item} index={i} compact={true} />
+          {/each}
+        </div>
+      {/if}
     </div>
   </section>
 
@@ -148,7 +150,7 @@
 {#if hasMore}
   <div class="load-more-wrap">
     <button class="load-more-btn" onclick={() => (visibleCount += 10)}>
-      ↓ load more posts
+      <span aria-hidden="true">↓</span> load more posts
     </button>
   </div>
 {/if}
