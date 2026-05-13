@@ -140,7 +140,7 @@
   {/if}
 
 {:else}
-  <div id="post-list" class="animate-[fadeIn_0.2s_ease] px-5">
+  <div id="post-list" class="animate-[fadeIn_0.2s_ease] px-5" style="max-width:680px;margin-left:auto;margin-right:auto;">
     {#each visibleListing.map((item, i) => ({ ...item, isLatest: i === 0 })) as item, i}
       <PostCard {...item} index={i} />
     {/each}
@@ -271,6 +271,9 @@
   }
 
   .listing-section {
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
     padding: 0 20px;
   }
 
