@@ -18,6 +18,7 @@
     index?: number;
     postNumber?: number;
     isLatest?: boolean;
+    compact?: boolean;
   }
 
   const {
@@ -34,6 +35,7 @@
     index = 0,
     postNumber,
     isLatest = false,
+    compact = false,
   }: Props = $props();
 
   let hov = $state(false);
@@ -131,6 +133,7 @@
   class:hov
   class:first-post={isFirstPost}
   class:latest-post={isLatest}
+  class:compact
   onmouseenter={() => (hov = true)}
   onmouseleave={() => (hov = false)}
 >
@@ -605,5 +608,33 @@
   .first-post {
     border-bottom-style: solid;
     border-bottom-color: var(--accent);
+  }
+
+  /* ─── Compact mode (sidebar cards in grid) ──────────────────── */
+  .post-card.compact {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .post-card.compact .this-one {
+    display: none;
+  }
+
+  .post-card.compact .post-num,
+  .post-card.compact .latest-stamp,
+  .post-card.compact .first-stamp {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .post-card.compact {
+      margin-left: 0;
+      margin-right: 0;
+      padding: 10px 12px;
+    }
   }
 </style>
