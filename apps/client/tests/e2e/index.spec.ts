@@ -5,34 +5,37 @@ test("homepage loads", async ({ page }) => {
   await expect(page).toHaveTitle(/Blab Bun/);
 });
 
-test("homepage renders post list", async ({ page }) => {
+test("homepage renders featured card in default view", async ({ page }) => {
   await page.goto("/");
-  // FeedItem renders h3.feed-title
-  await expect(page.locator(".feed-title").first()).toBeVisible();
+  await expect(page.locator(".featured-card")).toBeVisible();
 });
 
-test("homepage shows end marker when all posts are visible", async ({
-  page,
-}) => {
+test("homepage renders post titles", async ({ page }) => {
   await page.goto("/");
-  // With 5 posts < 10 initial items, all are rendered and end marker shows
-  await expect(page.getByLabel("End of list")).toBeVisible();
+  await expect(page.locator(".post-title").first()).toBeVisible();
 });
 
-test("homepage tag filter hides non-matching posts", async ({ page }) => {
+test("homepage tag filter collapses grid to flat list", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: /\/\s*technical/i }).click();
-  // "Hello World" is RANTS tag — should be hidden
-  await expect(
-    page.locator(".feed-title").filter({ hasText: "Hello World" })
-  ).not.toBeVisible();
+  await expect(page.locator(".featured-card")).toBeVisible();
+  // click first non-"all" tag filter button
+  const tagBtn = page.locator("nav#tag-filters .tag-btn").filter({ hasText: /\// }).first();
+  await tagBtn.click();
+  await expect(page.locator(".featured-card")).not.toBeVisible();
+  await expect(page.locator(".post-title").first()).toBeVisible();
 });
 
-test("homepage tag filter all button restores posts", async ({ page }) => {
+test("homepage all filter restores grid", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: /\/\s*technical/i }).click();
+  const tagBtn = page.locator("nav#tag-filters .tag-btn").filter({ hasText: /\// }).first();
+  await tagBtn.click();
   await page.getByRole("button", { name: /^all$/i }).click();
-  await expect(
-    page.locator(".feed-title").filter({ hasText: "Hello World" })
-  ).toBeVisible();
+  await expect(page.locator(".featured-card")).toBeVisible();
+});
+
+test("homepage sort toggle collapses grid to flat list", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".featured-card")).toBeVisible();
+  await page.getByRole("button", { name: /latest blab|oldest blab/i }).click();
+  await expect(page.locator(".featured-card")).not.toBeVisible();
 });
