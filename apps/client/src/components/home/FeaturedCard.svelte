@@ -34,6 +34,7 @@
   let clapCount = $state(claps);
   let hasClapped = $state(false);
   let clapLoading = $state(true);
+  let clapPending = $state(false);
   let burst = $state(false);
   let showPlus = $state(false);
   let burstTimer: ReturnType<typeof setTimeout> | undefined;
@@ -64,7 +65,7 @@
   async function toggleClap(e: MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (clapLoading) return;
+    if (clapLoading || clapPending) return;
     const optimisticHasClapped = !hasClapped;
     clapCount = hasClapped ? clapCount - 1 : clapCount + 1;
     hasClapped = optimisticHasClapped;
@@ -76,6 +77,7 @@
       clearTimeout(plusTimer);
       plusTimer = setTimeout(() => (showPlus = false), 700);
     }
+    clapPending = true;
     try {
       const res = await fetch(`/api/claps/${slug}`, { method: "POST" });
       if (!res.ok) throw new Error();
@@ -85,6 +87,8 @@
     } catch {
       clapCount = hasClapped ? clapCount - 1 : clapCount + 1;
       hasClapped = !hasClapped;
+    } finally {
+      clapPending = false;
     }
   }
 </script>
@@ -130,7 +134,7 @@
           viewBox="0 0 24 24"
           fill="none"
           aria-hidden="true"
-          style="display:inline-block;vertical-align:middle;margin-right:2px"
+          class="stat-icon"
         >
           <path
             d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
@@ -182,7 +186,7 @@
           viewBox="0 0 24 24"
           fill="none"
           aria-hidden="true"
-          style="display:inline-block;vertical-align:middle;margin-right:3px"
+          class="stat-icon"
         >
           <path
             d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
@@ -206,7 +210,8 @@
 <style>
   /* ─── Card shell ──────────────────────────────────────────────── */
   .featured-card {
-    background: #1a1008;
+    --featured-bg: #1a1008;
+    background: var(--featured-bg);
     border-radius: 8px;
     padding: 24px;
     min-height: 280px;
@@ -236,7 +241,6 @@
     position: absolute;
     inset: 0;
     z-index: 0;
-    border-radius: 8px;
   }
 
   /* ─── Top badges ──────────────────────────────────────────────── */
@@ -327,6 +331,12 @@
   .stat {
     font-size: 0.65rem;
     color: rgba(255, 255, 255, 0.35);
+  }
+
+  .stat-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 2px;
   }
 
   /* ─── Action row ──────────────────────────────────────────────── */
