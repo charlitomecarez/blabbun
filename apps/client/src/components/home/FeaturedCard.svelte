@@ -66,6 +66,7 @@
     e.preventDefault();
     e.stopPropagation();
     if (clapLoading || clapPending) return;
+    clapPending = true;
     const optimisticHasClapped = !hasClapped;
     clapCount = hasClapped ? clapCount - 1 : clapCount + 1;
     hasClapped = optimisticHasClapped;
@@ -77,7 +78,6 @@
       clearTimeout(plusTimer);
       plusTimer = setTimeout(() => (showPlus = false), 700);
     }
-    clapPending = true;
     try {
       const res = await fetch(`/api/claps/${slug}`, { method: "POST" });
       if (!res.ok) throw new Error();
@@ -94,9 +94,6 @@
 </script>
 
 <article class="featured-card">
-  <!-- Stretched link — makes the whole card clickable -->
-  <a {href} class="card-link" aria-label={title} tabindex="-1"></a>
-
   <!-- Top badges row -->
   <div class="badges-row">
     <span class="latest-badge">🚀 LATEST</span>
@@ -113,8 +110,10 @@
     <span class="post-date">{date}</span>
   </div>
 
-  <!-- Title -->
-  <h2 class="post-title">{title}</h2>
+  <!-- Title — the ::after stretched link makes the whole card clickable -->
+  <a {href} class="title-link" aria-label={title}>
+    <h2 class="post-title">{title}</h2>
+  </a>
 
   <!-- Excerpt -->
   {#if excerpt}
@@ -236,10 +235,17 @@
     z-index: 0;
   }
 
-  /* ─── Stretched link ──────────────────────────────────────────── */
-  .card-link {
+  /* ─── Title link + stretched overlay ────────────────────────── */
+  .title-link {
+    text-decoration: none;
+    position: relative;
+    z-index: 1;
+  }
+
+  .title-link::after {
+    content: "";
     position: absolute;
-    inset: 0;
+    inset: -9999px;
     z-index: 0;
   }
 

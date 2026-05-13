@@ -45,6 +45,7 @@
   let clapLoading = $state(true);
   let burst = $state(false);
   let showPlus = $state(false);
+  let clapPending = $state(false);
   let burstTimer: ReturnType<typeof setTimeout> | undefined;
   let plusTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -99,7 +100,8 @@
   async function toggleClap(e: MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (clapLoading) return;
+    if (clapLoading || clapPending) return;
+    clapPending = true;
     const optimisticCount = hasClapped ? clapCount - 1 : clapCount + 1;
     const optimisticHasClapped = !hasClapped;
     clapCount = optimisticCount;
@@ -122,6 +124,8 @@
       // revert optimistic update — hasClapped is already the new value, so inverse it
       clapCount = hasClapped ? clapCount - 1 : clapCount + 1;
       hasClapped = !hasClapped;
+    } finally {
+      clapPending = false;
     }
   }
 </script>

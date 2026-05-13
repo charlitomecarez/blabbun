@@ -104,7 +104,7 @@
 
 {#if isGridView && featuredPost}
   <section class="grid-section" aria-label="Featured posts">
-    <div class="featured-grid">
+    <div class="featured-grid" class:solo={sidebarPosts.length === 0}>
       <FeaturedCard
         date={featuredPost.date}
         title={featuredPost.title}
@@ -134,7 +134,7 @@
     </div>
     <section class="listing-section" aria-label="More posts">
       {#each visibleListing as item, i}
-        <PostCard {...item} index={i} />
+        <PostCard {...item} index={i} isLatest={false} />
       {/each}
     </section>
   {/if}
@@ -230,6 +230,10 @@
     grid-template-columns: 1.5fr 1fr;
     gap: 12px;
     align-items: start;
+  }
+
+  .featured-grid.solo {
+    grid-template-columns: 1fr;
   }
 
   .sidebar-col {
