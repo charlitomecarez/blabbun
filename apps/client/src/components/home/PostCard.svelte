@@ -635,6 +635,15 @@
     display: none;
   }
 
+  .post-card.compact .post-excerpt {
+    display: none;
+  }
+
+  .post-card.compact .post-title {
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+
   @media (max-width: 640px) {
     .post-card.compact {
       margin-left: 0;
