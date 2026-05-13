@@ -618,6 +618,7 @@
     padding: 10px 12px;
     border-bottom: none;
     margin-bottom: 0;
+    transform: none !important;
   }
 
   .post-card.compact .this-one {
