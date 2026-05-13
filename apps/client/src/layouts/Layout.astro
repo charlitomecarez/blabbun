@@ -18,6 +18,7 @@ interface Props {
   articleTags?: string[];
   readTime?: string;
   keywords?: string[];
+  noindex?: boolean;
 }
 
 const {
@@ -30,7 +31,12 @@ const {
   articleTags,
   readTime,
   keywords,
+  noindex = false,
 } = Astro.props;
+
+// Fall back to the site logo so non-article pages still get a social card.
+const resolvedOgImage = ogImage ?? "/blabbun.png";
+const isFallbackOgImage = !ogImage;
 
 const siteTitle = "Blab Bun";
 const pageTitle = rawTitle ? `${rawTitle} · ${siteTitle}` : siteTitle;
@@ -119,6 +125,7 @@ const isLive = getAppEnv(getRuntimeEnv(Astro.locals)) === "live";
         : "blabbun, blab bun, personal blog, writing, thoughts, essays"}
     />
     <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="me" href="https://twitter.com/blabbun" />
     <link rel="me" href="https://x.com/blabbun" />
 
@@ -129,21 +136,23 @@ const isLive = getAppEnv(getRuntimeEnv(Astro.locals)) === "live";
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
+    <meta
+      property="og:image"
+      content={
+        resolvedOgImage.startsWith("http")
+          ? resolvedOgImage
+          : `${siteUrl}${resolvedOgImage}`
+      }
+    />
     {
-      ogImage && (
+      !isFallbackOgImage && (
         <>
-          <meta
-            property="og:image"
-            content={
-              ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`
-            }
-          />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
-          <meta property="og:image:alt" content={pageTitle} />
         </>
       )
     }
+    <meta property="og:image:alt" content={pageTitle} />
 
     <!-- Article-specific Open Graph -->
     {
@@ -184,25 +193,21 @@ const isLive = getAppEnv(getRuntimeEnv(Astro.locals)) === "live";
     <!-- Twitter card -->
     <meta
       name="twitter:card"
-      content={ogImage ? "summary_large_image" : "summary"}
+      content={isFallbackOgImage ? "summary" : "summary_large_image"}
     />
     <meta name="twitter:site" content="@blabbun" />
     <meta name="twitter:creator" content="@blabbun" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
-    {
-      ogImage && (
-        <>
-          <meta
-            name="twitter:image"
-            content={
-              ogImage.startsWith("http") ? ogImage : `${siteUrl}${ogImage}`
-            }
-          />
-          <meta name="twitter:image:alt" content={pageTitle} />
-        </>
-      )
-    }
+    <meta
+      name="twitter:image"
+      content={
+        resolvedOgImage.startsWith("http")
+          ? resolvedOgImage
+          : `${siteUrl}${resolvedOgImage}`
+      }
+    />
+    <meta name="twitter:image:alt" content={pageTitle} />
     {readTime && <meta name="twitter:label1" content="Reading time" />}
     {readTime && <meta name="twitter:data1" content={readTime} />}
     {pubDate && <meta name="twitter:label2" content="Published" />}
