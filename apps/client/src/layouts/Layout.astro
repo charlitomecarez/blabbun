@@ -17,7 +17,6 @@ interface Props {
   updatedDate?: Date;
   articleTags?: string[];
   readTime?: string;
-  keywords?: string[];
   noindex?: boolean;
 }
 
@@ -30,7 +29,6 @@ const {
   updatedDate,
   articleTags,
   readTime,
-  keywords,
   noindex = false,
 } = Astro.props;
 
@@ -70,7 +68,7 @@ const isLive = getAppEnv(getRuntimeEnv(Astro.locals)) === "live";
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en-US">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -118,12 +116,6 @@ const isLive = getAppEnv(getRuntimeEnv(Astro.locals)) === "live";
 
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <meta
-      name="keywords"
-      content={keywords && keywords.length > 0
-        ? [...keywords, "blabbun", "blab bun", "personal blog"].join(", ")
-        : "blabbun, blab bun, personal blog, writing, thoughts, essays"}
-    />
     <link rel="canonical" href={canonicalUrl} />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="me" href="https://twitter.com/blabbun" />

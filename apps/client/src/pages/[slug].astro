@@ -135,7 +135,6 @@ const breadcrumbLd = {
   updatedDate={post.data.updatedDate}
   articleTags={post.data.tags ?? []}
   readTime={postReadTime}
-  keywords={post.data.tags ?? []}
 >
   <Fragment slot="head">
     {
@@ -189,7 +188,7 @@ const breadcrumbLd = {
           <div style="margin-bottom:24px">
             <img
               src={post.data.image}
-              alt={post.data.title}
+              alt=""
               width="616"
               height="280"
               loading="eager"
