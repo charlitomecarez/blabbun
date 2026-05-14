@@ -12,11 +12,18 @@
   let cooldownMs = $state(0);
   let done = $state(false);
   let scrollVisible = $state(false);
+  let subCount = $state<number | null>(null);
 
   onMount(() => {
     const onScroll = () => (scrollVisible = window.scrollY > 300);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
+    fetch("/api/newsletter")
+      .then((r) => r.json() as Promise<{ count?: number }>)
+      .then((d) => {
+        if (typeof d?.count === "number") subCount = d.count;
+      })
+      .catch(() => {});
     return () => window.removeEventListener("scroll", onScroll);
   });
 
@@ -104,7 +111,11 @@
   {#if done}
     <p class="nl-done">{info} ✶</p>
   {:else}
-    <p class="nl-sub">new posts, straight to your inbox.</p>
+    <p class="nl-sub">
+      an email when something new drops.{#if subCount !== null}
+        <span class="nl-count"> · {subCount} subscribed</span>
+      {/if}
+    </p>
 
     {#if err}
       <p class="nl-err" role="alert">! {err}</p>
@@ -233,6 +244,9 @@
     color: var(--muted);
     line-height: 1.6;
     margin-bottom: 12px;
+  }
+  .nl-count {
+    color: var(--muted2);
   }
 
   .nl-err {

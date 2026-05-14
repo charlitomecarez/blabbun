@@ -21,12 +21,18 @@
 
   const filtered = $derived.by(() => {
     if (!q) return [];
+    const qCompact = q.replace(/\s+/g, "");
     return posts
       .filter((p) => {
         const haystack = toLower(
           join([p.title, p.description, ...p.tags], " ")
         );
-        return haystack.includes(q);
+        // Also match against a whitespace-stripped version so queries like
+        // "blabbun" hit titles/content containing "Blab Bun".
+        return (
+          haystack.includes(q) ||
+          haystack.replace(/\s+/g, "").includes(qCompact)
+        );
       })
       .slice(0, 6);
   });

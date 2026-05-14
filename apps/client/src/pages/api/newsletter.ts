@@ -26,6 +26,23 @@ function parseEmails(raw: string | string[]): string[] {
     .filter(Boolean);
 }
 
+export const GET: APIRoute = async ({ locals }) => {
+  const env = getRuntimeEnv(locals);
+  const appEnv = getAppEnv(env);
+  const supabase = getSupabaseClient(
+    env.SUPABASE_URL ?? import.meta.env.SUPABASE_URL,
+    env.SUPABASE_SERVICE_ROLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+
+  const { count, error } = await supabase
+    .from("subscribers")
+    .select("*", { count: "exact", head: true })
+    .eq("env", appEnv);
+
+  if (error) return jsonResponse({ count: 0 }, 200);
+  return jsonResponse({ count: count ?? 0 }, 200);
+};
+
 export const POST: APIRoute = async ({ request, locals }) => {
   const body = (await request.json()) as { email?: string | string[] };
 
