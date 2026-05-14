@@ -44,9 +44,9 @@ body.light {
   --bg: #fdf9f4;
   --bg2: #f5ede0;
   --bg3: #ede0ce;
-  --text: #6b4a35;
-  --muted: #9c8b78;
-  --muted2: #c5b8a8;
+  --text: #5a3d2b;
+  --muted: #6e5b46;
+  --muted2: #8a7860;
   --accent: #c4832a;
   --accent-soft: #faebd7;
   --accent2: #c0463a;
@@ -66,8 +66,8 @@ body.dark {
   --bg2: #1f1a14;
   --bg3: #261f17;
   --text: #f0e0c8;
-  --muted: #7a6e60;
-  --muted2: #4a4038;
+  --muted: #b0a18a;
+  --muted2: #897c6a;
   --accent: #d4a040;
   --accent-soft: #2a1e0a;
   --accent2: #d96a5a;

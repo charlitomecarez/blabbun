@@ -110,7 +110,7 @@ const isLive = getAppEnv(getRuntimeEnv(Astro.locals)) === "live";
       }
       html[data-theme-loading="light"] {
         background: #fdf9f4;
-        color: #6b4a35;
+        color: #5a3d2b;
       }
     </style>
 
@@ -130,11 +130,9 @@ const isLive = getAppEnv(getRuntimeEnv(Astro.locals)) === "live";
     <meta property="og:url" content={canonicalUrl} />
     <meta
       property="og:image"
-      content={
-        resolvedOgImage.startsWith("http")
-          ? resolvedOgImage
-          : `${siteUrl}${resolvedOgImage}`
-      }
+      content={resolvedOgImage.startsWith("http")
+        ? resolvedOgImage
+        : `${siteUrl}${resolvedOgImage}`}
     />
     {
       !isFallbackOgImage && (
@@ -193,11 +191,9 @@ const isLive = getAppEnv(getRuntimeEnv(Astro.locals)) === "live";
     <meta name="twitter:description" content={description} />
     <meta
       name="twitter:image"
-      content={
-        resolvedOgImage.startsWith("http")
-          ? resolvedOgImage
-          : `${siteUrl}${resolvedOgImage}`
-      }
+      content={resolvedOgImage.startsWith("http")
+        ? resolvedOgImage
+        : `${siteUrl}${resolvedOgImage}`}
     />
     <meta name="twitter:image:alt" content={pageTitle} />
     {readTime && <meta name="twitter:label1" content="Reading time" />}
