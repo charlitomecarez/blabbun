@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /search.json
+Disallow: /saved
+Disallow: /unsubscribe
 
 Sitemap: https://blabbun.com/sitemap.xml
