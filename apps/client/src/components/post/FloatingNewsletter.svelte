@@ -13,6 +13,7 @@
   let submitting = $state(false);
   let cooldownMs = $state(0);
   let succeeded = $state(false);
+  let subCount = $state<number | null>(null);
 
   let cooldownTimer: ReturnType<typeof setTimeout> | undefined;
   let autoDismissTimer: ReturnType<typeof setTimeout> | undefined;
@@ -32,6 +33,13 @@
     }
 
     refreshCooldown();
+
+    fetch("/api/newsletter")
+      .then((r) => r.json() as Promise<{ count?: number }>)
+      .then((d) => {
+        if (typeof d?.count === "number") subCount = d.count;
+      })
+      .catch(() => {});
 
     function onScroll() {
       const scrollable =
@@ -131,7 +139,11 @@
   >
     <button class="fn-close" onclick={dismiss} aria-label="dismiss">×</button>
     <div class="fn-title">stay in the loop</div>
-    <div class="fn-sub">new posts, straight to your inbox.</div>
+    <div class="fn-sub">
+      an email when something new drops.{#if subCount !== null}
+        <span class="fn-count"> · {subCount} subscribed</span>
+      {/if}
+    </div>
     {#if succeeded}
       <div class="fn-info">{info}</div>
     {:else}
@@ -263,6 +275,9 @@
     color: var(--muted);
     line-height: 1.55;
     margin-bottom: 14px;
+  }
+  .fn-count {
+    color: var(--muted2);
   }
 
   .fn-form {

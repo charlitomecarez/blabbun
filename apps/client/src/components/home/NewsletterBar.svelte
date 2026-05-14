@@ -8,9 +8,16 @@
   let submitting = $state(false);
   let cooldownMs = $state(0);
   let done = $state(false);
+  let subCount = $state<number | null>(null);
 
   $effect(() => {
     tick();
+    fetch("/api/newsletter")
+      .then((r) => r.json() as Promise<{ count?: number }>)
+      .then((d) => {
+        if (typeof d?.count === "number") subCount = d.count;
+      })
+      .catch(() => {});
   });
 
   function tick() {
@@ -124,8 +131,9 @@
       get new posts in your inbox
     </h2>
     <p class="newsletter-sub">
-      no schedule. no newsletter-newsletter. just an email when something new
-      drops. separate multiple addresses with a comma.
+      an email when something new drops.{#if subCount !== null}
+        <span class="sub-count"> · {subCount} subscribed</span>
+      {/if}
     </p>
 
     {#if err}
@@ -201,6 +209,9 @@
     color: var(--muted);
     margin-bottom: 16px;
     line-height: 1.65;
+  }
+  .sub-count {
+    color: var(--muted2);
   }
 
   .form-error {

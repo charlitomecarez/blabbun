@@ -417,6 +417,11 @@
     line-height: 1.7;
     text-wrap: pretty;
     margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   /* ─── Bottom meta ─────────────────────────────────────────────── */
