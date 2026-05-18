@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { tagSlug } from "@blabbun/utils";
 import { getCollection } from "astro:content";
 
 export const prerender = true;
@@ -54,7 +55,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   const tagEntries = [...tagLatest.entries()].map(([tag, date]) => {
     const lastmod = date.toISOString().split("T")[0];
-    return `  <url><loc>${siteUrl}/topics/${encodeURIComponent(tag)}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>`;
+    return `  <url><loc>${siteUrl}/topics/${tagSlug(tag)}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>`;
   });
 
   const entries = [
