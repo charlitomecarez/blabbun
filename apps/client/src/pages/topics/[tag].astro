@@ -1,9 +1,13 @@
 ---
-import { tagToLabel } from "@blabbun/utils";
+import { tagSlug, tagToLabel } from "@blabbun/utils";
 import { getCollection } from "astro:content";
 
 import ArchiveList from "@/components/archive/ArchiveList.svelte";
 import Layout from "@/layouts/Layout.astro";
+
+interface Props {
+  rawTag: string;
+}
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts", ({ data }) => !data.draft);
@@ -12,18 +16,17 @@ export async function getStaticPaths() {
       posts.flatMap((p) => p.data.tags ?? []).map((t) => t.toUpperCase())
     ),
   ];
-  return tags.map((tag) => ({ params: { tag } }));
+  return tags.map((tag) => ({ params: { tag: tagSlug(tag) }, props: { rawTag: tag } }));
 }
 
-const { tag: rawTag } = Astro.params;
-const tag = rawTag || "";
+const { rawTag } = Astro.props;
 
 const allPosts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
 const tagPosts = allPosts.filter((p) =>
-  p.data.tags?.map((t) => t.toUpperCase()).includes(tag || "")
+  p.data.tags?.map((t) => t.toUpperCase()).includes(rawTag)
 );
 
 const postItems = tagPosts.map((post) => ({
@@ -44,7 +47,7 @@ const postItems = tagPosts.map((post) => ({
   imageUrl: post.data.image,
 }));
 
-const label = tagToLabel(tag);
+const label = tagToLabel(rawTag);
 ---
 
 <Layout
@@ -90,7 +93,7 @@ const label = tagToLabel(tag);
             border-radius:3px;padding:3px 8px;
           "
         >
-          {tag}
+          {rawTag}
         </span>
       </div>
 
@@ -103,6 +106,6 @@ const label = tagToLabel(tag);
       </p>
     </div>
 
-    <ArchiveList posts={postItems} tags={[]} lockedTag={tag} client:load />
+    <ArchiveList posts={postItems} tags={[]} lockedTag={rawTag} client:load />
   </main>
 </Layout>

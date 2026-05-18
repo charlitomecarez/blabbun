@@ -3,3 +3,10 @@
 #   Request URL matches: https://www.blabbun.com/*
 #   Redirect to: https://blabbun.com/${1}
 #   Type: 301 Permanent
+
+# Topic URL migrations: old uppercase/space paths → new lowercase slugs
+/topics/ANIME /topics/anime 301
+/topics/PERSONAL /topics/personal 301
+/topics/RANTS /topics/rants 301
+/topics/LIFE%20STUFF /topics/life-stuff 301
+/topics/life%20stuff /topics/life-stuff 301

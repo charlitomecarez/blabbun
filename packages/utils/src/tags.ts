@@ -1,3 +1,8 @@
+/** Converts an uppercase tag key to a URL-safe slug. "LIFE STUFF" → "life-stuff". */
+export function tagSlug(tag: string): string {
+  return tag.toLowerCase().replace(/\s+/g, "-");
+}
+
 /**
  * Converts an uppercased tag slug (e.g. "DEEP-WORK") to a human-readable label ("Deep-Work").
  * Each word and hyphen-separated part is title-cased independently.

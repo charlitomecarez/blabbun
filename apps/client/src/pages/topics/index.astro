@@ -1,5 +1,5 @@
 ---
-import { tagToLabel } from "@blabbun/utils";
+import { tagSlug, tagToLabel } from "@blabbun/utils";
 import { getCollection } from "astro:content";
 
 import Layout from "@/layouts/Layout.astro";
@@ -19,7 +19,7 @@ const topics = [...tagMap.entries()]
   .map(([tag, count]) => ({
     tag,
     count,
-    slug: tag.toLowerCase(),
+    slug: tagSlug(tag),
     label: tagToLabel(tag),
   }));
 ---
